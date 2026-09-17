@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dani R | Media & Blog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff77bc;
+            --secondary: #00ffff;
+            --accent: #b55fe6;
+            --gold: #ffd700;
+            --silver: #e0e0e0;
+            --bg-color: #0a0812;
+            --card-bg: rgba(20, 15, 30, 0.55);
+            --text: #ffffff;
+            --badge-bg: #ff3e3e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas#bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Encabezado */
+        header {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem 1.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.2rem;
+            background: rgba(255, 119, 188, 0.1);
+            border: 1px solid var(--primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        h1.title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--accent);
+        }
+
+        /* Contenedor Principal de Secciones (5 Cuadros) */
+        .categories-grid {
+            width: 90%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+            padding-bottom: 3rem;
+        }
+
+        /* Tarjeta de Categoría Individual */
+        .category-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 119, 188, 0.3);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            text-decoration: none;
+            position: relative;
+        }
+
+        .category-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        }
+
+        /* Estilo Especial para Tarjeta Suscripciones */
+        .category-card.vip-card {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: rgba(30, 22, 15, 0.6);
+        }
+
+        .category-card.vip-card:hover {
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .category-preview {
+            width: 100%;
+            height: 200px;
+            background: rgba(10, 8, 18, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 119, 188, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-preview img, 
+        .category-preview video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .category-card:hover .category-preview img,
+        .category-card:hover .category-preview video {
+            transform: scale(1.08);
+        }
+
+        .category-icon {
+            font-size: 3.2rem;
+            filter: drop-shadow(0 0 10px var(--primary));
+        }
+
+        .vip-card .category-icon {
+            filter: drop-shadow(0 0 12px var(--gold));
+        }
+
+        .category-info {
+            padding: 1.2rem;
+            text-align: center;
+        }
+
+        .category-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+        }
+
+        .vip-card .category-title {
+            color: var(--gold);
+            text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+        }
+
+        .category-desc {
+            font-size: 0.78rem;
+            color: #a080b0;
+        }
+
+        /* Vista Interna de Galería */
+        .subgallery-container {
+            display: none;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 2rem;
+            padding-bottom: 3rem;
+        }
+
+        .subgallery-container.active {
+            display: block;
+        }
+
+        .subgallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Toggle de Descuento de Suscripciones */
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            width: 100%;
+        }
+
+        .toggle-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            background: rgba(20, 15, 30, 0.8);
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333344;
+            transition: .3s;
+            border-radius: 30px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        /* Grid Especial para las Suscripciones (Centrado y máximo 2 columnas) */
+        .subscriptions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 420px));
+            gap: 2.5rem;
+            justify-content: center;
+            align-items: stretch;
+        }
+
+        .media-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 119, 188, 0.25);
+            border-radius: 18px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 290px;
+            position: relative;
+        }
+
+        .media-item:hover {
+            border-color: var(--secondary);
+            transform: translateY(-4px);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+        }
+
+        /* TARJETAS DE SUSCRIPCIÓN CON ESTILO VIP Y CORONAS */
+        .subscription-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.6);
+        }
+
+        .subscription-card.plata {
+            border: 1px solid rgba(220, 220, 220, 0.4);
+        }
+
+        .subscription-card.plata:hover {
+            border-color: #ffffff;
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 35px rgba(220, 220, 220, 0.4);
+        }
+
+        .subscription-card.diamante {
+            border: 1px solid rgba(0, 255, 255, 0.5);
+            background: rgba(15, 25, 45, 0.7);
+        }
+
+        .subscription-card.diamante:hover {
+            border-color: var(--secondary);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+        }
+
+        .subscription-preview {
+            width: 100%;
+            height: 220px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(10, 8, 18, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .subscription-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .subscription-card:hover .subscription-preview img {
+            transform: scale(1.06);
+        }
+
+        /* Ícono de Corona Central Flotante */
+        .subscription-crown-icon {
+            position: absolute;
+            font-size: 4.5rem;
+            z-index: 2;
+            transition: transform 0.4s ease;
+            pointer-events: none;
+        }
+
+        .plata .subscription-crown-icon {
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 30px rgba(192, 192, 192, 0.5));
+        }
+
+        .diamante .subscription-crown-icon {
+            filter: drop-shadow(0 0 15px var(--gold)) drop-shadow(0 0 30px rgba(0, 255, 255, 0.8));
+        }
+
+        .subscription-card:hover .subscription-crown-icon {
+            transform: scale(1.18) rotate(5deg);
+        }
+
+        /* Insignia / Badge Superior */
+        .subscription-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+            z-index: 3;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .plata .subscription-badge {
+            background: rgba(220, 220, 220, 0.25);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .diamante .subscription-badge {
+            background: rgba(0, 255, 255, 0.25);
+            color: var(--secondary);
+            border: 1px solid var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+        }
+
+        .promo-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--badge-bg);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            z-index: 3;
+            box-shadow: 0 0 10px rgba(255, 62, 62, 0.5);
+        }
+
+        .subscription-info {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.6rem;
+        }
+
+        .subscription-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plata .subscription-title {
+            color: #ffffff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .diamante .subscription-title {
+            color: var(--secondary);
+            text-shadow: 0 0 12px rgba(0, 255, 255, 0.6);
+        }
+
+        .price-box { margin: 10px 0; }
+        .price { font-size: 2.5rem; font-weight: bold; font-family: 'Orbitron', sans-serif; line-height: 1; }
+        .original-price {
+            font-size: 1.1rem;
+            color: #a080b0;
+            text-decoration: line-through;
+            margin-left: 8px;
+        }
+        .period { color: #a080b0; font-size: 0.8rem; margin-top: 5px; }
+
+        .subscription-desc {
+            font-size: 0.85rem;
+            color: #b0a0cc;
+            line-height: 1.4;
+        }
+
+        .media-item img, 
+        .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .media-item-title {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background: linear-gradient(0deg, rgba(10,8,18,0.9) 0%, transparent 100%);
+            font-size: 0.85rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Tarjetas de Audios */
+        .audio-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .audio-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 119, 188, 0.3);
+            border-radius: 18px;
+            padding: 1.2rem;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .audio-card:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+
+        .audio-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .audio-icon {
+            font-size: 1.8rem;
+        }
+
+        .audio-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.95rem;
+            color: #fff;
+        }
+
+        audio {
+            width: 100%;
+            height: 40px;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        /* Blog Section Layout */
+        .blog-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .blog-entry {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 119, 188, 0.3);
+            border-radius: 18px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .blog-date {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .blog-entry-title {
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 0.8rem;
+        }
+
+        .blog-text {
+            font-size: 0.9rem;
+            color: #d0c0e0;
+            line-height: 1.6;
+        }
+
+        /* Lightbox Modal */
+        .media-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 8, 18, 0.94);
+            backdrop-filter: blur(15px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .media-modal.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content-container {
+            max-width: 85vw;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .modal-content-container img,
+        .modal-content-container video {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 119, 188, 0.4);
+            box-shadow: 0 0 35px rgba(255, 119, 188, 0.25);
+            object-fit: contain;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 25px;
+            right: 35px;
+            color: var(--primary);
+            font-size: 40px;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            z-index: 10001;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+
+        .modal-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(20, 15, 30, 0.7);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10001;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+            user-select: none;
+        }
+
+        .modal-nav-btn:hover {
+            background: var(--primary);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .modal-nav-prev { left: 25px; }
+        .modal-nav-next { right: 25px; }
+
+        @media (max-width: 768px) {
+            .modal-nav-prev { left: 10px; }
+            .modal-nav-next { right: 10px; }
+            .modal-nav-btn { width: 40px; height: 40px; font-size: 1.3rem; }
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            font-size: 0.75rem;
+            color: #a080b0;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <header>
+        <button id="nav-back-btn" class="back-btn" onclick="handleBackNav()">← VOLVER</button>
+        <h1 class="title" id="page-title">DANI R</h1>
+    </header>
+
+    <!-- MENÚ PRINCIPAL: 5 CUADROS -->
+    <main id="main-categories" class="categories-grid">
+        
+        <!-- Cuadro 1: Blog de Diarios -->
+        <article class="category-card" onclick="openSection('diarios')">
+            <div class="category-preview">
+                <span class="category-icon">📖</span>
+            </div>
+            <div class="category-info">
+                <h2 class="category-title">DIARIOS</h2>
+                <p class="category-desc">Pensamientos y vivencias</p>
+            </div>
+        </article>
+
+        <!-- Cuadro 2: Fotos -->
+        <article class="category-card" onclick="openSection('fotos')">
+            <div class="category-preview">
+                <img src="fotos/1.jpg" alt="Fotos Dani R" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span class="category-icon" style="display:none;">📷</span>
+            </div>
+            <div class="category-info">
+                <h2 class="category-title">FOTOS</h2>
+                <p class="category-desc">Galería fotográfica</p>
+            </div>
+        </article>
+
+        <!-- Cuadro 3: Videos -->
+        <article class="category-card" onclick="openSection('videos')">
+            <div class="category-preview">
+                <video src="videos/1.mp4" muted preload="metadata"></video>
+            </div>
+            <div class="category-info">
+                <h2 class="category-title">VIDEOS</h2>
+                <p class="category-desc">Clips y momentos</p>
+            </div>
+        </article>
+
+        <!-- Cuadro 4: Audios / Notas de Voz -->
+        <article class="category-card" onclick="openSection('audios')">
+            <div class="category-preview">
+                <span class="category-icon">🎙️</span>
+            </div>
+            <div class="category-info">
+                <h2 class="category-title">NOTAS DE VOZ</h2>
+                <p class="category-desc">Audios e historias</p>
+            </div>
+        </article>
+
+        <!-- Cuadro 5: Suscripciones -->
+        <article class="category-card vip-card" onclick="openSection('suscripciones')">
+            <div class="category-preview">
+                <span class="category-icon">👑</span>
+            </div>
+            <div class="category-info">
+                <h2 class="category-title">SUSCRIPCIONES</h2>
+                <p class="category-desc">Planes y contenido exclusivo</p>
+            </div>
+        </article>
+
+    </main>
+
+    <!-- VISTA INTERNA 1: BLOG DE DIARIOS -->
+    <section id="section-diarios" class="subgallery-container">
+        <div class="blog-list">
+            <article class="blog-entry">
+                <div class="blog-date">12 DE JULIO, 2025</div>
+                <h3 class="blog-entry-title">Un nuevo comienzo en el set ✨</h3>
+                <p class="blog-text">Hoy estuve organizando el espacio para las grabaciones. Coloqué las luces LED azul y púrpura detrás del tocador y realmente le dan un ambiente súper cozy a la habitación...</p>
+            </article>
+            <article class="blog-entry">
+                <div class="blog-date">05 DE JULIO, 2025</div>
+                <h3 class="blog-entry-title">Tarde tranquila con Shadow 🐾</h3>
+                <p class="blog-text">Shadow estuvo acompañándome todo el día mientras preparaba el contenido. Nada como trabajar relajada en casa con una taza de café y buena música de fondo.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- VISTA INTERNA 2: CARPETA FOTOS (1 A 10 JPG) -->
+    <section id="section-fotos" class="subgallery-container">
+        <div class="subgallery-grid">
+            <script>
+                for(let i=1; i<=10; i++){
+                    document.write(`
+                        <div class="media-item" onclick="openMediaModal(${i-1}, 'image')">
+                            <img src="fotos/${i}.jpg" alt="Foto ${i}">
+                            <div class="media-item-title">Foto ${i}</div>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- VISTA INTERNA 3: CARPETA VIDEOS (1 A 10 MP4) -->
+    <section id="section-videos" class="subgallery-container">
+        <div class="subgallery-grid">
+            <script>
+                for(let i=1; i<=10; i++){
+                    document.write(`
+                        <div class="media-item" onclick="openMediaModal(${i-1}, 'video')">
+                            <video src="videos/${i}.mp4" muted preload="metadata"></video>
+                            <div class="media-item-title">Video ${i}</div>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- VISTA INTERNA 4: AUDIOS / NOTAS DE VOZ (1 A 10 MP3) -->
+    <section id="section-audios" class="subgallery-container">
+        <div class="audio-list">
+            <script>
+                for(let i=1; i<=10; i++){
+                    document.write(`
+                        <div class="audio-card">
+                            <div class="audio-info">
+                                <span class="audio-icon">🎧</span>
+                                <span class="audio-title">Nota de Voz ${i}</span>
+                            </div>
+                            <audio controls src="audios/${i}.mp3" preload="metadata" onplay="stopOtherAudios(this)"></audio>
+                        </div>
+                    `);
+                }
+            </script>
+        </div>
+    </section>
+
+    <!-- VISTA INTERNA 5: SUSCRIPCIONES (CON CORONAS Y DETALLES VIP) -->
+    <section id="section-suscripciones" class="subgallery-container">
+        
+        <div class="pricing-header">
+            <div class="toggle-container">
+                <span>Precio regular</span>
+                <label class="switch">
+                    <input type="checkbox" id="promoToggle" onchange="togglePromo()">
+                    <span class="slider"></span>
+                </label>
+                <span style="font-weight: bold; color: var(--secondary);">Oferta Usuarios Nuevos (50% OFF)</span>
+            </div>
+        </div>
+
+        <div class="subscriptions-grid">
+            
+            <!-- PLAN PLATA -->
+            <article class="subscription-card plata" onclick="openMediaModal(0, 'vip')">
+                <div class="subscription-preview">
+                    <div id="badge-silver" class="promo-badge" style="display: none;">50% OFF</div>
+                    <span class="subscription-badge">🥈 Plata</span>
+                    <span class="subscription-crown-icon">👑</span>
+                    <img src="vip/plata.jpg" alt="Plan Plata" onerror="this.style.opacity='0.25';">
+                </div>
+                <div class="subscription-info">
+                    <h3 class="subscription-title">👑 PLAN PLATA</h3>
+                    <div class="price-box">
+                        <span id="price-silver" class="price">$5.00</span>
+                        <span id="old-price-silver" class="original-price" style="display: none;">$5.00</span>
+                        <span class="price-unit">USD</span>
+                        <div id="period-silver" class="period">Facturación mensual</div>
+                    </div>
+                    <p class="subscription-desc">Acceso a contenido exclusivo, fotos especiales y adelantos de mis publicaciones.</p>
+                </div>
+            </article>
+
+            <!-- PLAN DIAMANTE -->
+            <article class="subscription-card diamante" onclick="openMediaModal(1, 'vip')">
+                <div class="subscription-preview">
+                    <div id="badge-diamond" class="promo-badge" style="display: none;">50% OFF</div>
+                    <span class="subscription-badge">💎 VIP</span>
+                    <span class="subscription-crown-icon">👑</span>
+                    <img src="vip/diamante.jpg" alt="Plan Diamante" onerror="this.style.opacity='0.25';">
+                </div>
+                <div class="subscription-info">
+                    <h3 class="subscription-title">💎 PLAN DIAMANTE</h3>
+                    <div class="price-box">
+                        <span id="price-diamond" class="price">$15.00</span>
+                        <span id="old-price-diamond" class="original-price" style="display: none;">$15.00</span>
+                        <span class="price-unit">USD</span>
+                        <div id="period-diamond" class="period">Facturación mensual</div>
+                    </div>
+                    <p class="subscription-desc">Acceso VIP total, videos exclusivos, notas de voz personalizadas e interacciones prioritarias.</p>
+                </div>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Modal Lightbox Visualizador con Flechas -->
+    <div id="media-modal" class="media-modal" onclick="closeMediaModal(event)">
+        <span class="modal-close" onclick="closeMediaModal(event, true)">&times;</span>
+        <button class="modal-nav-btn modal-nav-prev" onclick="navigateMedia(-1, event)">&#10094;</button>
+        <div class="modal-content-container" onclick="event.stopPropagation()">
+            <div id="modal-media-body"></div>
+        </div>
+        <button class="modal-nav-btn modal-nav-next" onclick="navigateMedia(1, event)">&#10095;</button>
+    </div>
+
+    <footer>
+        <p>© Dani R • Official Media & Blog</p>
+    </footer>
+
+    <script>
+        let activeSection = null;
+        let currentIndex = 0;
+        let currentMediaType = 'image';
+
+        const photosList = Array.from({length: 10}, (_, i) => `fotos/${i + 1}.jpg`);
+        const videosList = Array.from({length: 10}, (_, i) => `videos/${i + 1}.mp4`);
+        const vipList = ['vip/plata.jpg', 'vip/diamante.jpg'];
+
+        function openSection(sectionId) {
+            document.getElementById('main-categories').style.display = 'none';
+            document.querySelectorAll('.subgallery-container').forEach(sec => sec.classList.remove('active'));
+            
+            const target = document.getElementById('section-' + sectionId);
+            if (target) {
+                target.classList.add('active');
+                activeSection = sectionId;
+            }
+
+            const title = document.getElementById('page-title');
+            if (sectionId === 'diarios') title.textContent = 'DIARIOS';
+            if (sectionId === 'fotos') title.textContent = 'FOTOS';
+            if (sectionId === 'videos') title.textContent = 'VIDEOS';
+            if (sectionId === 'audios') title.textContent = 'NOTAS DE VOZ';
+            if (sectionId === 'suscripciones') title.textContent = 'SUSCRIPCIONES';
+        }
+
+        function handleBackNav() {
+            stopAllMediaInModal();
+            if (activeSection) {
+                document.querySelectorAll('.subgallery-container').forEach(sec => sec.classList.remove('active'));
+                document.getElementById('main-categories').style.display = 'grid';
+                document.getElementById('page-title').textContent = 'DANI R';
+                activeSection = null;
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        /* Lógica del conmutador de oferta de descuento */
+        function togglePromo() {
+            const isPromo = document.getElementById('promoToggle').checked;
+
+            const priceSilver = document.getElementById('price-silver');
+            const oldPriceSilver = document.getElementById('old-price-silver');
+            const badgeSilver = document.getElementById('badge-silver');
+            const periodSilver = document.getElementById('period-silver');
+
+            const priceDiamond = document.getElementById('price-diamond');
+            const oldPriceDiamond = document.getElementById('old-price-diamond');
+            const badgeDiamond = document.getElementById('badge-diamond');
+            const periodDiamond = document.getElementById('period-diamond');
+
+            if (isPromo) {
+                priceSilver.innerText = '$2.50';
+                oldPriceSilver.style.display = 'inline';
+                badgeSilver.style.display = 'block';
+                periodSilver.innerText = 'Primer mes ($5.00/mes después)';
+
+                priceDiamond.innerText = '$7.50';
+                oldPriceDiamond.style.display = 'inline';
+                badgeDiamond.style.display = 'block';
+                periodDiamond.innerText = 'Primer mes ($15.00/mes después)';
+            } else {
+                priceSilver.innerText = '$5.00';
+                oldPriceSilver.style.display = 'none';
+                badgeSilver.style.display = 'none';
+                periodSilver.innerText = 'Facturación mensual';
+
+                priceDiamond.innerText = '$15.00';
+                oldPriceDiamond.style.display = 'none';
+                badgeDiamond.style.display = 'none';
+                periodDiamond.innerText = 'Facturación mensual';
+            }
+        }
+
+        /* Modal Lightbox con Navegación y Auto-Pausa */
+        function openMediaModal(index, type) {
+            currentIndex = index;
+            currentMediaType = type;
+            renderModalContent();
+
+            const modal = document.getElementById('media-modal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function stopAllMediaInModal() {
+            const modalBody = document.getElementById('modal-media-body');
+            const video = modalBody.querySelector('video');
+            if (video) {
+                video.pause();
+                video.currentTime = 0;
+                video.src = "";
+            }
+        }
+
+        function stopOtherAudios(currentAudio) {
+            document.querySelectorAll('audio').forEach(audio => {
+                if (audio !== currentAudio) {
+                    audio.pause();
+                }
+            });
+        }
+
+        function getActiveList() {
+            if (currentMediaType === 'image') return photosList;
+            if (currentMediaType === 'video') return videosList;
+            if (currentMediaType === 'vip') return vipList;
+            return photosList;
+        }
+
+        function renderModalContent() {
+            stopAllMediaInModal();
+
+            const modalBody = document.getElementById('modal-media-body');
+            modalBody.innerHTML = '';
+
+            const list = getActiveList();
+            const src = list[currentIndex];
+
+            if (currentMediaType === 'video') {
+                const videoElement = document.createElement('video');
+                videoElement.src = src;
+                videoElement.controls = true;
+                videoElement.autoplay = true;
+                modalBody.appendChild(videoElement);
+            } else {
+                const imgElement = document.createElement('img');
+                imgElement.src = src;
+                imgElement.alt = `Media ${currentIndex + 1}`;
+                imgElement.onerror = function() {
+                    if (currentMediaType === 'vip') {
+                        if (currentIndex === 0) this.src = 'vip/1.jpg';
+                        if (currentIndex === 1) this.src = 'vip/2.jpg';
+                    }
+                };
+                modalBody.appendChild(imgElement);
+            }
+        }
+
+        function navigateMedia(direction, event) {
+            if (event) event.stopPropagation();
+            const list = getActiveList();
+            
+            currentIndex = (currentIndex + direction + list.length) % list.length;
+            renderModalContent();
+        }
+
+        function closeMediaModal(event, force = false) {
+            if (force || event.target.id === 'media-modal') {
+                stopAllMediaInModal();
+                const modal = document.getElementById('media-modal');
+                const modalBody = document.getElementById('modal-media-body');
+
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+
+                setTimeout(() => {
+                    modalBody.innerHTML = '';
+                }, 300);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const modal = document.getElementById('media-modal');
+            if (!modal.classList.contains('active')) return;
+
+            if (e.key === 'Escape') closeMediaModal(null, true);
+            if (e.key === 'ArrowLeft') navigateMedia(-1);
+            if (e.key === 'ArrowRight') navigateMedia(1);
+        });
+
+        /* Background Particle Canvas Animation */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let w, h, centerX, centerY;
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            centerX = w / 2;
+            centerY = h / 2;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let infParticles = [];
+        const count = 90;
+
+        function getInfinity(t, scale) {
+            const x = scale * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
+            const y = scale * Math.sin(t) * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
+            return { x, y };
+        }
+
+        for (let i = 0; i < count; i++) {
+            infParticles.push({
+                t: (i / count) * Math.PI * 2,
+                speed: 0.0018 + Math.random() * 0.001,
+                size: Math.random() * 2 + 1,
+                colorShift: Math.random()
+            });
+        }
+
+        let time = 0;
+        function animate() {
+            ctx.fillStyle = 'rgba(10, 8, 18, 0.25)';
+            ctx.fillRect(0, 0, w, h);
+
+            const scale = Math.min(w, h) * 0.4;
+            ctx.globalCompositeOperation = 'lighter';
+
+            infParticles.forEach(p => {
+                p.t += p.speed;
+                const pos = getInfinity(p.t, scale);
+                const x = centerX + pos.x;
+                const y = centerY + pos.y;
+
+                const r = Math.floor(255 * (0.6 + 0.4 * Math.sin(p.colorShift + time * 0.001)));
+                const g = Math.floor(120 + 135 * Math.sin(p.colorShift * 2 + time * 0.0015));
+                const b = Math.floor(220 + 35 * Math.cos(time * 0.001));
+
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, 6.28);
+                ctx.fill();
+            });
+
+            time += 16;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
