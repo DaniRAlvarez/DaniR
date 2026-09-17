@@ -407,7 +407,7 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Corre, salta, esquiva abismos, recolecta caramelos grandes y supera los niveles progresivos del mundo de los dulces!</p>
+            <p>¡Corre, salta sobre plataformas flotantes, esquiva abismos, recolecta caramelos gigantes y supera los niveles del mundo de los dulces!</p>
             <div class="controls-hint">
                 <span class="key">ESPACIO / CLIC / TOQUE: Saltar (Doble Salto)</span>
             </div>
@@ -605,15 +605,28 @@
         let spawnTimer = 0;
 
         let floorSegments = [];
+        let platforms = []; // Plataformas flotantes en el aire
+        let backgroundScenery = [];
 
         function initFloorForLevel() {
             floorSegments = [];
+            platforms = [];
+            backgroundScenery = [];
             let currentX = 0;
             let totalLength = levelGoalDistance + 1000;
             
             while (currentX < totalLength) {
                 let segmentLength = 450 + Math.random() * 550;
                 floorSegments.push({ start: currentX, end: currentX + segmentLength });
+                
+                // Añadir plataformas elevadas flotantes sobre algunos segmentos de suelo o huecos
+                if (currentLevel >= 2 && Math.random() < 0.6) {
+                    let platWidth = 120 + Math.random() * 80;
+                    let platX = currentX + (segmentLength / 2) - (platWidth / 2);
+                    let platY = 230 + (Math.random() * 30 - 15); // Altura elevada accesible mediante doble salto
+                    platforms.push({ start: platX, end: platX + platWidth, y: platY });
+                }
+
                 currentX += segmentLength;
                 
                 if (currentLevel >= 2 && Math.random() < (0.25 + currentLevel * 0.035)) {
@@ -621,6 +634,25 @@
                     currentX += gapSize;
                 }
             }
+
+            const mushroomColors = ['#ff1493', '#9370db', '#00fa9a', '#00ffff', '#ffd700', '#ff4500'];
+            floorSegments.forEach(seg => {
+                let segmentSpan = seg.end - seg.start;
+                if (segmentSpan > 80) {
+                    let count = Math.max(1, Math.floor(segmentSpan / 140));
+                    for (let c = 0; c < count; c++) {
+                        let wx = seg.start + 50 + c * (segmentSpan / count) + (Math.random() * 20 - 10);
+                        if (wx > seg.start + 20 && wx < seg.end - 20) {
+                            backgroundScenery.push({
+                                worldX: wx,
+                                type: Math.random() > 0.5 ? 'candy_cane' : 'mushroom',
+                                color: mushroomColors[Math.floor(Math.random() * mushroomColors.length)],
+                                scale: 0.6 + Math.random() * 0.6
+                            });
+                        }
+                    }
+                }
+            });
         }
 
         function isOverGap(x) {
@@ -762,20 +794,45 @@
 
                 const groundLevel = 350;
                 let bunnyCenterBottomX = this.x + this.width / 2;
-                let inGap = isOverGap(distanceTraveled + bunnyCenterBottomX);
+                let bunnyWorldX = distanceTraveled + bunnyCenterBottomX;
+                let inGap = isOverGap(bunnyWorldX);
 
-                if (!inGap && this.y + this.height >= groundLevel) {
-                    this.y = groundLevel - this.height;
-                    this.vy = 0;
-                    this.isGrounded = true;
-                    this.jumpsLeft = 2;
-                } else {
-                    if (this.y > canvas.height + 60) {
-                        soundManager.playHit();
-                        lives = 0;
-                        triggerGameOver();
+                let landedOnPlatform = false;
+
+                // Comprobación de colisión con plataformas elevadas
+                if (this.vy >= 0) {
+                    for (let plat of platforms) {
+                        let platScreenStart = plat.start - distanceTraveled;
+                        let platScreenEnd = plat.end - distanceTraveled;
+
+                        if (
+                            bunnyWorldX >= plat.start && bunnyWorldX <= plat.end &&
+                            this.y + this.height >= plat.y && this.y + this.height - this.vy * gMultiplier <= plat.y + 12
+                        ) {
+                            this.y = plat.y - this.height;
+                            this.vy = 0;
+                            this.isGrounded = true;
+                            this.jumpsLeft = 2;
+                            landedOnPlatform = true;
+                            break;
+                        }
                     }
-                    this.isGrounded = false;
+                }
+
+                if (!landedOnPlatform) {
+                    if (!inGap && this.y + this.height >= groundLevel) {
+                        this.y = groundLevel - this.height;
+                        this.vy = 0;
+                        this.isGrounded = true;
+                        this.jumpsLeft = 2;
+                    } else {
+                        if (this.y > canvas.height + 60) {
+                            soundManager.playHit();
+                            lives = 0;
+                            triggerGameOver();
+                        }
+                        this.isGrounded = false;
+                    }
                 }
 
                 this.animTimer += 0.18 * gMultiplier;
@@ -904,7 +961,6 @@
         let obstacles = [];
         let collectibles = [];
         let clouds = [];
-        let backgroundScenery = [];
 
         function initWorldScenery() {
             clouds = [];
@@ -914,18 +970,6 @@
                     y: 40 + Math.random() * 100,
                     speed: 0.4 + Math.random() * 0.6,
                     scale: 0.6 + Math.random() * 0.8
-                });
-            }
-
-            backgroundScenery = [];
-            const mushroomColors = ['#ff1493', '#9370db', '#00fa9a', '#00ffff', '#ffd700', '#ff4500'];
-            for (let i = 0; i < 9; i++) {
-                backgroundScenery.push({
-                    x: i * 100,
-                    y: 270,
-                    type: i % 2 === 0 ? 'candy_cane' : 'mushroom',
-                    color: mushroomColors[Math.floor(Math.random() * mushroomColors.length)],
-                    scale: 0.7 + Math.random() * 0.6
                 });
             }
         }
@@ -1023,7 +1067,6 @@
 
         function drawWorldBackground(dt) {
             let gMult = dt * 60;
-            // Velocidad unificada exactamente a la del desplazamiento general del mundo (`travelSpeed`)
             let worldSpeedMultiplier = 3.5 + ((currentLevel - 1) * 0.35);
 
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -1052,45 +1095,61 @@
                 ctx.fill();
             });
 
-            // Decoraciones secundarias (bastones y hongos) moviéndose a la misma velocidad exacta del terreno
             backgroundScenery.forEach(item => {
-                item.x -= worldSpeedMultiplier * gMult;
-                if (item.x < -50) {
-                    item.x = canvas.width + 50;
-                    item.scale = 0.7 + Math.random() * 0.6;
-                }
+                let screenX = item.worldX - distanceTraveled;
 
-                if (item.type === 'candy_cane') {
-                    ctx.strokeStyle = '#ff69b4';
-                    ctx.lineWidth = 6;
-                    ctx.beginPath();
-                    ctx.moveTo(item.x, 350);
-                    ctx.lineTo(item.x, 300);
-                    ctx.arc(item.x + 8, 300, 8, Math.PI, 0, false);
-                    ctx.stroke();
-                } else {
-                    ctx.save();
-                    ctx.translate(item.x, 350);
-                    ctx.scale(item.scale, item.scale);
-                    
-                    ctx.fillStyle = item.color;
-                    ctx.beginPath();
-                    ctx.ellipse(0, -10, 16, 12, 0, Math.PI, 0, false);
-                    ctx.fill();
-                    
-                    ctx.fillStyle = '#ffffff';
-                    ctx.beginPath();
-                    ctx.arc(-5, -12, 2.5, 0, Math.PI * 2);
-                    ctx.arc(6, -10, 2, 0, Math.PI * 2);
-                    ctx.fill();
+                if (screenX > -50 && screenX < canvas.width + 50) {
+                    if (item.type === 'candy_cane') {
+                        ctx.strokeStyle = '#ff69b4';
+                        ctx.lineWidth = 6;
+                        ctx.beginPath();
+                        ctx.moveTo(screenX, 350);
+                        ctx.lineTo(screenX, 300);
+                        ctx.arc(screenX + 8, 300, 8, Math.PI, 0, false);
+                        ctx.stroke();
+                    } else {
+                        ctx.save();
+                        ctx.translate(screenX, 350);
+                        ctx.scale(item.scale, item.scale);
+                        
+                        ctx.fillStyle = item.color;
+                        ctx.beginPath();
+                        ctx.ellipse(0, -10, 16, 12, 0, Math.PI, 0, false);
+                        ctx.fill();
+                        
+                        ctx.fillStyle = '#ffffff';
+                        ctx.beginPath();
+                        ctx.arc(-5, -12, 2.5, 0, Math.PI * 2);
+                        ctx.arc(6, -10, 2, 0, Math.PI * 2);
+                        ctx.fill();
 
-                    ctx.fillStyle = '#f0e6ff';
-                    ctx.fillRect(-4, -10, 8, 10);
-                    ctx.restore();
+                        ctx.fillStyle = '#f0e6ff';
+                        ctx.fillRect(-4, -10, 8, 10);
+                        ctx.restore();
+                    }
                 }
             });
 
-            // Suelo unificado, sólido y con líneas sincronizadas perfectamente al scroll
+            // Dibujar Plataformas Elevadas Flotantes
+            platforms.forEach(plat => {
+                let screenStart = plat.start - distanceTraveled;
+                let screenEnd = plat.end - distanceTraveled;
+
+                if (screenEnd > 0 && screenStart < canvas.width) {
+                    ctx.fillStyle = '#9370db'; // Color estético lila/morado dulce
+                    ctx.shadowColor = '#9370db';
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.roundRect(screenStart, plat.y, plat.end - plat.start, 14, 6);
+                    ctx.fill();
+                    ctx.shadowBlur = 0; // Resetear sombra
+
+                    // Borde brillante superior de la plataforma
+                    ctx.fillStyle = '#00ffff';
+                    ctx.fillRect(screenStart + 4, plat.y, plat.end - plat.start - 8, 3);
+                }
+            });
+
             floorSegments.forEach(seg => {
                 let screenStart = seg.start - distanceTraveled;
                 let screenEnd = seg.end - distanceTraveled;
@@ -1105,7 +1164,6 @@
                     ctx.fillStyle = floorGrad;
                     ctx.fillRect(screenStart, 350, seg.end - seg.start, 15);
 
-                    // Líneas blancas del suelo renderizadas relativas al mundo para que nunca se desfasen
                     ctx.fillStyle = '#ffffff';
                     let firstLine = Math.floor(seg.start / 40) * 40;
                     for (let worldX = firstLine; worldX < seg.end; worldX += 40) {
@@ -1176,7 +1234,7 @@
                 }
             }
 
-            if (Math.random() < 0.023) {
+            if (Math.random() < 0.025) {
                 let spawnWorldX = distanceTraveled + canvas.width + 50;
                 if (!isOverGap(spawnWorldX)) {
                     let randType = Math.random();
@@ -1187,9 +1245,17 @@
                     else if (randType < 0.45) itemType = 'powerup_jump';
 
                     let collectibleSpeed = 3.5 + ((currentLevel - 1) * 0.3);
+                    
+                    // Probabilidad de que aparezca sobre una plataforma elevada flotante si existe alguna cercana
+                    let targetY = 190 + Math.random() * 110;
+                    let nearbyPlat = platforms.find(p => p.start <= spawnWorldX + 100 && p.end >= spawnWorldX - 100);
+                    if (nearbyPlat && Math.random() < 0.5) {
+                        targetY = nearbyPlat.y - 40; // Colocar encima de la plataforma flotante
+                    }
+
                     collectibles.push({
                         x: canvas.width + 50,
-                        y: 190 + Math.random() * 110,
+                        y: targetY,
                         width: 42,
                         height: 42,
                         type: itemType,
