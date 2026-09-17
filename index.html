@@ -548,7 +548,6 @@
     <script>
         /* Funciones para controlar los paneles flotantes */
         function openModal(modalId) {
-            // Limpiar el mensaje de éxito y mostrar formulario al abrir
             if (modalId === 'giftModal') {
                 document.getElementById('successMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'flex';
@@ -568,7 +567,7 @@
             }
         }
 
-        /* Función optimizada para enviar datos a SheetDB y mostrar el cuadro de éxito */
+        /* Función para enviar datos a SheetDB con límite diario y llaves en mayúsculas */
         function submitMessage() {
             const nameInput = document.getElementById('userName');
             const msgInput = document.getElementById('userMessage');
@@ -581,6 +580,21 @@
                 return;
             }
 
+            // --- LÍMITE DE 2 MENSAJES POR DÍA POR NAVEGADOR ---
+            const hoy = new Date().toLocaleDateString();
+            let controlEnvios = JSON.parse(localStorage.getItem('limiteMensajesDaniR')) || { fecha: hoy, count: 0 };
+
+            if (controlEnvios.fecha !== hoy) {
+                controlEnvios = { fecha: hoy, count: 0 };
+            }
+
+            if (controlEnvios.count >= 2) {
+                alert("💖 ¡Ya has enviado tus 2 mensajes permitidos para el día de hoy! Vuelve mañana para dejar más cariño.");
+                return;
+            }
+            // --------------------------------------------------
+
+            // Llaves en mayúscula estricta para hacer match con Google Sheets
             const datosAEnviar = {
                 data: [
                     {
@@ -603,17 +617,21 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Ocultar campos y botones, y mostrar el cuadro de éxito bonito
+                // Actualizar contador diario en el localStorage
+                controlEnvios.count++;
+                localStorage.setItem('limiteMensajesDaniR', JSON.stringify(controlEnvios));
+
+                // Ocultar formulario y mostrar cuadro de éxito verde
                 document.getElementById('userName').style.display = 'none';
                 document.getElementById('userMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
 
-                // Limpiar los inputs
+                // Limpiar inputs
                 nameInput.value = "";
                 msgInput.value = "";
 
-                // Cerrar la ventana automáticamente después de 2.5 segundos
+                // Cerrar modal tras 2.5 segundos automáticamente
                 setTimeout(() => {
                     closeModal('giftModal');
                 }, 2500);
