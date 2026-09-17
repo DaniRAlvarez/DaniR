@@ -576,7 +576,7 @@
             }
         }
 
-        // Personaje del Conejo (Diseño Clásico Original)
+        // Personaje del Conejo (Con patitas, colita y manitos añadidas)
         const player = {
             x: 100,
             y: 300,
@@ -616,13 +616,16 @@
                 targetCtx.save();
                 targetCtx.translate(this.width / 2, this.height / 2);
 
+                // Sombra en el suelo
                 targetCtx.fillStyle = 'rgba(0,0,0,0.25)';
                 targetCtx.beginPath();
                 targetCtx.ellipse(0, this.height/2 - 2, 16, 5, 0, 0, Math.PI * 2);
                 targetCtx.fill();
 
                 let earOffset = Math.sin(this.animTimer) * 4;
+                let limbOffset = Math.sin(this.animTimer * 2) * 3; // Animación de patitas/manitos al correr
                 
+                // Oreja Izquierda
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.ellipse(-9, -34 + earOffset, 6, 22, -0.15, 0, Math.PI * 2);
@@ -635,6 +638,7 @@
                 targetCtx.ellipse(-9, -34 + earOffset, 3, 14, -0.15, 0, Math.PI * 2);
                 targetCtx.fill();
 
+                // Oreja Derecha
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.ellipse(9, -34 - earOffset, 6, 22, 0.15, 0, Math.PI * 2);
@@ -647,16 +651,45 @@
                 targetCtx.ellipse(9, -34 - earOffset, 3, 14, 0.15, 0, Math.PI * 2);
                 targetCtx.fill();
 
+                // Colita pompón atrás
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.arc(-18, 5, 5, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.strokeStyle = '#f0e0f0';
+                targetCtx.lineWidth = 1;
+                targetCtx.stroke();
+
+                // Patitas traseras y delanteras
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.ellipse(-8, 25 + (this.isGrounded ? limbOffset : 0), 6, 4, 0.2, 0, Math.PI * 2);
+                targetCtx.ellipse(8, 25 - (this.isGrounded ? limbOffset : 0), 6, 4, -0.2, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.strokeStyle = '#f0e0f0';
+                targetCtx.lineWidth = 1;
+                targetCtx.stroke();
+
+                // Cuerpo
                 targetCtx.fillStyle = '#ff69b4';
                 targetCtx.beginPath();
                 targetCtx.roundRect(-16, -1, 32, 28, [12, 12, 14, 14]);
                 targetCtx.fill();
 
+                // Manitos al frente
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.arc(-13, 8, 3.5, 0, Math.PI * 2);
+                targetCtx.arc(13, 8, 3.5, 0, Math.PI * 2);
+                targetCtx.fill();
+
+                // Cuello / base de cabeza
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.arc(0, -1, 9, Math.PI, 0, false);
                 targetCtx.fill();
 
+                // Cabeza
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.arc(0, -15, 18, 0, Math.PI * 2);
@@ -665,12 +698,14 @@
                 targetCtx.lineWidth = 2;
                 targetCtx.stroke();
 
+                // Mejillas
                 targetCtx.fillStyle = 'rgba(255, 150, 180, 0.5)';
                 targetCtx.beginPath();
                 targetCtx.arc(-11, -11, 3.5, 0, Math.PI * 2);
                 targetCtx.arc(11, -11, 3.5, 0, Math.PI * 2);
                 targetCtx.fill();
 
+                // Ojos
                 targetCtx.fillStyle = '#3a1e2b';
                 targetCtx.beginPath();
                 targetCtx.arc(-6, -16, 2.5, 0, Math.PI * 2);
@@ -682,11 +717,13 @@
                 targetCtx.arc(5, -17, 1.1, 0, Math.PI * 2);
                 targetCtx.fill();
 
+                // Nariz
                 targetCtx.fillStyle = '#ff8fa3';
                 targetCtx.beginPath();
                 targetCtx.arc(0, -11, 2.5, 0, Math.PI * 2);
                 targetCtx.fill();
 
+                // Escudo protector
                 if (powerups.shield.active) {
                     targetCtx.strokeStyle = '#00ffff';
                     targetCtx.lineWidth = 2.5;
@@ -1048,7 +1085,6 @@
                     pBox.y + pBox.height > obs.y
                 ) {
                     if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - (player.vy * gMult) <= obs.y + 14) {
-                        // Partículas explosivas al derrotar la gominola
                         createParticles(obs.x + obs.width/2, obs.y + obs.height/2, '#ff1493', 15);
                         createParticles(obs.x + obs.width/2, obs.y + obs.height/2, '#00ffff', 10);
                         
@@ -1192,13 +1228,11 @@
             obstacles.forEach(obs => {
                 ctx.save();
                 if (obs.type === 'gummy') {
-                    // Cálculo de Squash & Stretch basado en su velocidad vertical (vy)
-                    let stretchX = 1 + (obs.vy * 0.02);
-                    let stretchY = 1 - (obs.vy * 0.02);
-                    
-                    // Límites para que el estiramiento sea estético y natural
-                    stretchX = Math.max(0.75, Math.min(1.35, stretchX));
-                    stretchY = Math.max(0.75, Math.min(1.35, stretchY));
+                    // Squash & Stretch dinámico para las gomitas saltarinas
+                    let stretchX = 1 + (obs.vy * 0.025);
+                    let stretchY = 1 - (obs.vy * 0.025);
+                    stretchX = Math.max(0.7, Math.min(1.4, stretchX));
+                    stretchY = Math.max(0.7, Math.min(1.4, stretchY));
 
                     ctx.translate(obs.x + obs.width / 2, obs.y + obs.height / 2);
                     ctx.scale(stretchX, stretchY);
@@ -1331,7 +1365,7 @@
             spawnTimer = 0;
             obstacles = [];
             collectibles = [];
-            activeParticles.length, 0;
+            activeParticles.length = 0;
             victoryScreen.classList.add('hidden');
             gameState = 'PLAYING';
         }
@@ -1459,7 +1493,7 @@
                         break;
                 }
                 saveGameData();
-                rouletteResult.textContent = pivotMessage = prizeMessage;
+                rouletteResult.textContent = prizeMessage;
                 rouletteResult.style.color = '#ff69b4';
             }, 4000);
         });
@@ -1480,7 +1514,7 @@
 
         document.getElementById('roulette-menu-btn').addEventListener('click', () => {
             rouletteResult.textContent = '';
-            rouletteScreen.classList.add('hidden');
+            rouletteScreen.classList.remove('hidden');
         });
         document.getElementById('close-roulette-btn').addEventListener('click', () => {
             rouletteScreen.classList.add('hidden');
