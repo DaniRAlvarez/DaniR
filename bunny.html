@@ -391,7 +391,6 @@
                     <span id="jumpStatus" style="opacity: 0.3;">🦘</span>
                 </div>
                 <div class="hud-stats">
-                    <!-- Modificado para mostrar solamente Nivel X sin el total de 10 -->
                     <div class="stat-item">Nivel <span id="levelVal">1</span></div>
                 </div>
             </div>
@@ -408,7 +407,7 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Corre, salta, recolecta caramelos, cumple misiones y supera los niveles progresivos del mundo de los dulces!</p>
+            <p>¡Corre, salta, esquiva abismos, recolecta caramelos grandes y supera los niveles progresivos del mundo de los dulces!</p>
             <div class="controls-hint">
                 <span class="key">ESPACIO / CLIC / TOQUE: Saltar (Doble Salto)</span>
             </div>
@@ -422,7 +421,7 @@
         <!-- Pantalla de Game Over -->
         <div id="gameover-screen" class="screen hidden interactive-ui">
             <h1>¡Oh no!</h1>
-            <p>El conejito se tropezó con un obstáculo.</p>
+            <p>El conejito cayó al abismo o tropezó con un obstáculo.</p>
             <div style="font-size: 20px; margin: 10px 0;">Puntuación final: <span id="finalScore" style="color: #ff69b4; font-weight: bold;">0</span></div>
             <div class="menu-buttons-group">
                 <button class="btn" id="restart-btn">Volver a Jugar</button>
@@ -605,6 +604,34 @@
         let levelGoalDistance = 3500;
         let spawnTimer = 0;
 
+        let floorSegments = [];
+
+        function initFloorForLevel() {
+            floorSegments = [];
+            let currentX = 0;
+            let totalLength = levelGoalDistance + 1000;
+            
+            while (currentX < totalLength) {
+                let segmentLength = 450 + Math.random() * 550;
+                floorSegments.push({ start: currentX, end: currentX + segmentLength });
+                currentX += segmentLength;
+                
+                if (currentLevel >= 2 && Math.random() < (0.25 + currentLevel * 0.035)) {
+                    let gapSize = 85 + (currentLevel * 10);
+                    currentX += gapSize;
+                }
+            }
+        }
+
+        function isOverGap(x) {
+            for (let seg of floorSegments) {
+                if (x >= seg.start && x <= seg.end) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         let currentMission = {
             type: 'candies',
             target: 10,
@@ -734,12 +761,23 @@
                 this.y += this.vy * gMultiplier;
 
                 const groundLevel = 350;
-                if (this.y + this.height > groundLevel) {
+                let bunnyCenterBottomX = this.x + this.width / 2;
+                let inGap = isOverGap(distanceTraveled + bunnyCenterBottomX);
+
+                if (!inGap && this.y + this.height >= groundLevel) {
                     this.y = groundLevel - this.height;
                     this.vy = 0;
                     this.isGrounded = true;
                     this.jumpsLeft = 2;
+                } else {
+                    if (this.y > canvas.height + 60) {
+                        soundManager.playHit();
+                        lives = 0;
+                        triggerGameOver();
+                    }
+                    this.isGrounded = false;
                 }
+
                 this.animTimer += 0.18 * gMultiplier;
             },
             jump() {
@@ -985,7 +1023,8 @@
 
         function drawWorldBackground(dt) {
             let gMult = dt * 60;
-            let worldSpeedMultiplier = 3.0 + ((currentLevel - 1) * 0.35);
+            // Velocidad unificada exactamente a la del desplazamiento general del mundo (`travelSpeed`)
+            let worldSpeedMultiplier = 3.5 + ((currentLevel - 1) * 0.35);
 
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
             if (currentLevel <= 3) {
@@ -1013,6 +1052,7 @@
                 ctx.fill();
             });
 
+            // Decoraciones secundarias (bastones y hongos) moviéndose a la misma velocidad exacta del terreno
             backgroundScenery.forEach(item => {
                 item.x -= worldSpeedMultiplier * gMult;
                 if (item.x < -50) {
@@ -1050,21 +1090,40 @@
                 }
             });
 
-            ctx.fillStyle = '#3d123d';
-            ctx.fillRect(0, 350, canvas.width, 100);
+            // Suelo unificado, sólido y con líneas sincronizadas perfectamente al scroll
+            floorSegments.forEach(seg => {
+                let screenStart = seg.start - distanceTraveled;
+                let screenEnd = seg.end - distanceTraveled;
 
-            let floorGrad = ctx.createLinearGradient(0, 350, 0, 365);
-            floorGrad.addColorStop(0, '#ff9aef');
-            floorGrad.addColorStop(1, '#ff1493');
-            ctx.fillStyle = floorGrad;
-            ctx.fillRect(0, 350, canvas.width, 15);
+                if (screenEnd > 0 && screenStart < canvas.width) {
+                    ctx.fillStyle = '#3d123d';
+                    ctx.fillRect(screenStart, 350, seg.end - seg.start, 100);
 
-            ctx.fillStyle = '#ffffff';
-            for (let i = 0; i < canvas.width; i += 40) {
-                ctx.beginPath();
-                ctx.arc(i + 20, 365, 8, 0, Math.PI, false);
-                ctx.fill();
-            }
+                    let floorGrad = ctx.createLinearGradient(0, 350, 0, 365);
+                    floorGrad.addColorStop(0, '#ff9aef');
+                    floorGrad.addColorStop(1, '#ff1493');
+                    ctx.fillStyle = floorGrad;
+                    ctx.fillRect(screenStart, 350, seg.end - seg.start, 15);
+
+                    // Líneas blancas del suelo renderizadas relativas al mundo para que nunca se desfasen
+                    ctx.fillStyle = '#ffffff';
+                    let firstLine = Math.floor(seg.start / 40) * 40;
+                    for (let worldX = firstLine; worldX < seg.end; worldX += 40) {
+                        let lineScreenX = worldX - distanceTraveled;
+                        if (lineScreenX >= screenStart && lineScreenX <= screenEnd - 20) {
+                            ctx.beginPath();
+                            ctx.arc(lineScreenX + 20, 365, 8, 0, Math.PI, false);
+                            ctx.fill();
+                        }
+                    }
+
+                    if (currentLevel >= 2) {
+                        ctx.fillStyle = '#00ffff';
+                        ctx.fillRect(screenStart + 2, 335, 4, 15);
+                        ctx.fillRect(screenEnd - 6, 335, 4, 15);
+                    }
+                }
+            });
         }
 
         function spawnEntities() {
@@ -1074,6 +1133,12 @@
 
             if (spawnTimer > spawnInterval && obstacles.length < maxObstaclesOnScreen) {
                 spawnTimer = 0;
+                let spawnWorldX = distanceTraveled + canvas.width + 50;
+
+                if (isOverGap(spawnWorldX) || isOverGap(spawnWorldX + 40)) {
+                    return;
+                }
+
                 let isGummy = Math.random() > 0.4;
                 let speedScale = 3.0 + ((currentLevel - 1) * 0.35);
 
@@ -1112,23 +1177,26 @@
             }
 
             if (Math.random() < 0.023) {
-                let randType = Math.random();
-                let itemType = 'star';
-                if (randType < 0.25) itemType = 'candy';
-                else if (randType < 0.32) itemType = 'powerup_shield';
-                else if (randType < 0.39) itemType = 'powerup_magnet';
-                else if (randType < 0.45) itemType = 'powerup_jump';
+                let spawnWorldX = distanceTraveled + canvas.width + 50;
+                if (!isOverGap(spawnWorldX)) {
+                    let randType = Math.random();
+                    let itemType = 'star';
+                    if (randType < 0.25) itemType = 'candy';
+                    else if (randType < 0.32) itemType = 'powerup_shield';
+                    else if (randType < 0.39) itemType = 'powerup_magnet';
+                    else if (randType < 0.45) itemType = 'powerup_jump';
 
-                let collectibleSpeed = 3.5 + ((currentLevel - 1) * 0.3);
-                collectibles.push({
-                    x: canvas.width + 50,
-                    y: 190 + Math.random() * 110,
-                    width: 24,
-                    height: 24,
-                    type: itemType,
-                    speed: collectibleSpeed,
-                    bobTimer: Math.random() * Math.PI
-                });
+                    let collectibleSpeed = 3.5 + ((currentLevel - 1) * 0.3);
+                    collectibles.push({
+                        x: canvas.width + 50,
+                        y: 190 + Math.random() * 110,
+                        width: 42,
+                        height: 42,
+                        type: itemType,
+                        speed: collectibleSpeed,
+                        bobTimer: Math.random() * Math.PI
+                    });
+                }
             }
         }
 
@@ -1329,36 +1397,46 @@
                 let currentY = col.y + Math.sin(col.bobTimer) * 4;
                 if (col.type === 'star') {
                     ctx.fillStyle = '#ffd700';
+                    ctx.shadowColor = '#ffd700';
+                    ctx.shadowBlur = 10;
                     ctx.beginPath();
-                    ctx.arc(col.x + 12, currentY + 12, 10, 0, Math.PI * 2);
+                    ctx.arc(col.x + 21, currentY + 21, 18, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.fillStyle = '#fff';
-                    ctx.font = '12px sans-serif';
-                    ctx.fillText('⭐', col.x + 4, currentY + 16);
+                    ctx.font = '20px sans-serif';
+                    ctx.fillText('⭐', col.x + 8, currentY + 28);
                 } else if (col.type === 'candy') {
                     ctx.fillStyle = '#ff1493';
+                    ctx.shadowColor = '#ff1493';
+                    ctx.shadowBlur = 10;
                     ctx.beginPath();
-                    ctx.roundRect(col.x, currentY + 4, 24, 16, 6);
+                    ctx.roundRect(col.x, currentY + 6, 42, 30, 10);
                     ctx.fill();
                     ctx.fillStyle = '#00ffff';
                     ctx.beginPath();
-                    ctx.moveTo(col.x, currentY + 12); ctx.lineTo(col.x - 6, currentY + 6); ctx.lineTo(col.x - 6, currentY + 18);
+                    ctx.moveTo(col.x, currentY + 21); ctx.lineTo(col.x - 10, currentY + 12); ctx.lineTo(col.x - 10, currentY + 30);
                     ctx.fill();
                     ctx.beginPath();
-                    ctx.moveTo(col.x + 24, currentY + 12); ctx.lineTo(col.x + 30, currentY + 6); ctx.lineTo(col.x + 30, currentY + 18);
+                    ctx.moveTo(col.x + 42, currentY + 21); ctx.lineTo(col.x + 52, currentY + 12); ctx.lineTo(col.x + 52, currentY + 30);
                     ctx.fill();
                 } else if (col.type === 'powerup_shield') {
                     ctx.fillStyle = '#00ffff';
-                    ctx.beginPath(); ctx.arc(col.x + 12, currentY + 12, 11, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#000'; ctx.font = '11px sans-serif'; ctx.fillText('🛡️', col.x + 3, currentY + 16);
+                    ctx.shadowColor = '#00ffff';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath(); ctx.arc(col.x + 21, currentY + 21, 21, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#000'; ctx.font = '22px sans-serif'; ctx.fillText('🛡️', col.x + 7, currentY + 29);
                 } else if (col.type === 'powerup_magnet') {
                     ctx.fillStyle = '#ff4500';
-                    ctx.beginPath(); ctx.arc(col.x + 12, currentY + 12, 11, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif'; ctx.fillText('🧲', col.x + 3, currentY + 16);
+                    ctx.shadowColor = '#ff4500';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath(); ctx.arc(col.x + 21, currentY + 21, 21, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#fff'; ctx.font = '22px sans-serif'; ctx.fillText('🧲', col.x + 7, currentY + 29);
                 } else if (col.type === 'powerup_jump') {
                     ctx.fillStyle = '#00fa9a';
-                    ctx.beginPath(); ctx.arc(col.x + 12, currentY + 12, 11, 0, Math.PI * 2); ctx.fill();
-                    ctx.fillStyle = '#000'; ctx.font = '11px sans-serif'; ctx.fillText('🦘', col.x + 3, currentY + 16);
+                    ctx.shadowColor = '#00fa9a';
+                    ctx.shadowBlur = 15;
+                    ctx.beginPath(); ctx.arc(col.x + 21, currentY + 21, 21, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#000'; ctx.font = '22px sans-serif'; ctx.fillText('🦘', col.x + 7, currentY + 29);
                 }
                 ctx.restore();
             });
@@ -1449,6 +1527,7 @@
             currentLevel = 1;
             distanceTraveled = 0;
             levelGoalDistance = 3500;
+            initFloorForLevel();
             spawnTimer = 0;
             obstacles = [];
             collectibles = [];
@@ -1511,7 +1590,8 @@
             if (currentLevel < maxLevels) {
                 currentLevel++;
                 distanceTraveled = 0;
-                levelGoalDistance += 800; // Incremento progresivo de la distancia de cada nivel
+                levelGoalDistance = Math.floor(levelGoalDistance * 1.7); 
+                initFloorForLevel();
                 spawnTimer = 0;
                 obstacles = [];
                 collectibles = [];
