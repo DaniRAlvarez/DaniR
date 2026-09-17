@@ -286,16 +286,38 @@
         .modal-text {
             font-size: 0.85rem;
             color: #d0b0e0;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             line-height: 1.5;
         }
 
-        .message-input {
+        /* Campo de texto para el Nombre */
+        .name-input {
             width: 100%;
-            height: 80px;
+            height: 40px;
             background: rgba(10, 8, 18, 0.6);
             border: 1px solid rgba(255, 85, 170, 0.4);
-            border-radius: 12px;
+            border-radius: 10px;
+            padding: 0 0.8rem;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .name-input:focus {
+            border-color: var(--gift-color);
+            box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
+        }
+
+        /* Campo de texto para el Mensaje */
+        .message-input {
+            width: 100%;
+            height: 75px;
+            background: rgba(10, 8, 18, 0.6);
+            border: 1px solid rgba(255, 85, 170, 0.4);
+            border-radius: 10px;
             padding: 0.8rem;
             color: #fff;
             font-family: 'Poppins', sans-serif;
@@ -462,7 +484,7 @@
         </div>
     </div>
 
-    <!-- Panel Flotante / Modal de Regalos (Conectado a SheetDB) -->
+    <!-- Panel Flotante / Modal de Regalos (Con Nombre, Fecha, Mensaje y Mariposas) -->
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
         <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
             <!-- Mariposas decorativas animadas -->
@@ -471,15 +493,18 @@
             <span class="butterfly" style="top: 75%; left: 45%; animation-delay: 2.8s;">🦋</span>
 
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
-            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Muy pronto habilitaremos esta sección. Si gustas, déjale un mensaje:</p>
+            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu nombre y tu mensaje:</p>
             
-            <!-- Campo para dejar el mensaje -->
+            <!-- Campo para el Nombre -->
+            <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
+
+            <!-- Campo para el Mensaje -->
             <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
 
             <!-- Botones alineados -->
             <div class="modal-buttons">
-                <button class="modal-btn secondary" onclick="closeModal('giftModal')">ENTENDIDO</button>
-                <button class="modal-btn primary" onclick="submitMessage()">💬 DEJAR MENSAJE</button>
+                <button class="modal-btn secondary" onclick="closeModal('giftModal')">CANCELAR</button>
+                <button class="modal-btn primary" onclick="submitMessage()">💬 ENVIAR</button>
             </div>
         </div>
     </div>
@@ -515,19 +540,23 @@
             }
         }
 
-        /* Función para enviar el mensaje directamente a Google Sheets mediante SheetDB */
+        /* Función para enviar Nombre, Fecha y Mensaje a SheetDB */
         function submitMessage() {
+            const nameInput = document.getElementById('userName');
             const msgInput = document.getElementById('userMessage');
+            
+            const nombreFan = nameInput.value.trim();
             const textoMensaje = msgInput.value.trim();
 
-            if (textoMensaje === "") {
-                alert("Por favor escribe un mensaje antes de enviarlo.");
+            if (nombreFan === "" || textoMensaje === "") {
+                alert("Por favor escribe tu nombre y tu mensaje antes de enviarlo.");
                 return;
             }
 
             const datosAEnviar = {
                 data: [
                     {
+                        nombre: nombreFan,
                         fecha: new Date().toLocaleString(),
                         mensaje: textoMensaje
                     }
@@ -546,7 +575,8 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert("¡Mensaje enviado y guardado con éxito para Dani R! 💖");
+                alert("¡Mensaje enviado con éxito para Dani R! 💖");
+                nameInput.value = "";
                 msgInput.value = "";
                 closeModal('giftModal');
             })
