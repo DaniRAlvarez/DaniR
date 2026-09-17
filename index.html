@@ -290,7 +290,7 @@
             line-height: 1.5;
         }
 
-        .name-input {
+        .name-input, .visibility-select {
             width: 100%;
             height: 40px;
             background: rgba(10, 8, 18, 0.6);
@@ -305,14 +305,19 @@
             transition: border-color 0.2s ease;
         }
 
-        .name-input:focus {
+        .visibility-select option {
+            background: #1a1228;
+            color: #fff;
+        }
+
+        .name-input:focus, .visibility-select:focus {
             border-color: var(--gift-color);
             box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
         }
 
         .message-input {
             width: 100%;
-            height: 75px;
+            height: 70px;
             background: rgba(10, 8, 18, 0.6);
             border: 1px solid rgba(255, 85, 170, 0.4);
             border-radius: 10px;
@@ -321,7 +326,7 @@
             font-family: 'Poppins', sans-serif;
             font-size: 0.85rem;
             resize: none;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             outline: none;
             transition: border-color 0.2s ease;
         }
@@ -511,13 +516,19 @@
             <span class="butterfly" style="top: 75%; left: 45%; animation-delay: 2.8s;">🦋</span>
 
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
-            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu nombre y tu mensaje:</p>
+            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu mensaje:</p>
             
             <!-- Aviso visual de mensaje enviado (inicialmente oculto) -->
             <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
 
             <!-- Campo para el Nombre -->
             <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
+
+            <!-- Selector de Privacidad / Visibilidad -->
+            <select id="userVisibility" class="visibility-select">
+                <option value="PUBLICO">Público (Visible en el muro) 💖</option>
+                <option value="PRIVADO">Privado (Solo para Dani R) 🌙</option>
+            </select>
 
             <!-- Campo para el Mensaje -->
             <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
@@ -552,6 +563,7 @@
                 document.getElementById('successMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'flex';
                 document.getElementById('userName').style.display = 'block';
+                document.getElementById('userVisibility').style.display = 'block';
                 document.getElementById('userMessage').style.display = 'block';
             }
             document.getElementById(modalId).classList.add('active');
@@ -567,16 +579,18 @@
             }
         }
 
-        /* Función para enviar datos a SheetDB con límite diario y llaves en mayúsculas */
+        /* Función para enviar datos a SheetDB incluyendo la visibilidad */
         function submitMessage() {
             const nameInput = document.getElementById('userName');
+            const visibilitySelect = document.getElementById('userVisibility');
             const msgInput = document.getElementById('userMessage');
             
             const nombreFan = nameInput.value.trim();
+            const visibilidad = visibilitySelect.value;
             const textoMensaje = msgInput.value.trim();
 
             if (nombreFan === "" || textoMensaje === "") {
-                alert("Por favor completa ambos campos.");
+                alert("Por favor completa tu nombre y tu mensaje.");
                 return;
             }
 
@@ -594,13 +608,14 @@
             }
             // --------------------------------------------------
 
-            // Llaves en mayúscula estricta para hacer match con Google Sheets
+            // Columnas mapeadas exactamente en mayúsculas para Google Sheets
             const datosAEnviar = {
                 data: [
                     {
                         NOMBRE: nombreFan,
                         FECHA: new Date().toLocaleString(),
-                        MENSAJE: textoMensaje
+                        MENSAJE: textoMensaje,
+                        VISIBILIDAD: visibilidad
                     }
                 ]
             };
@@ -623,6 +638,7 @@
 
                 // Ocultar formulario y mostrar cuadro de éxito verde
                 document.getElementById('userName').style.display = 'none';
+                document.getElementById('userVisibility').style.display = 'none';
                 document.getElementById('userMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
