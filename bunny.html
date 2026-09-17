@@ -56,13 +56,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
         }
         .hud-stats {
             display: flex;
-            gap: 20px;
+            gap: 15px;
             background: rgba(0, 0, 0, 0.4);
             padding: 8px 16px;
             border-radius: 20px;
@@ -73,6 +73,12 @@
             display: flex;
             align-items: center;
             gap: 6px;
+        }
+        .powerup-hud {
+            display: flex;
+            gap: 8px;
+            font-size: 13px;
+            align-items: center;
         }
         .interactive-ui {
             pointer-events: auto;
@@ -308,6 +314,11 @@
                     <div class="stat-item">⭐ <span id="starsVal">0</span></div>
                     <div class="stat-item">❤️ <span id="livesVal">3</span></div>
                 </div>
+                <div class="hud-stats powerup-hud">
+                    <span id="shieldStatus" style="opacity: 0.3;">🛡️</span>
+                    <span id="magnetStatus" style="opacity: 0.3;">🧲</span>
+                    <span id="jumpStatus" style="opacity: 0.3;">🦘</span>
+                </div>
                 <div class="hud-stats">
                     <div class="stat-item">Nivel <span id="levelVal">1</span></div>
                 </div>
@@ -317,7 +328,7 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Corre, salta, recolecta caramelos y colecciona fotos únicas en el mundo de los dulces!</p>
+            <p>¡Corre, salta, recolecta caramelos, activa power-ups y colecciona fotos únicas en el mundo de los dulces!</p>
             <div class="controls-hint">
                 <span class="key">ESPACIO / CLIC: Saltar</span>
                 <span class="key">DOBLE SALTO</span>
@@ -385,23 +396,39 @@
     </div>
 
     <script>
+        // Polyfill seguro para roundRect
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, radii) {
+                if (typeof radii === 'number') radii = [radii];
+                else if (!radii) radii = [0];
+                const r = radii.length === 1 ? [radii[0], radii[0], radii[0], radii[0]] : radii;
+                this.beginPath();
+                this.moveTo(x + r[0], y);
+                this.lineTo(x + w - r[1], y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+                this.lineTo(x + w, y + h - r[2]);
+                this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+                this.lineTo(x + r[3], y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+                this.lineTo(x, y + r[0]);
+                this.quadraticCurveTo(x, y, x + r[0], y);
+                this.closePath();
+                return this;
+            };
+        }
+
         // --- GESTIÓN DE AUDIO WEB API ---
         class SoundManager {
-            constructor() {
-                this.ctx = null;
-            }
+            constructor() { this.ctx = null; }
             init() {
                 if (!this.ctx) {
                     const AudioContext = window.AudioContext || window.webkitAudioContext;
                     this.ctx = new AudioContext();
                 }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
+                if (this.ctx.state === 'suspended') { this.ctx.resume(); }
             }
             playJump() {
-                this.init();
-                if (!this.ctx) return;
+                this.init(); if (!this.ctx) return;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'sine';
@@ -409,14 +436,11 @@
                 osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
                 gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
                 gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.15);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.15);
             }
             playCoin() {
-                this.init();
-                if (!this.ctx) return;
+                this.init(); if (!this.ctx) return;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'triangle';
@@ -424,14 +448,11 @@
                 osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.08);
                 gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
                 gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.2);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.2);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.2);
             }
             playHit() {
-                this.init();
-                if (!this.ctx) return;
+                this.init(); if (!this.ctx) return;
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'sawtooth';
@@ -439,14 +460,11 @@
                 osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.25);
                 gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
                 gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.25);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + 0.25);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.25);
             }
             playWin() {
-                this.init();
-                if (!this.ctx) return;
+                this.init(); if (!this.ctx) return;
                 const notes = [523.25, 659.25, 783.99, 1046.50];
                 notes.forEach((freq, idx) => {
                     const osc = this.ctx.createOscillator();
@@ -455,11 +473,22 @@
                     osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.1);
                     gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.1);
                     gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + idx * 0.1 + 0.25);
-                    osc.connect(gain);
-                    gain.connect(this.ctx.destination);
+                    osc.connect(gain); gain.connect(this.ctx.destination);
                     osc.start(this.ctx.currentTime + idx * 0.1);
                     osc.stop(this.ctx.currentTime + idx * 0.1 + 0.25);
                 });
+            }
+            playPowerup() {
+                this.init(); if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + 0.3);
             }
         }
 
@@ -473,6 +502,10 @@
         const starsValEl = document.getElementById('starsVal');
         const livesValEl = document.getElementById('livesVal');
         const levelValEl = document.getElementById('levelVal');
+        const shieldStatus = document.getElementById('shieldStatus');
+        const magnetStatus = document.getElementById('magnetStatus');
+        const jumpStatus = document.getElementById('jumpStatus');
+
         const startScreen = document.getElementById('start-screen');
         const gameoverScreen = document.getElementById('gameover-screen');
         const victoryScreen = document.getElementById('victory-screen');
@@ -489,6 +522,12 @@
         let distanceTraveled = 0;
         let levelGoalDistance = 2500;
         let spawnTimer = 0;
+
+        let powerups = {
+            shield: { active: false, timer: 0 },
+            magnet: { active: false, timer: 0 },
+            superJump: { active: false, timer: 0 }
+        };
 
         let savedData = {
             stars: 0,
@@ -537,21 +576,22 @@
             }
         }
 
-        // Personaje del Conejo
+        // Personaje del Conejo (Diseño Clásico Original)
         const player = {
             x: 100,
             y: 300,
             width: 44,
             height: 52,
             vy: 0,
-            jumpPower: -11.5,
+            baseJumpPower: -11.5,
             gravity: 0.55,
             isGrounded: false,
             jumpsLeft: 2,
             animTimer: 0,
-            update() {
-                this.vy += this.gravity;
-                this.y += this.vy;
+            update(dt) {
+                let gMultiplier = dt * 60;
+                this.vy += this.gravity * gMultiplier;
+                this.y += this.vy * gMultiplier;
 
                 const groundLevel = 350;
                 if (this.y + this.height > groundLevel) {
@@ -560,11 +600,12 @@
                     this.isGrounded = true;
                     this.jumpsLeft = 2;
                 }
-                this.animTimer += 0.18;
+                this.animTimer += 0.18 * gMultiplier;
             },
             jump() {
                 if (this.isGrounded || this.jumpsLeft > 0) {
-                    this.vy = this.jumpPower;
+                    let jumpPow = powerups.superJump.active ? this.baseJumpPower * 1.35 : this.baseJumpPower;
+                    this.vy = jumpPow;
                     this.isGrounded = false;
                     this.jumpsLeft--;
                     soundManager.playJump();
@@ -646,6 +687,14 @@
                 targetCtx.arc(0, -11, 2.5, 0, Math.PI * 2);
                 targetCtx.fill();
 
+                if (powerups.shield.active) {
+                    targetCtx.strokeStyle = '#00ffff';
+                    targetCtx.lineWidth = 2.5;
+                    targetCtx.beginPath();
+                    targetCtx.arc(0, -5, 26, 0, Math.PI * 2);
+                    targetCtx.stroke();
+                }
+
                 targetCtx.restore();
             }
         };
@@ -655,7 +704,6 @@
         let clouds = [];
         let backgroundScenery = [];
 
-        // Inicializar decoración del mundo con variedad de colores y tamaños en los hongos
         function initWorldScenery() {
             clouds = [];
             for (let i = 0; i < 5; i++) {
@@ -675,13 +723,12 @@
                     y: 270,
                     type: i % 2 === 0 ? 'candy_cane' : 'mushroom',
                     color: mushroomColors[Math.floor(Math.random() * mushroomColors.length)],
-                    scale: 0.7 + Math.random() * 0.6 // Tamaños variables (unos más grandes, otros más pequeños)
+                    scale: 0.7 + Math.random() * 0.6
                 });
             }
         }
         initWorldScenery();
 
-        // Generador de Escenas aleatorias para la Galería
         function drawPhotoContent(targetCtx, photoIndex, width, height) {
             targetCtx.save();
             let seed = (photoIndex + 1) * 93;
@@ -772,8 +819,8 @@
             targetCtx.restore();
         }
 
-        // Renderizado del fondo con reciclaje de elementos que salen del mapa
-        function drawWorldBackground() {
+        function drawWorldBackground(dt) {
+            let gMult = dt * 60;
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
             if (currentLevel === 1) {
                 skyGrad.addColorStop(0, '#2e1a47');
@@ -788,10 +835,9 @@
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Actualizar y reciclar nubes (Salen a la izquierda y se recrean a la derecha)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             clouds.forEach(cloud => {
-                cloud.x -= cloud.speed;
+                cloud.x -= cloud.speed * gMult;
                 if (cloud.x < -60) cloud.x = canvas.width + 60;
 
                 ctx.beginPath();
@@ -801,12 +847,11 @@
                 ctx.fill();
             });
 
-            // Actualizar y reciclar elementos de escenografía (Bastones y hongos variados que se destruyen por la izquierda y aparecen por la derecha)
             backgroundScenery.forEach(item => {
-                item.x -= (4 + (currentLevel * 0.4));
+                item.x -= (4 + (currentLevel * 0.4)) * gMult;
                 if (item.x < -50) {
                     item.x = canvas.width + 50;
-                    item.scale = 0.7 + Math.random() * 0.6; // Cambia de tamaño al reaparecer
+                    item.scale = 0.7 + Math.random() * 0.6;
                 }
 
                 if (item.type === 'candy_cane') {
@@ -818,25 +863,21 @@
                     ctx.arc(item.x + 8, 300, 8, Math.PI, 0, false);
                     ctx.stroke();
                 } else {
-                    // Hongo de decoración variado en tamaño y color
                     ctx.save();
                     ctx.translate(item.x, 350);
                     ctx.scale(item.scale, item.scale);
                     
-                    // Sombrero del hongo (con su color único)
                     ctx.fillStyle = item.color;
                     ctx.beginPath();
                     ctx.ellipse(0, -10, 16, 12, 0, Math.PI, 0, false);
                     ctx.fill();
                     
-                    // Lunares blancos del hongo
                     ctx.fillStyle = '#ffffff';
                     ctx.beginPath();
                     ctx.arc(-5, -12, 2.5, 0, Math.PI * 2);
                     ctx.arc(6, -10, 2, 0, Math.PI * 2);
                     ctx.fill();
 
-                    // Tallo del hongo
                     ctx.fillStyle = '#f0e6ff';
                     ctx.fillRect(-4, -10, 8, 10);
                     ctx.restore();
@@ -902,26 +943,46 @@
                 }
             }
 
-            if (Math.random() < 0.02) {
-                let isStar = Math.random() < 0.2;
+            if (Math.random() < 0.023) {
+                let randType = Math.random();
+                let itemType = 'star';
+                if (randType < 0.25) itemType = 'candy';
+                else if (randType < 0.32) itemType = 'powerup_shield';
+                else if (randType < 0.39) itemType = 'powerup_magnet';
+                else if (randType < 0.45) itemType = 'powerup_jump';
+
                 collectibles.push({
                     x: canvas.width + 50,
-                    y: 200 + Math.random() * 100,
+                    y: 190 + Math.random() * 110,
                     width: 24,
                     height: 24,
-                    type: isStar ? 'star' : 'candy',
+                    type: itemType,
                     speed: 4.0,
                     bobTimer: Math.random() * Math.PI
                 });
             }
         }
 
-        function updateGame() {
+        function updateGame(dt) {
             if (gameState !== 'PLAYING') return;
 
-            distanceTraveled += 4 + (currentLevel * 0.4);
+            let gMult = dt * 60;
+            distanceTraveled += (4 + (currentLevel * 0.4)) * gMult;
 
-            player.update();
+            Object.keys(powerups).forEach(key => {
+                if (powerups[key].active) {
+                    powerups[key].timer -= dt;
+                    if (powerups[key].timer <= 0) {
+                        powerups[key].active = false;
+                    }
+                }
+            });
+
+            shieldStatus.style.opacity = powerups.shield.active ? '1' : '0.3';
+            magnetStatus.style.opacity = powerups.magnet.active ? '1' : '0.3';
+            jumpStatus.style.opacity = powerups.superJump.active ? '1' : '0.3';
+
+            player.update(dt);
             spawnEntities();
 
             const pBox = {
@@ -931,13 +992,12 @@
                 height: player.height - 12
             };
 
-            // Actualizar obstáculos (destruyéndose al salir de pantalla por la izquierda)
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 let obs = obstacles[i];
 
                 if (obs.type === 'gummy') {
-                    obs.vy += obs.gravity;
-                    obs.y += obs.vy;
+                    obs.vy += obs.gravity * gMult;
+                    obs.y += obs.vy * gMult;
 
                     let groundLevel = 320;
                     if (obs.y >= groundLevel) {
@@ -947,12 +1007,12 @@
                     }
 
                     if (obs.defensiveStep > 0) {
-                        obs.defensiveStep--;
-                        if (obs.defensiveStep === 0) {
+                        obs.defensiveStep -= gMult;
+                        if (obs.defensiveStep <= 0) {
                             obs.vx = -(obs.baseSpeed * 2.0); 
                         }
                     } else {
-                        obs.actionTimer--;
+                        obs.actionTimer -= gMult;
                         if (obs.isGrounded && obs.actionTimer <= 0) {
                             if (obs.personality === 'aggressive') {
                                 obs.vy = -9.5;
@@ -968,7 +1028,7 @@
                                 obs.vx = -(obs.baseSpeed * 1.4);
                                 obs.isGrounded = false;
                             }
-                            obs.actionTimer = Math.random() * 50 + 30;
+                            obs.actionTimer = Math.random() * 50 + 20;
                         }
                     }
 
@@ -976,9 +1036,9 @@
                         obs.vx = -obs.baseSpeed * 1.5;
                     }
 
-                    obs.x += obs.vx;
+                    obs.x += obs.vx * gMult;
                 } else {
-                    obs.x += obs.vx;
+                    obs.x += obs.vx * gMult;
                 }
 
                 if (
@@ -987,34 +1047,50 @@
                     pBox.y < obs.y + obs.height &&
                     pBox.y + pBox.height > obs.y
                 ) {
-                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - player.vy <= obs.y + 14) {
+                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - (player.vy * gMult) <= obs.y + 14) {
+                        // Partículas explosivas al derrotar la gominola
+                        createParticles(obs.x + obs.width/2, obs.y + obs.height/2, '#ff1493', 15);
+                        createParticles(obs.x + obs.width/2, obs.y + obs.height/2, '#00ffff', 10);
+                        
                         obstacles.splice(i, 1);
                         player.vy = -8;
                         score += 50;
                         soundManager.playCoin();
-                        createParticles(obs.x + obs.width/2, obs.y, '#ff1493', 10);
                         continue;
                     } else {
                         obstacles.splice(i, 1);
-                        lives--;
-                        soundManager.playHit();
-                        createParticles(player.x + player.width/2, player.y + player.height/2, '#ff69b4', 12);
-                        if (lives <= 0) {
-                            triggerGameOver();
+                        if (powerups.shield.active) {
+                            powerups.shield.active = false;
+                            soundManager.playHit();
+                        } else {
+                            lives--;
+                            soundManager.playHit();
+                            createParticles(player.x + player.width/2, player.y + player.height/2, '#ff69b4', 12);
+                            if (lives <= 0) {
+                                triggerGameOver();
+                            }
                         }
                     }
                 }
 
-                // Destrucción limpia al salir por la izquierda
                 if (obs.x < -60) obstacles.splice(i, 1);
             }
 
-            // Actualizar Coleccionables (Destrucción limpia al salir por la izquierda)
             for (let i = collectibles.length - 1; i >= 0; i--) {
                 let col = collectibles[i];
-                col.x -= col.speed;
-                col.bobTimer += 0.1;
+                col.x -= col.speed * gMult;
+                col.bobTimer += 0.1 * gMult;
                 let currentY = col.y + Math.sin(col.bobTimer) * 4;
+
+                if (powerups.magnet.active) {
+                    let dx = (player.x + player.width/2) - col.x;
+                    let dy = (player.y + player.height/2) - currentY;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 220) {
+                        col.x += (dx / dist) * 6 * gMult;
+                        col.y += (dy / dist) * 6 * gMult;
+                    }
+                }
 
                 if (
                     pBox.x < col.x + col.width &&
@@ -1027,10 +1103,19 @@
                         score += 100;
                         soundManager.playWin();
                         createParticles(col.x, currentY, '#ffd700', 8);
-                    } else {
+                    } else if (col.type === 'candy') {
                         score += 20;
                         soundManager.playCoin();
                         createParticles(col.x, currentY, '#ff69b4', 6);
+                    } else if (col.type === 'powerup_shield') {
+                        powerups.shield.active = true; powerups.shield.timer = 8;
+                        soundManager.playPowerup(); createParticles(col.x, currentY, '#00ffff', 10);
+                    } else if (col.type === 'powerup_magnet') {
+                        powerups.magnet.active = true; powerups.magnet.timer = 7;
+                        soundManager.playPowerup(); createParticles(col.x, currentY, '#ff4500', 10);
+                    } else if (col.type === 'powerup_jump') {
+                        powerups.superJump.active = true; powerups.superJump.timer = 8;
+                        soundManager.playPowerup(); createParticles(col.x, currentY, '#00fa9a', 10);
                     }
                     collectibles.splice(i, 1);
                     continue;
@@ -1039,12 +1124,11 @@
                 if (col.x < -50) collectibles.splice(i, 1);
             }
 
-            // Actualizar Partículas
             for (let i = activeParticles.length - 1; i >= 0; i--) {
                 let p = activeParticles[i];
-                p.x += p.vx;
-                p.y += p.vy;
-                p.alpha -= p.decay;
+                p.x += p.vx * gMult;
+                p.y += p.vy * gMult;
+                p.alpha -= p.decay * gMult;
                 if (p.alpha <= 0) {
                     activeParticles.splice(i, 1);
                     particlePool.push(p);
@@ -1064,7 +1148,7 @@
         function renderGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            drawWorldBackground();
+            drawWorldBackground(delta);
 
             collectibles.forEach(col => {
                 ctx.save();
@@ -1077,7 +1161,7 @@
                     ctx.fillStyle = '#fff';
                     ctx.font = '12px sans-serif';
                     ctx.fillText('⭐', col.x + 4, currentY + 16);
-                } else {
+                } else if (col.type === 'candy') {
                     ctx.fillStyle = '#ff1493';
                     ctx.beginPath();
                     ctx.roundRect(col.x, currentY + 4, 24, 16, 6);
@@ -1089,6 +1173,18 @@
                     ctx.beginPath();
                     ctx.moveTo(col.x + 24, currentY + 12); ctx.lineTo(col.x + 30, currentY + 6); ctx.lineTo(col.x + 30, currentY + 18);
                     ctx.fill();
+                } else if (col.type === 'powerup_shield') {
+                    ctx.fillStyle = '#00ffff';
+                    ctx.beginPath(); ctx.arc(col.x + 12, currentY + 12, 11, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#000'; ctx.font = '11px sans-serif'; ctx.fillText('🛡️', col.x + 3, currentY + 16);
+                } else if (col.type === 'powerup_magnet') {
+                    ctx.fillStyle = '#ff4500';
+                    ctx.beginPath(); ctx.arc(col.x + 12, currentY + 12, 11, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif'; ctx.fillText('🧲', col.x + 3, currentY + 16);
+                } else if (col.type === 'powerup_jump') {
+                    ctx.fillStyle = '#00fa9a';
+                    ctx.beginPath(); ctx.arc(col.x + 12, currentY + 12, 11, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = '#000'; ctx.font = '11px sans-serif'; ctx.fillText('🦘', col.x + 3, currentY + 16);
                 }
                 ctx.restore();
             });
@@ -1096,20 +1192,31 @@
             obstacles.forEach(obs => {
                 ctx.save();
                 if (obs.type === 'gummy') {
+                    // Cálculo de Squash & Stretch basado en su velocidad vertical (vy)
+                    let stretchX = 1 + (obs.vy * 0.02);
+                    let stretchY = 1 - (obs.vy * 0.02);
+                    
+                    // Límites para que el estiramiento sea estético y natural
+                    stretchX = Math.max(0.75, Math.min(1.35, stretchX));
+                    stretchY = Math.max(0.75, Math.min(1.35, stretchY));
+
+                    ctx.translate(obs.x + obs.width / 2, obs.y + obs.height / 2);
+                    ctx.scale(stretchX, stretchY);
+
                     ctx.fillStyle = '#ff1493';
                     ctx.beginPath();
-                    ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 10);
+                    ctx.roundRect(-obs.width / 2, -obs.height / 2, obs.width, obs.height, 10);
                     ctx.fill();
                     ctx.strokeStyle = '#ff9aef';
                     ctx.lineWidth = 2;
                     ctx.stroke();
 
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(obs.x + 8, obs.y + 8, 5, 5);
-                    ctx.fillRect(obs.x + 23, obs.y + 8, 5, 5);
+                    ctx.fillRect(-obs.width / 2 + 8, -obs.height / 2 + 8, 5, 5);
+                    ctx.fillRect(-obs.width / 2 + 23, -obs.height / 2 + 8, 5, 5);
                     ctx.fillStyle = '#000000';
-                    ctx.fillRect(obs.x + 9, obs.y + 9, 2, 2);
-                    ctx.fillRect(obs.x + 24, obs.y + 9, 2, 2);
+                    ctx.fillRect(-obs.width / 2 + 9, -obs.height / 2 + 9, 2, 2);
+                    ctx.fillRect(-obs.width / 2 + 24, -obs.height / 2 + 9, 2, 2);
                 } else {
                     ctx.fillStyle = '#ff4500';
                     ctx.strokeStyle = '#ff1493';
@@ -1151,8 +1258,16 @@
             ctx.fillRect(canvas.width / 2 - 100, 15, 200 * progress, 8);
         }
 
-        function gameLoop() {
-            updateGame();
+        let lastTime = 0;
+        let delta = 0;
+
+        function gameLoop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            delta = (timestamp - lastTime) / 1000;
+            if (delta > 0.1) delta = 0.1;
+            lastTime = timestamp;
+
+            updateGame(delta);
             renderGame();
             requestAnimationFrame(gameLoop);
         }
@@ -1167,6 +1282,9 @@
             obstacles = [];
             collectibles = [];
             activeParticles.length = 0;
+            powerups.shield.active = false;
+            powerups.magnet.active = false;
+            powerups.superJump.active = false;
             player.y = 300;
             player.vy = 0;
 
@@ -1213,7 +1331,7 @@
             spawnTimer = 0;
             obstacles = [];
             collectibles = [];
-            activeParticles.length = 0;
+            activeParticles.length, 0;
             victoryScreen.classList.add('hidden');
             gameState = 'PLAYING';
         }
@@ -1321,7 +1439,7 @@
                         if (lockedIndices.length > 0) {
                             let randomLock = lockedIndices[Math.floor(Math.random() * lockedIndices.length)];
                             savedData.gallery[randomLock] = true;
-                            prizeMessage = `¡Recuerdo aleatorio #${randomLock + 1} desbloqueada!`;
+                            prizeMessage = `¡Recuerdo aleatorio #${randomLock + 1} desbloqueado!`;
                         } else {
                             stars += 150;
                             prizeMessage = '¡Galería llena! Premio de 150 ⭐';
@@ -1341,7 +1459,7 @@
                         break;
                 }
                 saveGameData();
-                rouletteResult.textContent = prizeMessage;
+                rouletteResult.textContent = pivotMessage = prizeMessage;
                 rouletteResult.style.color = '#ff69b4';
             }, 4000);
         });
@@ -1362,7 +1480,7 @@
 
         document.getElementById('roulette-menu-btn').addEventListener('click', () => {
             rouletteResult.textContent = '';
-            rouletteScreen.classList.remove('hidden');
+            rouletteScreen.classList.add('hidden');
         });
         document.getElementById('close-roulette-btn').addEventListener('click', () => {
             rouletteScreen.classList.add('hidden');
