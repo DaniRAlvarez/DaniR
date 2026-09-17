@@ -13,6 +13,7 @@
             --accent: #b55fe6;
             --shop-color: #ffaa33;
             --gift-color: #ff55aa;
+            --wall-color: #00ffcc;
             --bg-color: #0a0812;
             --card-bg: rgba(20, 15, 30, 0.55);
             --text: #ffffff;
@@ -232,6 +233,18 @@
             box-shadow: 0 0 20px var(--gift-color);
         }
 
+        .link-btn.wall-btn {
+            border-color: var(--wall-color);
+            background: rgba(0, 255, 204, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.wall-btn:hover {
+            background: var(--wall-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--wall-color);
+        }
+
         /* Estilos del Panel Flotante (Modal) */
         .modal-overlay {
             position: fixed;
@@ -271,6 +284,14 @@
             overflow: hidden;
         }
 
+        /* Modal específico para el muro (más ancho) */
+        .modal-card.wall-card {
+            max-width: 480px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
         .modal-overlay.active .modal-card {
             transform: translateY(0);
         }
@@ -288,6 +309,34 @@
             color: #d0b0e0;
             margin-bottom: 1rem;
             line-height: 1.5;
+        }
+
+        /* Contenedor con scroll para los mensajes del muro */
+        .messages-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 320px;
+            margin-bottom: 1.2rem;
+            padding-right: 5px;
+            text-align: left;
+        }
+
+        /* Estilo personalizado de la barra de desplazamiento */
+        .messages-scroll-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .messages-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .fan-message-card {
+            background: rgba(255, 119, 188, 0.05);
+            border: 1px solid rgba(255, 119, 188, 0.25);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px rgba(255, 119, 188, 0.05);
         }
 
         .name-input, .visibility-select {
@@ -375,6 +424,16 @@
         .modal-btn.secondary:hover {
             background: rgba(255, 255, 255, 0.2);
             transform: scale(1.03);
+        }
+
+        .modal-btn.wall-action {
+            background: var(--wall-color);
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+        .modal-btn.wall-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(0, 255, 204, 0.7);
         }
 
         /* Estilo para el aviso de éxito dentro del modal */
@@ -489,6 +548,11 @@
                 🛍️ TIENDA
             </a>
 
+            <!-- Botón Muro de Fans -->
+            <a onclick="openModal('wallModal')" class="link-btn wall-btn">
+                💬 MURO DE FANS
+            </a>
+
             <!-- Botón Regalos al puro final -->
             <a onclick="openModal('giftModal')" class="link-btn gift-btn">
                 🎁 REGALOS
@@ -503,6 +567,23 @@
             <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
             <div class="modal-buttons">
                 <button class="modal-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812; box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);">ENTENDIDO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Flotante / Modal del Muro de Mensajes Públicos -->
+    <div id="wallModal" class="modal-overlay" onclick="closeModalOnBg(event, 'wallModal')">
+        <div class="modal-card wall-card" style="border-color: var(--wall-color); box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);">
+            <h3 class="modal-title" style="color: var(--wall-color);">💬 MURO DE FANS 💬</h3>
+            <p class="modal-text">Últimos mensajes públicos para Dani R:</p>
+            
+            <!-- Contenedor donde se cargarán los mensajes públicos -->
+            <div id="listaMensajesPublicos" class="messages-scroll-container">
+                <p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn wall-action" onclick="closeModal('wallModal')">CERRAR</button>
             </div>
         </div>
     </div>
@@ -565,6 +646,8 @@
                 document.getElementById('userName').style.display = 'block';
                 document.getElementById('userVisibility').style.display = 'block';
                 document.getElementById('userMessage').style.display = 'block';
+            } else if (modalId === 'wallModal') {
+                cargarMensajesPublicos();
             }
             document.getElementById(modalId).classList.add('active');
         }
@@ -577,6 +660,51 @@
             if (event.target.id === modalId) {
                 closeModal(modalId);
             }
+        }
+
+        /* Función para descargar, filtrar y mostrar solo los ÚLTIMOS 20 mensajes públicos */
+        function cargarMensajesPublicos() {
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+            const contenedor = document.getElementById('listaMensajesPublicos');
+            contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>';
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    contenedor.innerHTML = "";
+
+                    // Filtramos los públicos
+                    const mensajesPublicos = data.filter(item => {
+                        let vis = item.VISIBILIDAD ? item.VISIBILIDAD.trim().toUpperCase() : 'PUBLICO';
+                        return vis === 'PUBLICO' && item.NOMBRE && item.MENSAJE;
+                    });
+
+                    if (mensajesPublicos.length === 0) {
+                        contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Aún no hay mensajes públicos. ¡Sé el primero en dejar uno! 💖</p>';
+                        return;
+                    }
+
+                    // Invertimos para que los más nuevos queden arriba, y tomamos solo los últimos 20 con .slice(0, 20)
+                    const ultimosVeinte = mensajesPublicos.reverse().slice(0, 20);
+
+                    ultimosVeinte.forEach(item => {
+                        let tarjeta = document.createElement('div');
+                        tarjeta.className = 'fan-message-card';
+                        
+                        tarjeta.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="color: var(--primary); font-size: 0.8rem;">✨ ${item.NOMBRE}</strong>
+                                <span style="font-size: 0.6rem; color: #a080b0;">${item.FECHA || ''}</span>
+                            </div>
+                            <p style="font-size: 0.8rem; color: #f3e8ff; line-height: 1.4; word-break: break-word;">${item.MENSAJE}</p>
+                        `;
+                        contenedor.appendChild(tarjeta);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar el muro:', error);
+                    contenedor.innerHTML = '<p style="text-align: center; color: #ff77bc; font-size: 0.8rem; margin-top: 2rem;">Error al cargar los mensajes. Inténtalo más tarde.</p>';
+                });
         }
 
         /* Función para enviar datos a SheetDB incluyendo la visibilidad */
@@ -608,7 +736,6 @@
             }
             // --------------------------------------------------
 
-            // Columnas mapeadas exactamente en mayúsculas para Google Sheets
             const datosAEnviar = {
                 data: [
                     {
@@ -632,22 +759,18 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Actualizar contador diario en el localStorage
                 controlEnvios.count++;
                 localStorage.setItem('limiteMensajesDaniR', JSON.stringify(controlEnvios));
 
-                // Ocultar formulario y mostrar cuadro de éxito verde
                 document.getElementById('userName').style.display = 'none';
                 document.getElementById('userVisibility').style.display = 'none';
                 document.getElementById('userMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
 
-                // Limpiar inputs
                 nameInput.value = "";
                 msgInput.value = "";
 
-                // Cerrar modal tras 2.5 segundos automáticamente
                 setTimeout(() => {
                     closeModal('giftModal');
                 }, 2500);
