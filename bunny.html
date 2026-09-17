@@ -83,6 +83,33 @@
         .interactive-ui {
             pointer-events: auto;
         }
+        
+        /* Botón de Fullscreen Estilizado */
+        #fullscreen-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 50;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+        #fullscreen-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 20, 147, 0.6);
+            border-color: #ff69b4;
+        }
+
         .btn {
             background: linear-gradient(135deg, #ff69b4, #ff1493);
             border: none;
@@ -305,6 +332,9 @@
 <body>
 
     <div id="game-container">
+        <!-- Botón de Pantalla Completa -->
+        <button id="fullscreen-btn" class="interactive-ui" title="Pantalla Completa">⛶</button>
+
         <canvas id="gameCanvas" width="800" height="450"></canvas>
         
         <div class="ui-layer">
@@ -576,7 +606,7 @@
             }
         }
 
-        // Personaje del Conejo (Con patitas, colita y manitos añadidas)
+        // Personaje del Conejo (Con patitas, colita y manitos)
         const player = {
             x: 100,
             y: 300,
@@ -616,16 +646,14 @@
                 targetCtx.save();
                 targetCtx.translate(this.width / 2, this.height / 2);
 
-                // Sombra en el suelo
                 targetCtx.fillStyle = 'rgba(0,0,0,0.25)';
                 targetCtx.beginPath();
                 targetCtx.ellipse(0, this.height/2 - 2, 16, 5, 0, 0, Math.PI * 2);
                 targetCtx.fill();
 
                 let earOffset = Math.sin(this.animTimer) * 4;
-                let limbOffset = Math.sin(this.animTimer * 2) * 3; // Animación de patitas/manitos al correr
+                let limbOffset = Math.sin(this.animTimer * 2) * 3;
                 
-                // Oreja Izquierda
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.ellipse(-9, -34 + earOffset, 6, 22, -0.15, 0, Math.PI * 2);
@@ -638,7 +666,6 @@
                 targetCtx.ellipse(-9, -34 + earOffset, 3, 14, -0.15, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // Oreja Derecha
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.ellipse(9, -34 - earOffset, 6, 22, 0.15, 0, Math.PI * 2);
@@ -651,7 +678,6 @@
                 targetCtx.ellipse(9, -34 - earOffset, 3, 14, 0.15, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // Colita pompón atrás
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.arc(-18, 5, 5, 0, Math.PI * 2);
@@ -660,7 +686,6 @@
                 targetCtx.lineWidth = 1;
                 targetCtx.stroke();
 
-                // Patitas traseras y delanteras
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.ellipse(-8, 25 + (this.isGrounded ? limbOffset : 0), 6, 4, 0.2, 0, Math.PI * 2);
@@ -670,26 +695,22 @@
                 targetCtx.lineWidth = 1;
                 targetCtx.stroke();
 
-                // Cuerpo
                 targetCtx.fillStyle = '#ff69b4';
                 targetCtx.beginPath();
                 targetCtx.roundRect(-16, -1, 32, 28, [12, 12, 14, 14]);
                 targetCtx.fill();
 
-                // Manitos al frente
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.arc(-13, 8, 3.5, 0, Math.PI * 2);
                 targetCtx.arc(13, 8, 3.5, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // Cuello / base de cabeza
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.arc(0, -1, 9, Math.PI, 0, false);
                 targetCtx.fill();
 
-                // Cabeza
                 targetCtx.fillStyle = '#ffffff';
                 targetCtx.beginPath();
                 targetCtx.arc(0, -15, 18, 0, Math.PI * 2);
@@ -698,14 +719,12 @@
                 targetCtx.lineWidth = 2;
                 targetCtx.stroke();
 
-                // Mejillas
                 targetCtx.fillStyle = 'rgba(255, 150, 180, 0.5)';
                 targetCtx.beginPath();
                 targetCtx.arc(-11, -11, 3.5, 0, Math.PI * 2);
                 targetCtx.arc(11, -11, 3.5, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // Ojos
                 targetCtx.fillStyle = '#3a1e2b';
                 targetCtx.beginPath();
                 targetCtx.arc(-6, -16, 2.5, 0, Math.PI * 2);
@@ -717,13 +736,11 @@
                 targetCtx.arc(5, -17, 1.1, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // Nariz
                 targetCtx.fillStyle = '#ff8fa3';
                 targetCtx.beginPath();
                 targetCtx.arc(0, -11, 2.5, 0, Math.PI * 2);
                 targetCtx.fill();
 
-                // Escudo protector
                 if (powerups.shield.active) {
                     targetCtx.strokeStyle = '#00ffff';
                     targetCtx.lineWidth = 2.5;
@@ -1228,7 +1245,6 @@
             obstacles.forEach(obs => {
                 ctx.save();
                 if (obs.type === 'gummy') {
-                    // Squash & Stretch dinámico para las gomitas saltarinas
                     let stretchX = 1 + (obs.vy * 0.025);
                     let stretchY = 1 - (obs.vy * 0.025);
                     stretchX = Math.max(0.7, Math.min(1.4, stretchX));
@@ -1496,6 +1512,28 @@
                 rouletteResult.textContent = prizeMessage;
                 rouletteResult.style.color = '#ff69b4';
             }, 4000);
+        });
+
+        // Lógica del Botón Fullscreen
+        const fullscreenBtn = document.getElementById('fullscreen-btn');
+        const gameContainer = document.getElementById('game-container');
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                if (gameContainer.requestFullscreen) {
+                    gameContainer.requestFullscreen();
+                } else if (gameContainer.webkitRequestFullscreen) {
+                    gameContainer.webkitRequestFullscreen();
+                }
+                fullscreenBtn.textContent = '⤹';
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+                fullscreenBtn.textContent = '⛶';
+            }
         });
 
         document.getElementById('start-btn').addEventListener('click', startGame);
