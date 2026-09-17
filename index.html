@@ -12,6 +12,7 @@
             --secondary: #00ffff;
             --accent: #b55fe6;
             --shop-color: #ffaa33;
+            --gift-color: #ff55aa; /* Rosadito especial para el botón de Regalos */
             --bg-color: #0a0812;
             --card-bg: rgba(20, 15, 30, 0.55);
             --text: #ffffff;
@@ -219,7 +220,19 @@
             box-shadow: 0 0 20px var(--shop-color);
         }
 
-        /* Estilos del Panel Flotante (Modal Próximamente) */
+        .link-btn.gift-btn {
+            border-color: var(--gift-color);
+            background: rgba(255, 85, 170, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.gift-btn:hover {
+            background: var(--gift-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--gift-color);
+        }
+
+        /* Estilos del Panel Flotante (Modal) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -245,15 +258,17 @@
 
         .modal-card {
             background: rgba(25, 18, 40, 0.95);
-            border: 1px solid var(--shop-color);
+            border: 1px solid var(--primary);
             border-radius: 20px;
             padding: 2.5rem 2rem;
             width: 85%;
             max-width: 380px;
             text-align: center;
-            box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);
+            box-shadow: 0 0 30px rgba(255, 119, 188, 0.3);
             transform: translateY(20px);
             transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
         .modal-overlay.active .modal-card {
@@ -262,8 +277,8 @@
 
         .modal-title {
             font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            color: var(--shop-color);
+            font-size: 1.1rem;
+            color: var(--primary);
             margin-bottom: 0.8rem;
             letter-spacing: 2px;
         }
@@ -277,7 +292,7 @@
 
         .modal-close-btn {
             padding: 0.7rem 1.5rem;
-            background: var(--shop-color);
+            background: var(--primary);
             color: #0a0812;
             border: none;
             border-radius: 12px;
@@ -287,12 +302,41 @@
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);
+            box-shadow: 0 0 15px rgba(255, 119, 188, 0.4);
         }
 
         .modal-close-btn:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(255, 170, 51, 0.7);
+            box-shadow: 0 0 25px rgba(255, 119, 188, 0.7);
+        }
+
+        /* Mariposas flotantes animadas */
+        .butterfly {
+            position: absolute;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: flyButterfly 4s infinite ease-in-out;
+            opacity: 0.8;
+        }
+
+        @keyframes flyButterfly {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            50% {
+                transform: translate(60px, -70px) rotate(15deg) scale(1.2);
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-40px, -140px) rotate(-15deg) scale(0.8);
+                opacity: 0;
+            }
         }
 
         footer {
@@ -353,19 +397,38 @@
                 FACEBOOK
             </a>
 
-            <!-- Botón Tienda con activación del panel flotante -->
-            <a onclick="openModal()" class="link-btn shop-btn">
+            <!-- Botón Tienda -->
+            <a onclick="openModal('shopModal')" class="link-btn shop-btn">
                 🛍️ TIENDA
+            </a>
+
+            <!-- Botón Regalos al puro final -->
+            <a onclick="openModal('giftModal')" class="link-btn gift-btn">
+                🎁 REGALOS
             </a>
         </div>
     </main>
 
-    <!-- Panel Flotante / Modal de Próximamente -->
-    <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event)">
-        <div class="modal-card">
-            <h3 class="modal-title">✨ TIENDA OFICIAL ✨</h3>
+    <!-- Panel Flotante / Modal de Tienda -->
+    <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event, 'shopModal')">
+        <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
+            <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
             <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
-            <button class="modal-close-btn" onclick="closeModal()">ENTENDIDO</button>
+            <button class="modal-close-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <!-- Panel Flotante / Modal de Regalos (Con Mariposas Volando) -->
+    <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
+        <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
+            <!-- Mariposas decorativas animadas dentro de la tarjeta -->
+            <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
+            <span class="butterfly" style="top: 85%; left: 70%; animation-delay: 1.5s;">🦋</span>
+            <span class="butterfly" style="top: 75%; left: 45%; animation-delay: 2.8s;">🦋</span>
+
+            <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
+            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Muy pronto habilitaremos esta sección con sorpresas y detalles únicos.</p>
+            <button class="modal-close-btn" onclick="closeModal('giftModal')" style="background: var(--gift-color); box-shadow: 0 0 15px rgba(255, 85, 170, 0.4);">ENTENDIDO</button>
         </div>
     </div>
 
@@ -385,19 +448,18 @@
     </footer>
 
     <script>
-        /* Funciones para controlar el panel flotante de la tienda */
-        function openModal() {
-            document.getElementById('shopModal').classList.add('active');
+        /* Funciones para controlar los paneles flotantes */
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
         }
 
-        function closeModal() {
-            document.getElementById('shopModal').classList.remove('active');
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
         }
 
-        function closeModalOnBg(event) {
-            // Si hace clic en el fondo oscuro (fuera de la tarjeta), se cierra
-            if (event.target.id === 'shopModal') {
-                closeModal();
+        function closeModalOnBg(event, modalId) {
+            if (event.target.id === modalId) {
+                closeModal(modalId);
             }
         }
 
@@ -462,8 +524,7 @@
                 const g = Math.floor(120 + 135 * Math.sin(p.colorShift * 2 + time * 0.0015));
                 const b = Math.floor(220 + 35 * Math.cos(time * 0.001));
 
-                cdnColor = `rgba(${r}, ${g}, ${b}, 0.6)`;
-                ctx.fillStyle = cdnColor;
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
                 ctx.beginPath();
                 ctx.arc(x, y, p.size, 0, 6.28);
                 ctx.fill();
