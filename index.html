@@ -372,6 +372,26 @@
             transform: scale(1.03);
         }
 
+        /* Estilo para el aviso de éxito dentro del modal */
+        #successMessage {
+            display: none;
+            background: rgba(85, 255, 170, 0.15);
+            border: 1px solid #55ffaa;
+            color: #55ffaa;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1rem;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         /* Mariposas flotantes animadas */
         .butterfly {
             position: absolute;
@@ -493,6 +513,9 @@
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
             <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu nombre y tu mensaje:</p>
             
+            <!-- Aviso visual de mensaje enviado (inicialmente oculto) -->
+            <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
+
             <!-- Campo para el Nombre -->
             <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
 
@@ -500,7 +523,7 @@
             <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
 
             <!-- Botones alineados -->
-            <div class="modal-buttons">
+            <div class="modal-buttons" id="modalActionBtns">
                 <button class="modal-btn secondary" onclick="closeModal('giftModal')">CANCELAR</button>
                 <button class="modal-btn primary" onclick="submitMessage()">💬 ENVIAR</button>
             </div>
@@ -525,6 +548,13 @@
     <script>
         /* Funciones para controlar los paneles flotantes */
         function openModal(modalId) {
+            // Limpiar el mensaje de éxito y mostrar formulario al abrir
+            if (modalId === 'giftModal') {
+                document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('modalActionBtns').style.display = 'flex';
+                document.getElementById('userName').style.display = 'block';
+                document.getElementById('userMessage').style.display = 'block';
+            }
             document.getElementById(modalId).classList.add('active');
         }
 
@@ -538,7 +568,7 @@
             }
         }
 
-        /* Función para enviar datos directamente a SheetDB sin alertas estorbosas del navegador */
+        /* Función optimizada para enviar datos a SheetDB y mostrar el cuadro de éxito */
         function submitMessage() {
             const nameInput = document.getElementById('userName');
             const msgInput = document.getElementById('userMessage');
@@ -547,7 +577,8 @@
             const textoMensaje = msgInput.value.trim();
 
             if (nombreFan === "" || textoMensaje === "") {
-                return; // Si está vacío no hace nada de forma silenciosa
+                alert("Por favor completa ambos campos.");
+                return;
             }
 
             const datosAEnviar = {
@@ -562,7 +593,6 @@
 
             const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
 
-            // Envío directo a la API en segundo plano
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -573,13 +603,24 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Limpiar campos y cerrar modal suavemente al terminar de guardar
+                // Ocultar campos y botones, y mostrar el cuadro de éxito bonito
+                document.getElementById('userName').style.display = 'none';
+                document.getElementById('userMessage').style.display = 'none';
+                document.getElementById('modalActionBtns').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+
+                // Limpiar los inputs
                 nameInput.value = "";
                 msgInput.value = "";
-                closeModal('giftModal');
+
+                // Cerrar la ventana automáticamente después de 2.5 segundos
+                setTimeout(() => {
+                    closeModal('giftModal');
+                }, 2500);
             })
             .catch(error => {
-                console.error('Error al guardar en la base de datos:', error);
+                console.error('Error al conectar con la base de datos:', error);
+                alert("Hubo un error al enviar el mensaje. Revisa tu conexión.");
             });
         }
 
