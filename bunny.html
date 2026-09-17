@@ -355,9 +355,7 @@
         <div id="gallery-screen" class="modal-screen hidden interactive-ui">
             <h1 style="font-size: 32px;">Galería de Recuerdos</h1>
             <p>Fotos coleccionables desbloqueadas al superar niveles.</p>
-            <div class="gallery-grid" id="galleryGrid">
-                <!-- Se generan dinámicamente con JS (10 slots) -->
-            </div>
+            <div class="gallery-grid" id="galleryGrid"></div>
             <button class="btn btn-secondary" id="close-gallery-btn" style="margin-top: 25px;">Volver</button>
         </div>
 
@@ -422,8 +420,8 @@
                 const osc = this.ctx.createOscillator();
                 const gain = this.ctx.createGain();
                 osc.type = 'triangle';
-                osc.frequency.setValueAtTime(987.77, this.ctx.currentTime); // B5
-                osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.08); // E6
+                osc.frequency.setValueAtTime(987.77, this.ctx.currentTime);
+                osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.08);
                 gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
                 gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.2);
                 osc.connect(gain);
@@ -449,7 +447,7 @@
             playWin() {
                 this.init();
                 if (!this.ctx) return;
-                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                const notes = [523.25, 659.25, 783.99, 1046.50];
                 notes.forEach((freq, idx) => {
                     const osc = this.ctx.createOscillator();
                     const gain = this.ctx.createGain();
@@ -469,9 +467,8 @@
 
         // --- MOTOR DEL JUEGO ---
         const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
 
-        // Referencias UI
         const scoreValEl = document.getElementById('scoreVal');
         const starsValEl = document.getElementById('starsVal');
         const livesValEl = document.getElementById('livesVal');
@@ -484,21 +481,18 @@
         const finalScoreEl = document.getElementById('finalScore');
         const photoUnlockedMsg = document.getElementById('photoUnlockedMsg');
 
-        // Estados del Juego
-        let gameState = 'START'; // START, PLAYING, GAMEOVER, VICTORY
+        let gameState = 'START';
         let score = 0;
         let stars = 0;
         let lives = 3;
         let currentLevel = 1;
-        let gameTime = 0;
         let distanceTraveled = 0;
         let levelGoalDistance = 2500;
 
-        // Datos de Guardado & Galería (10 fotos)
         let savedData = {
             stars: 0,
             highScore: 0,
-            gallery: [true, false, false, false, false, false, false, false, false, false] // Foto 1 desbloqueada por defecto
+            gallery: [true, false, false, false, false, false, false, false, false, false]
         };
 
         function loadGameData() {
@@ -519,7 +513,6 @@
         }
         loadGameData();
 
-        // Estructura original del Jugador (Conejo)
         const player = {
             x: 100,
             y: 300,
@@ -530,13 +523,11 @@
             gravity: 0.55,
             isGrounded: false,
             jumpsLeft: 2,
-            ducking: false,
             animTimer: 0,
             update() {
                 this.vy += this.gravity;
                 this.y += this.vy;
 
-                // Suelo base
                 const groundLevel = 350;
                 if (this.y + this.height > groundLevel) {
                     this.y = groundLevel - this.height;
@@ -559,54 +550,44 @@
                 ctx.save();
                 ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
 
-                // --- ESTRUCTURA ORIGINAL DEL DIBUJADO DEL CONEJO ---
-                // Sombra
                 ctx.fillStyle = 'rgba(0,0,0,0.3)';
                 ctx.beginPath();
                 ctx.ellipse(0, this.height/2 - 2, 18, 6, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Orejas
                 ctx.fillStyle = '#ffffff';
                 let earOffset = Math.sin(this.animTimer) * 3;
-                // Oreja izq
                 ctx.beginPath();
                 ctx.ellipse(-10, -32 + earOffset, 6, 20, -0.1, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#e0d0e0';
                 ctx.stroke();
-                // Interior oreja izq
                 ctx.fillStyle = '#ffb6c1';
                 ctx.beginPath();
                 ctx.ellipse(-10, -32 + earOffset, 3, 13, -0.1, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Oreja der
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.ellipse(10, -32 - earOffset, 6, 20, 0.1, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.strokeStyle = '#e0d0e0';
                 ctx.stroke();
-                // Interior oreja der
                 ctx.fillStyle = '#ffb6c1';
                 ctx.beginPath();
                 ctx.ellipse(10, -32 - earOffset, 3, 13, 0.1, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Cuerpo / Vestido
-                ctx.fillStyle = '#ff69b4'; // Vestido rosa
+                ctx.fillStyle = '#ff69b4';
                 ctx.beginPath();
                 ctx.roundRect(-16, -2, 32, 28, [10, 10, 14, 14]);
                 ctx.fill();
 
-                // Cuello / Encaje
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(0, -2, 10, Math.PI, 0, false);
                 ctx.fill();
 
-                // Cabeza
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(0, -14, 18, 0, Math.PI * 2);
@@ -615,26 +596,22 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Ojos
                 ctx.fillStyle = '#4a2e35';
                 ctx.beginPath();
                 ctx.arc(-6, -16, 2.5, 0, Math.PI * 2);
                 ctx.arc(6, -16, 2.5, 0, Math.PI * 2);
                 ctx.fill();
-                // Brillo de ojos
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(-7, -17, 1, 0, Math.PI * 2);
                 ctx.arc(5, -17, 1, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Nariz y hocico
                 ctx.fillStyle = '#ffb6c1';
                 ctx.beginPath();
                 ctx.arc(0, -11, 3, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Bigotes
                 ctx.strokeStyle = '#d0c0d0';
                 ctx.lineWidth = 1;
                 ctx.beginPath();
@@ -644,7 +621,6 @@
                 ctx.moveTo(3, -9); ctx.lineTo(12, -8);
                 ctx.stroke();
 
-                // Patitas y manos
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath();
                 ctx.arc(-12, 22, 6, 0, Math.PI * 2);
@@ -655,14 +631,12 @@
             }
         };
 
-        // Arreglos de entidades del mundo
         let obstacles = [];
         let collectibles = [];
         let particles = [];
         let clouds = [];
         let backgroundScenery = [];
 
-        // Inicializar elementos decorativos del mundo
         function initWorldScenery() {
             clouds = [];
             for (let i = 0; i < 5; i++) {
@@ -699,10 +673,8 @@
             }
         }
 
-        // --- GENERADOR DE FOTOGRAFÍAS (Dibujado en Canvas para Galería) ---
         function drawPhotoContent(targetCtx, photoIndex, width, height) {
             targetCtx.save();
-            // Fondo temático según la foto
             let grad = targetCtx.createLinearGradient(0, 0, 0, height);
             if (photoIndex % 3 === 0) {
                 grad.addColorStop(0, '#1a0933'); grad.addColorStop(1, '#ff1493');
@@ -714,7 +686,6 @@
             targetCtx.fillStyle = grad;
             targetCtx.fillRect(0, 0, width, height);
 
-            // Estrellas de fondo en la foto
             targetCtx.fillStyle = '#ffffff';
             for (let i = 0; i < 20; i++) {
                 let px = (i * 37 + photoIndex * 19) % width;
@@ -722,12 +693,10 @@
                 targetCtx.fillRect(px, py, 2, 2);
             }
 
-            // Dibujar al conejito protagonista centrado conmemorativo
             targetCtx.save();
             targetCtx.translate(width / 2, height / 2 + 20);
             targetCtx.scale(1.5, 1.5);
 
-            // Orejas
             targetCtx.fillStyle = '#ffffff';
             targetCtx.beginPath(); targetCtx.ellipse(-10, -32, 6, 20, -0.1, 0, Math.PI * 2); targetCtx.fill();
             targetCtx.fillStyle = '#ffb6c1';
@@ -738,28 +707,22 @@
             targetCtx.fillStyle = '#ffb6c1';
             targetCtx.beginPath(); targetCtx.ellipse(10, -32, 3, 13, 0.1, 0, Math.PI * 2); targetCtx.fill();
 
-            // Cuerpo
             targetCtx.fillStyle = photoIndex % 2 === 0 ? '#ff69b4' : '#00ffff';
             targetCtx.beginPath(); targetCtx.roundRect(-16, -2, 32, 28, [10, 10, 14, 14]); targetCtx.fill();
 
-            // Cabeza
             targetCtx.fillStyle = '#ffffff';
             targetCtx.beginPath(); targetCtx.arc(0, -14, 18, 0, Math.PI * 2); targetCtx.fill();
 
-            // Ojos felices
             targetCtx.fillStyle = '#4a2e35';
             targetCtx.beginPath();
             targetCtx.arc(-6, -16, 2.5, 0, Math.PI * 2);
             targetCtx.arc(6, -16, 2.5, 0, Math.PI * 2);
             targetCtx.fill();
 
-            // Nariz
             targetCtx.fillStyle = '#ffb6c1';
             targetCtx.beginPath(); targetCtx.arc(0, -11, 3, 0, Math.PI * 2); targetCtx.fill();
-
             targetCtx.restore();
 
-            // Marco decorativo y texto de la foto
             targetCtx.strokeStyle = '#ffffff';
             targetCtx.lineWidth = 4;
             targetCtx.strokeRect(10, 10, width - 20, height - 20);
@@ -769,13 +732,10 @@
             targetCtx.shadowColor = 'rgba(0,0,0,0.8)';
             targetCtx.shadowBlur = 4;
             targetCtx.fillText(`Recuerdo #${photoIndex + 1}`, 20, 35);
-
             targetCtx.restore();
         }
 
-        // --- RENDERIZADO DEL MUNDO Y PERSONAJES (Estructura Original) ---
         function drawWorldBackground() {
-            // Cielo degradado dinámico según nivel
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
             if (currentLevel === 1) {
                 skyGrad.addColorStop(0, '#2e1a47');
@@ -790,7 +750,6 @@
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Nubes de fondo con estructura original
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             clouds.forEach(cloud => {
                 ctx.beginPath();
@@ -800,10 +759,8 @@
                 ctx.fill();
             });
 
-            // Elementos de escenografía del mundo (Bastones de caramelo y setas)
             backgroundScenery.forEach(item => {
                 if (item.type === 'candy_cane') {
-                    // Estructura original bastón de caramelo
                     ctx.strokeStyle = '#ff69b4';
                     ctx.lineWidth = 6;
                     ctx.beginPath();
@@ -812,7 +769,6 @@
                     ctx.arc(item.x + 8, 300, 8, Math.PI, 0, false);
                     ctx.stroke();
                 } else {
-                    // Estructura original seta
                     ctx.fillStyle = '#ff1493';
                     ctx.beginPath();
                     ctx.ellipse(item.x, 340, 16, 12, 0, Math.PI, 0, false);
@@ -822,18 +778,15 @@
                 }
             });
 
-            // Suelo Principal (Candy Land Floor)
             ctx.fillStyle = '#3d123d';
             ctx.fillRect(0, 350, canvas.width, 100);
 
-            // Borde superior del suelo con glaseado brillante
             let floorGrad = ctx.createLinearGradient(0, 350, 0, 365);
             floorGrad.addColorStop(0, '#ff9aef');
             floorGrad.addColorStop(1, '#ff1493');
             ctx.fillStyle = floorGrad;
             ctx.fillRect(0, 350, canvas.width, 15);
 
-            // Ondas de glaseado decorativas en el suelo
             ctx.fillStyle = '#ffffff';
             for (let i = 0; i < canvas.width; i += 40) {
                 ctx.beginPath();
@@ -842,23 +795,40 @@
             }
         }
 
-        // --- LÓGICA DE OBSTÁCULOS Y COLECCIONABLES (Estructura Original) ---
         function spawnEntities() {
-            if (Math.random() < 0.018 + (currentLevel * 0.003)) {
-                // Obstáculo (Gominola enemiga o bloque espinoso de caramelo)
-                let type = Math.random() > 0.5 ? 'gummy' : 'spike';
-                obstacles.push({
-                    x: canvas.width + 50,
-                    y: type === 'gummy' ? 320 : 310,
-                    width: type === 'gummy' ? 36 : 30,
-                    height: type === 'gummy' ? 30 : 40,
-                    type: type,
-                    speed: 4 + (currentLevel * 0.5)
-                });
+            // Frecuencia aumentada para un número considerable de enemigos y pinchos equilibrados
+            if (Math.random() < 0.022 + (currentLevel * 0.003)) {
+                let isGummy = Math.random() > 0.35; // Mayoría de enemigos rosados con vida propia
+                if (isGummy) {
+                    obstacles.push({
+                        x: canvas.width + 50,
+                        y: 320,
+                        width: 36,
+                        height: 30,
+                        type: 'gummy',
+                        baseSpeed: 3.8 + (currentLevel * 0.4),
+                        vx: -(3.8 + (currentLevel * 0.4)),
+                        vy: 0,
+                        gravity: 0.5,
+                        isGrounded: true,
+                        jumpCooldown: Math.random() * 60 + 40
+                    });
+                } else {
+                    let spikeCount = Math.random() > 0.5 ? 2 : 3;
+                    let spikeWidth = spikeCount * 14;
+                    obstacles.push({
+                        x: canvas.width + 50,
+                        y: 325,
+                        width: spikeWidth,
+                        height: 25,
+                        type: 'spike',
+                        spikeCount: spikeCount,
+                        vx: -(4 + (currentLevel * 0.4))
+                    });
+                }
             }
 
             if (Math.random() < 0.025) {
-                // Coleccionable (Caramelo / Estrella)
                 let isStar = Math.random() < 0.2;
                 collectibles.push({
                     x: canvas.width + 50,
@@ -866,26 +836,22 @@
                     width: 24,
                     height: 24,
                     type: isStar ? 'star' : 'candy',
-                    speed: 4 + (currentLevel * 0.5),
+                    speed: 4.2 + (currentLevel * 0.4),
                     bobTimer: Math.random() * Math.PI
                 });
             }
         }
 
-        // --- BUCLE PRINCIPAL ---
         function updateGame() {
             if (gameState !== 'PLAYING') return;
 
-            gameTime++;
             distanceTraveled += 4 + (currentLevel * 0.5);
 
-            // Actualizar nubes
             clouds.forEach(cloud => {
                 cloud.x -= cloud.speed;
                 if (cloud.x < -60) cloud.x = canvas.width + 60;
             });
 
-            // Actualizar escenografía fondo
             backgroundScenery.forEach(item => {
                 item.x -= (4 + (currentLevel * 0.5));
                 if (item.x < -30) item.x = canvas.width + 30;
@@ -894,39 +860,71 @@
             player.update();
             spawnEntities();
 
-            // Actualizar Obstáculos
+            // Actualizar obstáculos (enemigos con vida propia y pinchos estáticos)
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 let obs = obstacles[i];
-                obs.x -= obs.speed;
 
-                // Colisión con Jugador
+                if (obs.type === 'gummy') {
+                    // IA propia del enemigo rosado: avanza, salta y se abalanza hacia el personaje
+                    obs.vy += obs.gravity;
+                    obs.y += obs.vy;
+
+                    let groundLevel = 320;
+                    if (obs.y >= groundLevel) {
+                        obs.y = groundLevel;
+                        obs.vy = 0;
+                        obs.isGrounded = true;
+                    }
+
+                    // Reducir contador para su próximo salto autónomo o embestida
+                    obs.jumpCooldown--;
+                    if (obs.isGrounded && obs.jumpCooldown <= 0) {
+                        obs.vy = -9.5; // Salto con vida propia
+                        obs.isGrounded = false;
+                        
+                        // Si está cerca del conejito, se impulsa un poco más hacia adelante para atacarlo
+                        let distanceToPlayer = obs.x - player.x;
+                        if (distanceToPlayer > 0 && distanceToPlayer < 350) {
+                            obs.vx = obs.baseSpeed * 1.6; // Embestida rápida hacia adelante
+                        } else {
+                            obs.vx = -obs.baseSpeed;
+                        }
+                        obs.jumpCooldown = Math.random() * 70 + 50;
+                    }
+
+                    obs.x += obs.vx;
+                } else {
+                    // Los pinchos son fijos y se mueven solo con el scroll del mundo
+                    obs.x += obs.vx;
+                }
+
+                // Detección de colisión precisa con el jugador
                 if (
                     player.x < obs.x + obs.width &&
                     player.x + player.width > obs.x &&
                     player.y < obs.y + obs.height &&
                     player.y + player.height > obs.y
                 ) {
-                    // Si cae sobre el enemigo gominola (mecánica de doble salto / rebote)
-                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - player.vy <= obs.y + 10) {
+                    // Si el jugador cae encima del enemigo rosado (rebote y eliminación)
+                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - player.vy <= obs.y + 12) {
                         obstacles.splice(i, 1);
-                        player.vy = -8; // rebote
+                        player.vy = -8; // Rebote
                         score += 50;
                         soundManager.playCoin();
-                        createParticles(obs.x + obs.width/2, obs.y, '#00ffff', 10);
+                        createParticles(obs.x + obs.width/2, obs.y, '#ff1493', 10);
                         continue;
                     } else {
-                        // Daño
                         obstacles.splice(i, 1);
                         lives--;
                         soundManager.playHit();
-                        createParticles(player.x + player.width/2, player.y + player.height/2, '#ff0000', 12);
+                        createParticles(player.x + player.width/2, player.y + player.height/2, '#ff69b4', 12);
                         if (lives <= 0) {
                             triggerGameOver();
                         }
                     }
                 }
 
-                if (obs.x < -50) obstacles.splice(i, 1);
+                if (obs.x < -60) obstacles.splice(i, 1);
             }
 
             // Actualizar Coleccionables
@@ -934,15 +932,14 @@
                 let col = collectibles[i];
                 col.x -= col.speed;
                 col.bobTimer += 0.1;
-                let currentY = col.y + Math.sin(col.bobTimer) * 4;
 
-                // Colisión Coleccionable
                 if (
                     player.x < col.x + col.width &&
                     player.x + player.width > col.x &&
                     player.y < col.y + col.height &&
                     player.y + player.height > col.y
                 ) {
+                    let currentY = col.y + Math.sin(col.bobTimer) * 4;
                     if (col.type === 'star') {
                         stars += 1;
                         score += 100;
@@ -969,13 +966,11 @@
                 if (p.alpha <= 0) particles.splice(i, 1);
             }
 
-            // Actualizar HUD en pantalla
             scoreValEl.textContent = score;
             starsValEl.textContent = stars;
             livesValEl.textContent = lives;
             levelValEl.textContent = currentLevel;
 
-            // Condición de Victoria de Nivel
             if (distanceTraveled >= levelGoalDistance) {
                 triggerVictory();
             }
@@ -986,12 +981,11 @@
 
             drawWorldBackground();
 
-            // Dibujar Coleccionables (Estructura Original)
+            // Dibujar Coleccionables
             collectibles.forEach(col => {
                 ctx.save();
                 let currentY = col.y + Math.sin(col.bobTimer) * 4;
                 if (col.type === 'star') {
-                    // Estrella
                     ctx.fillStyle = '#ffd700';
                     ctx.beginPath();
                     ctx.arc(col.x + 12, currentY + 12, 10, 0, Math.PI * 2);
@@ -1000,12 +994,10 @@
                     ctx.font = '12px sans-serif';
                     ctx.fillText('⭐', col.x + 4, currentY + 16);
                 } else {
-                    // Caramelo / Gominola dulce
                     ctx.fillStyle = '#ff1493';
                     ctx.beginPath();
                     ctx.roundRect(col.x, currentY + 4, 24, 16, 6);
                     ctx.fill();
-                    // Envoltorio extremos
                     ctx.fillStyle = '#00ffff';
                     ctx.beginPath();
                     ctx.moveTo(col.x, currentY + 12); ctx.lineTo(col.x - 6, currentY + 6); ctx.lineTo(col.x - 6, currentY + 18);
@@ -1017,36 +1009,47 @@
                 ctx.restore();
             });
 
-            // Dibujar Obstáculos (Estructura Original)
+            // Dibujar Obstáculos
             obstacles.forEach(obs => {
                 ctx.save();
                 if (obs.type === 'gummy') {
-                    // Enemigo Gominola Osito
-                    ctx.fillStyle = '#8a2be2';
+                    // Enemigo gominola rosado dinámico
+                    ctx.fillStyle = '#ff1493';
                     ctx.beginPath();
                     ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 10);
                     ctx.fill();
-                    // Ojos malignos
-                    ctx.fillStyle = '#ff0000';
-                    ctx.fillRect(obs.x + 8, obs.y + 8, 4, 4);
-                    ctx.fillRect(obs.x + 24, obs.y + 8, 4, 4);
+                    ctx.strokeStyle = '#ff9aef';
+                    ctx.lineWidth = 2;
+                    ctx.stroke();
+                    // Ojos expresivos
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(obs.x + 8, obs.y + 8, 5, 5);
+                    ctx.fillRect(obs.x + 23, obs.y + 8, 5, 5);
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(obs.x + 9, obs.y + 9, 2, 2);
+                    ctx.fillRect(obs.x + 24, obs.y + 9, 2, 2);
                 } else {
-                    // Bloque espinoso de caramelo
+                    // Pinchos estáticos pequeños
                     ctx.fillStyle = '#ff4500';
-                    ctx.beginPath();
-                    ctx.moveTo(obs.x, obs.y + obs.height);
-                    ctx.lineTo(obs.x + obs.width / 2, obs.y);
-                    ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
-                    ctx.closePath();
-                    ctx.fill();
+                    ctx.strokeStyle = '#ff1493';
+                    ctx.lineWidth = 2;
+                    let pWidth = 14;
+                    for (let s = 0; s < obs.spikeCount; s++) {
+                        let spikeX = obs.x + (s * pWidth);
+                        ctx.beginPath();
+                        ctx.moveTo(spikeX, obs.y + obs.height);
+                        ctx.lineTo(spikeX + pWidth / 2, obs.y);
+                        ctx.lineTo(spikeX + pWidth, obs.y + obs.height);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.stroke();
+                    }
                 }
                 ctx.restore();
             });
 
-            // Dibujar Jugador (Conejo - Estructura Original intacta)
             player.draw();
 
-            // Dibujar Partículas
             particles.forEach(p => {
                 ctx.save();
                 ctx.globalAlpha = p.alpha;
@@ -1057,7 +1060,6 @@
                 ctx.restore();
             });
 
-            // Barra de Progreso del Nivel
             ctx.fillStyle = 'rgba(0,0,0,0.5)';
             ctx.fillRect(canvas.width / 2 - 100, 15, 200, 8);
             let progress = Math.min(1, distanceTraveled / levelGoalDistance);
@@ -1071,7 +1073,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // --- GESTIÓN DE PANTALLAS Y ESTADOS ---
         function startGame() {
             score = 0;
             lives = 3;
@@ -1102,7 +1103,6 @@
             gameState = 'VICTORY';
             soundManager.playWin();
             
-            // Desbloquear foto correspondiente al nivel completado (si existe de 1 a 10)
             let photoIndexToUnlock = Math.min(currentLevel - 1, 9);
             let newlyUnlocked = false;
             if (!savedData.gallery[photoIndexToUnlock]) {
@@ -1140,7 +1140,6 @@
             gameState = 'START';
         }
 
-        // --- SISTEMA DE GALERÍA Y RULETA ---
         const galleryGrid = document.getElementById('galleryGrid');
         const photoViewer = document.getElementById('photo-viewer');
         const viewerCanvas = document.getElementById('viewerCanvas');
@@ -1192,7 +1191,6 @@
             photoViewer.classList.add('hidden');
         });
 
-        // Ruleta de la Suerte
         const rouletteWheel = document.getElementById('rouletteWheel');
         const spinBtn = document.getElementById('spin-btn');
         const rouletteResult = document.getElementById('rouletteResult');
@@ -1212,7 +1210,6 @@
             rouletteResult.textContent = '¡Girando...!';
             rouletteResult.style.color = '#00ffff';
 
-            // Seleccionar premio aleatorio (6 sectores de 60 grados)
             let randomSector = Math.floor(Math.random() * 6);
             let extraSpins = 360 * 5;
             let targetDegree = currentRotation + extraSpins + (randomSector * 60) + 30;
@@ -1232,7 +1229,6 @@
                         prizeMessage = '¡Bono de Puntuación! +500 pts';
                         break;
                     case 2:
-                        // Desbloquear foto aleatoria
                         let lockedIndices = [];
                         savedData.gallery.forEach((unlocked, idx) => { if (!unlocked) lockedIndices.push(idx); });
                         if (lockedIndices.length > 0) {
@@ -1263,7 +1259,6 @@
             }, 4000);
         });
 
-        // --- EVENT LISTENERS DE BOTONES Y CONTROLES ---
         document.getElementById('start-btn').addEventListener('click', startGame);
         document.getElementById('restart-btn').addEventListener('click', startGame);
         document.getElementById('home-btn').addEventListener('click', returnToMenu);
@@ -1286,7 +1281,6 @@
             rouletteScreen.classList.add('hidden');
         });
 
-        // Controles de Teclado y Táctil
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' || e.code === 'ArrowUp') {
                 if (gameState === 'PLAYING') {
@@ -1309,7 +1303,6 @@
             e.preventDefault();
         }, { passive: false });
 
-        // Iniciar bucle del juego
         requestAnimationFrame(gameLoop);
     </script>
 </body>
