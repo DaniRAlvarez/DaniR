@@ -488,6 +488,7 @@
         let currentLevel = 1;
         let distanceTraveled = 0;
         let levelGoalDistance = 2500;
+        let spawnTimer = 0; // Temporizador para controlar el flujo progresivo
 
         let savedData = {
             stars: 0,
@@ -796,22 +797,34 @@
         }
 
         function spawnEntities() {
-            // Frecuencia aumentada para un número considerable de enemigos y pinchos equilibrados
-            if (Math.random() < 0.022 + (currentLevel * 0.003)) {
-                let isGummy = Math.random() > 0.35; // Mayoría de enemigos rosados con vida propia
+            spawnTimer++;
+            // Límite estricto: Máximo 2 o 3 obstáculos en total en el mapa a la vez
+            let maxObstaclesOnScreen = Math.min(2 + Math.floor(currentLevel / 2), 3);
+            
+            // Intervalo progresivo según el nivel (nivel 1 sale con calma, niveles altos un poco más fluido)
+            let spawnInterval = Math.max(90 - (currentLevel * 10), 50);
+
+            if (spawnTimer > spawnInterval && obstacles.length < maxObstaclesOnScreen) {
+                spawnTimer = 0;
+                let isGummy = Math.random() > 0.4;
                 if (isGummy) {
+                    let personalities = ['aggressive', 'defensive', 'erratic'];
+                    let chosenPersonality = personalities[Math.floor(Math.random() * personalities.length)];
+
                     obstacles.push({
                         x: canvas.width + 50,
                         y: 320,
                         width: 36,
                         height: 30,
                         type: 'gummy',
-                        baseSpeed: 3.8 + (currentLevel * 0.4),
-                        vx: -(3.8 + (currentLevel * 0.4)),
+                        baseSpeed: 3.5 + (currentLevel * 0.3),
+                        vx: -(3.5 + (currentLevel * 0.3)),
                         vy: 0,
                         gravity: 0.5,
                         isGrounded: true,
-                        jumpCooldown: Math.random() * 60 + 40
+                        personality: chosenPersonality,
+                        actionTimer: Math.random() * 40 + 20,
+                        defensiveStep: 0
                     });
                 } else {
                     let spikeCount = Math.random() > 0.5 ? 2 : 3;
@@ -823,12 +836,12 @@
                         height: 25,
                         type: 'spike',
                         spikeCount: spikeCount,
-                        vx: -(4 + (currentLevel * 0.4))
+                        vx: -(3.8 + (currentLevel * 0.3))
                     });
                 }
             }
 
-            if (Math.random() < 0.025) {
+            if (Math.random() < 0.02) {
                 let isStar = Math.random() < 0.2;
                 collectibles.push({
                     x: canvas.width + 50,
@@ -836,7 +849,7 @@
                     width: 24,
                     height: 24,
                     type: isStar ? 'star' : 'candy',
-                    speed: 4.2 + (currentLevel * 0.4),
+                    speed: 4.0,
                     bobTimer: Math.random() * Math.PI
                 });
             }
@@ -845,7 +858,7 @@
         function updateGame() {
             if (gameState !== 'PLAYING') return;
 
-            distanceTraveled += 4 + (currentLevel * 0.5);
+            distanceTraveled += 4 + (currentLevel * 0.4);
 
             clouds.forEach(cloud => {
                 cloud.x -= cloud.speed;
@@ -853,19 +866,18 @@
             });
 
             backgroundScenery.forEach(item => {
-                item.x -= (4 + (currentLevel * 0.5));
+                item.x -= (4 + (currentLevel * 0.4));
                 if (item.x < -30) item.x = canvas.width + 30;
             });
 
             player.update();
             spawnEntities();
 
-            // Actualizar obstáculos (enemigos con vida propia y pinchos estáticos)
+            // Actualizar obstáculos de forma controlada
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 let obs = obstacles[i];
 
                 if (obs.type === 'gummy') {
-                    // IA propia del enemigo rosado: avanza, salta y se abalanza hacia el personaje
                     obs.vy += obs.gravity;
                     obs.y += obs.vy;
 
@@ -876,39 +888,51 @@
                         obs.isGrounded = true;
                     }
 
-                    // Reducir contador para su próximo salto autónomo o embestida
-                    obs.jumpCooldown--;
-                    if (obs.isGrounded && obs.jumpCooldown <= 0) {
-                        obs.vy = -9.5; // Salto con vida propia
-                        obs.isGrounded = false;
-                        
-                        // Si está cerca del conejito, se impulsa un poco más hacia adelante para atacarlo
-                        let distanceToPlayer = obs.x - player.x;
-                        if (distanceToPlayer > 0 && distanceToPlayer < 350) {
-                            obs.vx = obs.baseSpeed * 1.6; // Embestida rápida hacia adelante
-                        } else {
-                            obs.vx = -obs.baseSpeed;
+                    if (obs.defensiveStep > 0) {
+                        obs.defensiveStep--;
+                        if (obs.defensiveStep === 0) {
+                            obs.vx = -(obs.baseSpeed * 2.0); 
                         }
-                        obs.jumpCooldown = Math.random() * 70 + 50;
+                    } else {
+                        obs.actionTimer--;
+                        if (obs.isGrounded && obs.actionTimer <= 0) {
+                            if (obs.personality === 'aggressive') {
+                                obs.vy = -9.5;
+                                obs.vx = -(obs.baseSpeed * 1.8);
+                                obs.isGrounded = false;
+                            } else if (obs.personality === 'defensive') {
+                                obs.vx = obs.baseSpeed * 0.8; 
+                                obs.defensiveStep = 12; 
+                                obs.vy = -6;
+                                obs.isGrounded = false;
+                            } else { 
+                                obs.vy = -8.5;
+                                obs.vx = -(obs.baseSpeed * 1.4);
+                                obs.isGrounded = false;
+                            }
+                            obs.actionTimer = Math.random() * 50 + 30;
+                        }
+                    }
+
+                    if (obs.x > canvas.width + 80) {
+                        obs.vx = -obs.baseSpeed * 1.5;
                     }
 
                     obs.x += obs.vx;
                 } else {
-                    // Los pinchos son fijos y se mueven solo con el scroll del mundo
                     obs.x += obs.vx;
                 }
 
-                // Detección de colisión precisa con el jugador
+                // Colisiones
                 if (
                     player.x < obs.x + obs.width &&
                     player.x + player.width > obs.x &&
                     player.y < obs.y + obs.height &&
                     player.y + player.height > obs.y
                 ) {
-                    // Si el jugador cae encima del enemigo rosado (rebote y eliminación)
                     if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - player.vy <= obs.y + 12) {
                         obstacles.splice(i, 1);
-                        player.vy = -8; // Rebote
+                        player.vy = -8;
                         score += 50;
                         soundManager.playCoin();
                         createParticles(obs.x + obs.width/2, obs.y, '#ff1493', 10);
@@ -1013,7 +1037,6 @@
             obstacles.forEach(obs => {
                 ctx.save();
                 if (obs.type === 'gummy') {
-                    // Enemigo gominola rosado dinámico
                     ctx.fillStyle = '#ff1493';
                     ctx.beginPath();
                     ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 10);
@@ -1021,7 +1044,7 @@
                     ctx.strokeStyle = '#ff9aef';
                     ctx.lineWidth = 2;
                     ctx.stroke();
-                    // Ojos expresivos
+
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(obs.x + 8, obs.y + 8, 5, 5);
                     ctx.fillRect(obs.x + 23, obs.y + 8, 5, 5);
@@ -1029,7 +1052,6 @@
                     ctx.fillRect(obs.x + 9, obs.y + 9, 2, 2);
                     ctx.fillRect(obs.x + 24, obs.y + 9, 2, 2);
                 } else {
-                    // Pinchos estáticos pequeños
                     ctx.fillStyle = '#ff4500';
                     ctx.strokeStyle = '#ff1493';
                     ctx.lineWidth = 2;
@@ -1079,6 +1101,7 @@
             currentLevel = 1;
             distanceTraveled = 0;
             levelGoalDistance = 2500;
+            spawnTimer = 0;
             obstacles = [];
             collectibles = [];
             particles = [];
@@ -1125,6 +1148,7 @@
             currentLevel++;
             distanceTraveled = 0;
             levelGoalDistance += 1000;
+            spawnTimer = 0;
             obstacles = [];
             collectibles = [];
             victoryScreen.classList.add('hidden');
