@@ -662,7 +662,7 @@
             }
         }
 
-        /* Función para descargar, filtrar y mostrar solo los ÚLTIMOS 20 mensajes públicos */
+        /* Función para descargar, filtrar estrictamente por PUBLICO y mostrar los últimos 20 */
         function cargarMensajesPublicos() {
             const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
             const contenedor = document.getElementById('listaMensajesPublicos');
@@ -673,9 +673,9 @@
                 .then(data => {
                     contenedor.innerHTML = "";
 
-                    // Filtramos los públicos
+                    // FILTRO ESTRICTO: Solo deja pasar si VISIBILIDAD es exactamente "PUBLICO"
                     const mensajesPublicos = data.filter(item => {
-                        let vis = item.VISIBILIDAD ? item.VISIBILIDAD.trim().toUpperCase() : 'PUBLICO';
+                        let vis = item.VISIBILIDAD ? item.VISIBILIDAD.trim().toUpperCase() : '';
                         return vis === 'PUBLICO' && item.NOMBRE && item.MENSAJE;
                     });
 
@@ -684,7 +684,7 @@
                         return;
                     }
 
-                    // Invertimos para que los más nuevos queden arriba, y tomamos solo los últimos 20 con .slice(0, 20)
+                    // Invertimos para los más recientes arriba y cortamos a los últimos 20
                     const ultimosVeinte = mensajesPublicos.reverse().slice(0, 20);
 
                     ultimosVeinte.forEach(item => {
