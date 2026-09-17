@@ -12,7 +12,7 @@
             --secondary: #00ffff;
             --accent: #b55fe6;
             --shop-color: #ffaa33;
-            --gift-color: #ff55aa; /* Rosadito especial para el botón de Regalos */
+            --gift-color: #ff55aa;
             --bg-color: #0a0812;
             --card-bg: rgba(20, 15, 30, 0.55);
             --text: #ffffff;
@@ -260,9 +260,9 @@
             background: rgba(25, 18, 40, 0.95);
             border: 1px solid var(--primary);
             border-radius: 20px;
-            padding: 2.5rem 2rem;
-            width: 85%;
-            max-width: 380px;
+            padding: 2.2rem 1.8rem;
+            width: 90%;
+            max-width: 400px;
             text-align: center;
             box-shadow: 0 0 30px rgba(255, 119, 188, 0.3);
             transform: translateY(20px);
@@ -284,30 +284,72 @@
         }
 
         .modal-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #d0b0e0;
-            margin-bottom: 1.8rem;
+            margin-bottom: 1.2rem;
             line-height: 1.5;
         }
 
-        .modal-close-btn {
-            padding: 0.7rem 1.5rem;
-            background: var(--primary);
-            color: #0a0812;
+        .message-input {
+            width: 100%;
+            height: 80px;
+            background: rgba(10, 8, 18, 0.6);
+            border: 1px solid rgba(255, 85, 170, 0.4);
+            border-radius: 12px;
+            padding: 0.8rem;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            resize: none;
+            margin-bottom: 1.2rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .message-input:focus {
+            border-color: var(--gift-color);
+            box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 0.7rem 1rem;
             border: none;
             border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             letter-spacing: 1px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 0 15px rgba(255, 119, 188, 0.4);
         }
 
-        .modal-close-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(255, 119, 188, 0.7);
+        .modal-btn.primary {
+            background: var(--gift-color);
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(255, 85, 170, 0.4);
+        }
+
+        .modal-btn.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 85, 170, 0.7);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.03);
         }
 
         /* Mariposas flotantes animadas */
@@ -414,21 +456,31 @@
         <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
             <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
             <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
-            <button class="modal-close-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);">ENTENDIDO</button>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812; box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);">ENTENDIDO</button>
+            </div>
         </div>
     </div>
 
-    <!-- Panel Flotante / Modal de Regalos (Con Mariposas Volando) -->
+    <!-- Panel Flotante / Modal de Regalos (Conectado a SheetDB) -->
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
         <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
-            <!-- Mariposas decorativas animadas dentro de la tarjeta -->
+            <!-- Mariposas decorativas animadas -->
             <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
             <span class="butterfly" style="top: 85%; left: 70%; animation-delay: 1.5s;">🦋</span>
             <span class="butterfly" style="top: 75%; left: 45%; animation-delay: 2.8s;">🦋</span>
 
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
-            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Muy pronto habilitaremos esta sección con sorpresas y detalles únicos.</p>
-            <button class="modal-close-btn" onclick="closeModal('giftModal')" style="background: var(--gift-color); box-shadow: 0 0 15px rgba(255, 85, 170, 0.4);">ENTENDIDO</button>
+            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Muy pronto habilitaremos esta sección. Si gustas, déjale un mensaje:</p>
+            
+            <!-- Campo para dejar el mensaje -->
+            <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
+
+            <!-- Botones alineados -->
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal('giftModal')">ENTENDIDO</button>
+                <button class="modal-btn primary" onclick="submitMessage()">💬 DEJAR MENSAJE</button>
+            </div>
         </div>
     </div>
 
@@ -461,6 +513,47 @@
             if (event.target.id === modalId) {
                 closeModal(modalId);
             }
+        }
+
+        /* Función para enviar el mensaje directamente a Google Sheets mediante SheetDB */
+        function submitMessage() {
+            const msgInput = document.getElementById('userMessage');
+            const textoMensaje = msgInput.value.trim();
+
+            if (textoMensaje === "") {
+                alert("Por favor escribe un mensaje antes de enviarlo.");
+                return;
+            }
+
+            const datosAEnviar = {
+                data: [
+                    {
+                        fecha: new Date().toLocaleString(),
+                        mensaje: textoMensaje
+                    }
+                ]
+            };
+
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosAEnviar)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("¡Mensaje enviado y guardado con éxito para Dani R! 💖");
+                msgInput.value = "";
+                closeModal('giftModal');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Hubo un error al enviar el mensaje. Inténtalo de nuevo.");
+            });
         }
 
         /* Animación del Fondo de Partículas Cíclico (Morado -> Blanco -> Morado) */
