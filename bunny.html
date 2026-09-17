@@ -200,7 +200,7 @@
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
         }
-        .gallery-slot canvas {
+        .gallery-slot img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -214,6 +214,9 @@
             right: 5px;
             font-size: 10px;
             color: rgba(255,255,255,0.6);
+            background: rgba(0,0,0,0.5);
+            padding: 1px 3px;
+            border-radius: 3px;
         }
         
         /* Visor de Foto Pantalla Completa */
@@ -234,9 +237,10 @@
         #photo-viewer.hidden {
             display: none;
         }
-        #photo-viewer canvas {
+        #photo-viewer img {
             width: 400px;
             height: 300px;
+            object-fit: cover;
             border-radius: 10px;
             border: 3px solid #ff1493;
             box-shadow: 0 0 30px rgba(255,20,147,0.5);
@@ -354,7 +358,7 @@
         <!-- Pantalla de Galería -->
         <div id="gallery-screen" class="modal-screen hidden interactive-ui">
             <h1 style="font-size: 32px;">Galería de Recuerdos</h1>
-            <p>Fotos coleccionables desbloqueadas al superar niveles.</p>
+            <p>Capturas de pantalla reales guardadas al superar niveles.</p>
             <div class="gallery-grid" id="galleryGrid"></div>
             <button class="btn btn-secondary" id="close-gallery-btn" style="margin-top: 25px;">Volver</button>
         </div>
@@ -362,14 +366,14 @@
         <!-- Visor de Foto Pantalla Completa -->
         <div id="photo-viewer" class="hidden interactive-ui">
             <h2 id="photoTitle" style="color: #ff69b4; margin: 0;">Recuerdo #1</h2>
-            <canvas id="viewerCanvas" width="400" height="300"></canvas>
+            <img id="viewerImg" src="" alt="Screenshot">
             <button class="btn btn-secondary" id="close-viewer-btn">Cerrar Foto</button>
         </div>
 
         <!-- Pantalla de Ruleta -->
         <div id="roulette-screen" class="modal-screen hidden interactive-ui">
             <h1 style="font-size: 32px;">Ruleta de la Suerte</h1>
-            <p>Gasta 500 ⭐ para girar y ganar premios increíbles o fotos.</p>
+            <p>Gasta 50 ⭐ para girar y ganar premios increíbles o fotos.</p>
             <div class="roulette-container">
                 <div style="position: relative;">
                     <div class="roulette-pointer"></div>
@@ -377,7 +381,7 @@
                 </div>
                 <div id="rouletteResult" style="font-size: 18px; font-weight: bold; color: #00ffff; height: 25px;"></div>
                 <div class="menu-buttons-group">
-                    <button class="btn" id="spin-btn">Girar (500 ⭐)</button>
+                    <button class="btn" id="spin-btn">Girar (50 ⭐)</button>
                     <button class="btn btn-secondary" id="close-roulette-btn">Volver</button>
                 </div>
             </div>
@@ -493,7 +497,8 @@
         let savedData = {
             stars: 0,
             highScore: 0,
-            gallery: [true, false, false, false, false, false, false, false, false, false]
+            galleryUnlocked: [true, false, false, false, false, false, false, false, false, false],
+            galleryImages: new Array(10).fill(null) // Almacenará los screenshots en Base64
         };
 
         function loadGameData() {
@@ -502,6 +507,7 @@
                 try {
                     savedData = JSON.parse(data);
                     stars = savedData.stars || 0;
+                    if (!savedData.galleryImages) savedData.galleryImages = new Array(10).fill(null);
                 } catch(e) { console.error(e); }
             }
         }
@@ -537,7 +543,6 @@
             }
         }
 
-        // Personaje del Conejo mejorado
         const player = {
             x: 100,
             y: 300,
@@ -691,68 +696,6 @@
         }
         initWorldScenery();
 
-        function drawPhotoContent(targetCtx, photoIndex, width, height) {
-            targetCtx.save();
-            let grad = targetCtx.createLinearGradient(0, 0, 0, height);
-            if (photoIndex % 3 === 0) {
-                grad.addColorStop(0, '#1a0933'); grad.addColorStop(1, '#ff1493');
-            } else if (photoIndex % 3 === 1) {
-                grad.addColorStop(0, '#001133'); grad.addColorStop(1, '#00ffff');
-            } else {
-                grad.addColorStop(0, '#330011'); grad.addColorStop(1, '#ff69b4');
-            }
-            targetCtx.fillStyle = grad;
-            targetCtx.fillRect(0, 0, width, height);
-
-            targetCtx.fillStyle = '#ffffff';
-            for (let i = 0; i < 20; i++) {
-                let px = (i * 37 + photoIndex * 19) % width;
-                let py = (i * 23 + photoIndex * 31) % height;
-                targetCtx.fillRect(px, py, 2, 2);
-            }
-
-            targetCtx.save();
-            targetCtx.translate(width / 2, height / 2 + 20);
-            targetCtx.scale(1.5, 1.5);
-
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.beginPath(); targetCtx.ellipse(-10, -32, 6, 20, -0.1, 0, Math.PI * 2); targetCtx.fill();
-            targetCtx.fillStyle = '#ffb6c1';
-            targetCtx.beginPath(); targetCtx.ellipse(-10, -32, 3, 13, -0.1, 0, Math.PI * 2); targetCtx.fill();
-
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.beginPath(); targetCtx.ellipse(10, -32, 6, 20, 0.1, 0, Math.PI * 2); targetCtx.fill();
-            targetCtx.fillStyle = '#ffb6c1';
-            targetCtx.beginPath(); targetCtx.ellipse(10, -32, 3, 13, 0.1, 0, Math.PI * 2); targetCtx.fill();
-
-            targetCtx.fillStyle = photoIndex % 2 === 0 ? '#ff69b4' : '#00ffff';
-            targetCtx.beginPath(); targetCtx.roundRect(-16, -2, 32, 28, [10, 10, 14, 14]); targetCtx.fill();
-
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.beginPath(); targetCtx.arc(0, -14, 18, 0, Math.PI * 2); targetCtx.fill();
-
-            targetCtx.fillStyle = '#4a2e35';
-            targetCtx.beginPath();
-            targetCtx.arc(-6, -16, 2.5, 0, Math.PI * 2);
-            targetCtx.arc(6, -16, 2.5, 0, Math.PI * 2);
-            targetCtx.fill();
-
-            targetCtx.fillStyle = '#ffb6c1';
-            targetCtx.beginPath(); targetCtx.arc(0, -11, 3, 0, Math.PI * 2); targetCtx.fill();
-            targetCtx.restore();
-
-            targetCtx.strokeStyle = '#ffffff';
-            targetCtx.lineWidth = 4;
-            targetCtx.strokeRect(10, 10, width - 20, height - 20);
-
-            targetCtx.fillStyle = '#ffffff';
-            targetCtx.font = 'bold 14px sans-serif';
-            targetCtx.shadowColor = 'rgba(0,0,0,0.8)';
-            targetCtx.shadowBlur = 4;
-            targetCtx.fillText(`Recuerdo #${photoIndex + 1}`, 20, 35);
-            targetCtx.restore();
-        }
-
         function drawWorldBackground() {
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
             if (currentLevel === 1) {
@@ -841,7 +784,6 @@
                         defensiveStep: 0
                     });
                 } else {
-                    // PINCHOS ESTÁTICOS: Su velocidad es fija y constante (igual al scroll del fondo del mundo)
                     let spikeCount = Math.random() > 0.5 ? 2 : 3;
                     let spikeWidth = spikeCount * 14;
                     obstacles.push({
@@ -851,7 +793,7 @@
                         height: 25,
                         type: 'spike',
                         spikeCount: spikeCount,
-                        vx: -(4 + (currentLevel * 0.4)) // Velocidad constante y pegada al suelo
+                        vx: -(4 + (currentLevel * 0.4))
                     });
                 }
             }
@@ -899,7 +841,6 @@
                 let obs = obstacles[i];
 
                 if (obs.type === 'gummy') {
-                    // Enemigos rosados con IA activa
                     obs.vy += obs.gravity;
                     obs.y += obs.vy;
 
@@ -942,7 +883,6 @@
 
                     obs.x += obs.vx;
                 } else {
-                    // PINCHOS: Se desplazan rígidamente y de forma estática con el suelo del mundo
                     obs.x += obs.vx;
                 }
 
@@ -973,7 +913,6 @@
                 if (obs.x < -60) obstacles.splice(i, 1);
             }
 
-            // Actualizar Coleccionables
             for (let i = collectibles.length - 1; i >= 0; i--) {
                 let col = collectibles[i];
                 col.x -= col.speed;
@@ -1003,7 +942,6 @@
                 if (col.x < -50) collectibles.splice(i, 1);
             }
 
-            // Actualizar Partículas
             for (let i = activeParticles.length - 1; i >= 0; i--) {
                 let p = activeParticles[i];
                 p.x += p.vx;
@@ -1149,17 +1087,21 @@
             gameState = 'VICTORY';
             soundManager.playWin();
             
+            // --- CAPTURA DE SCREENSHOT REAL DEL JUEGO ---
             let photoIndexToUnlock = Math.min(currentLevel - 1, 9);
             let newlyUnlocked = false;
-            if (!savedData.gallery[photoIndexToUnlock]) {
-                savedData.gallery[photoIndexToUnlock] = true;
+            
+            if (!savedData.galleryUnlocked[photoIndexToUnlock]) {
+                savedData.galleryUnlocked[photoIndexToUnlock] = true;
+                // Tomamos la captura directa del canvas actual del juego en formato base64
+                savedData.galleryImages[photoIndexToUnlock] = canvas.toDataURL('image/png');
                 newlyUnlocked = true;
             }
             saveGameData();
 
             if (newlyUnlocked) {
                 photoUnlockedMsg.style.display = 'block';
-                photoUnlockedMsg.textContent = `📸 ¡Recuerdo #${photoIndexToUnlock + 1} desbloqueado en la galería!`;
+                photoUnlockedMsg.textContent = `📸 ¡Screenshot real del Nivel ${currentLevel} guardado en la galería!`;
             } else {
                 photoUnlockedMsg.style.display = 'none';
             }
@@ -1188,10 +1130,10 @@
             gameState = 'START';
         }
 
+        // --- GESTIÓN DE GALERÍA CON SCREENSHOTS ---
         const galleryGrid = document.getElementById('galleryGrid');
         const photoViewer = document.getElementById('photo-viewer');
-        const viewerCanvas = document.getElementById('viewerCanvas');
-        const viewerCtx = viewerCanvas.getContext('2d');
+        const viewerImg = document.getElementById('viewerImg');
         const photoTitle = document.getElementById('photoTitle');
         const closeViewerBtn = document.getElementById('close-viewer-btn');
 
@@ -1201,14 +1143,11 @@
                 const slot = document.createElement('div');
                 slot.className = 'gallery-slot';
                 
-                if (savedData.gallery[i]) {
+                if (savedData.galleryUnlocked[i] && savedData.galleryImages[i]) {
                     slot.classList.add('unlocked');
-                    const slotCanvas = document.createElement('canvas');
-                    slotCanvas.width = 90;
-                    slotCanvas.height = 90;
-                    const sCtx = slotCanvas.getContext('2d');
-                    drawPhotoContent(sCtx, i, 90, 90);
-                    slot.appendChild(slotCanvas);
+                    const img = document.createElement('img');
+                    img.src = savedData.galleryImages[i];
+                    slot.appendChild(img);
 
                     slot.addEventListener('click', () => {
                         openPhotoViewer(i);
@@ -1230,8 +1169,8 @@
         }
 
         function openPhotoViewer(index) {
-            photoTitle.textContent = `Recuerdo #${index + 1}`;
-            drawPhotoContent(viewerCtx, index, 400, 300);
+            photoTitle.textContent = `Recuerdo Nivel #${index + 1}`;
+            viewerImg.src = savedData.galleryImages[index];
             photoViewer.classList.remove('hidden');
         }
 
@@ -1245,13 +1184,14 @@
         let currentRotation = 0;
 
         spinBtn.addEventListener('click', () => {
-            if (stars < 500) {
-                rouletteResult.textContent = '¡No tienes suficientes estrellas! (Necesitas 500 ⭐)';
+            // Precio de la ruleta ajustado a 50 monedas
+            if (stars < 50) {
+                rouletteResult.textContent = '¡No tienes suficientes estrellas! (Necesitas 50 ⭐)';
                 rouletteResult.style.color = '#ff4500';
                 return;
             }
 
-            stars -= 500;
+            stars -= 50;
             saveGameData();
             starsValEl.textContent = stars;
             spinBtn.disabled = true;
@@ -1269,23 +1209,25 @@
                 let prizeMessage = '';
                 switch(randomSector) {
                     case 0:
-                        stars += 1000;
-                        prizeMessage = '¡Felicidades! Ganaste 1000 ⭐';
+                        stars += 200;
+                        prizeMessage = '¡Felicidades! Ganaste 200 ⭐';
                         break;
                     case 1:
-                        score += 500;
-                        prizeMessage = '¡Bono de Puntuación! +500 pts';
+                        score += 300;
+                        prizeMessage = '¡Bono de Puntuación! +300 pts';
                         break;
                     case 2:
                         let lockedIndices = [];
-                        savedData.gallery.forEach((unlocked, idx) => { if (!unlocked) lockedIndices.push(idx); });
+                        savedData.galleryUnlocked.forEach((unlocked, idx) => { if (!unlocked) lockedIndices.push(idx); });
                         if (lockedIndices.length > 0) {
                             let randomLock = lockedIndices[Math.floor(Math.random() * lockedIndices.length)];
-                            savedData.gallery[randomLock] = true;
-                            prizeMessage = `¡Foto Especial #${randomLock + 1} desbloqueada!`;
+                            savedData.galleryUnlocked[randomLock] = true;
+                            // Generamos un screenshot de respaldo si gana una foto por ruleta
+                            savedData.galleryImages[randomLock] = canvas.toDataURL('image/png');
+                            prizeMessage = `¡Foto Especial Nivel #${randomLock + 1} desbloqueada!`;
                         } else {
-                            stars += 300;
-                            prizeMessage = '¡Galería llena! Premio de 300 ⭐';
+                            stars += 100;
+                            prizeMessage = '¡Galería llena! Premio de 100 ⭐';
                         }
                         break;
                     case 3:
@@ -1293,12 +1235,12 @@
                         prizeMessage = '¡Vida extra! ❤️ +1';
                         break;
                     case 4:
-                        stars += 200;
-                        prizeMessage = '¡Ganaste 200 ⭐!';
+                        stars += 50;
+                        prizeMessage = '¡Ganaste 50 ⭐!';
                         break;
                     case 5:
-                        score += 200;
-                        prizeMessage = '¡Pequeño bono! +200 pts';
+                        score += 150;
+                        prizeMessage = '¡Pequeño bono! +150 pts';
                         break;
                 }
                 saveGameData();
