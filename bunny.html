@@ -51,7 +51,6 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            /* Margen interior aumentado para separar la barra superior del borde y del botón full screen */
             padding: 24px 20px 20px 20px;
         }
         .hud-top {
@@ -61,7 +60,7 @@
             font-size: 18px;
             font-weight: bold;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-            margin-right: 45px; /* Evita que las estadísticas choquen con el botón flotante de pantalla completa */
+            margin-right: 45px;
         }
         .hud-stats {
             display: flex;
@@ -84,10 +83,9 @@
             align-items: center;
         }
         
-        /* Tarjeta Flotante de Misión reubicada con mayor separación superior */
         #mission-card {
             position: absolute;
-            top: 75px; /* Movida hacia abajo para evitar solapamiento con el HUD superior */
+            top: 75px;
             left: 50%;
             transform: translateX(-50%);
             background: linear-gradient(135deg, rgba(46, 26, 71, 0.85), rgba(26, 9, 51, 0.9));
@@ -393,12 +391,12 @@
                     <span id="jumpStatus" style="opacity: 0.3;">🦘</span>
                 </div>
                 <div class="hud-stats">
+                    <!-- Modificado para mostrar solamente Nivel X sin el total de 10 -->
                     <div class="stat-item">Nivel <span id="levelVal">1</span></div>
                 </div>
             </div>
         </div>
 
-        <!-- Tarjeta Flotante de Misión Elegante reubicada -->
         <div id="mission-card">
             <div class="mission-icon">🎯</div>
             <div class="mission-content">
@@ -410,7 +408,7 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Corre, salta, recolecta caramelos, cumple misiones y colecciona fotos únicas en el mundo de los dulces!</p>
+            <p>¡Corre, salta, recolecta caramelos, cumple misiones y supera los niveles progresivos del mundo de los dulces!</p>
             <div class="controls-hint">
                 <span class="key">ESPACIO / CLIC / TOQUE: Saltar (Doble Salto)</span>
             </div>
@@ -434,8 +432,8 @@
 
         <!-- Pantalla de Victoria por Nivel -->
         <div id="victory-screen" class="screen hidden interactive-ui">
-            <h1>¡Nivel Superado!</h1>
-            <p>¡Has recolectado suficientes estrellas y completado el recorrido!</p>
+            <h1 id="victoryTitle">¡Nivel Superado!</h1>
+            <p id="victoryDesc">¡Has completado el recorrido con éxito y desbloqueado un recuerdo!</p>
             <div style="font-size: 18px; margin: 5px 0;" id="photoUnlockedMsg">📸 ¡Nueva escena aleatoria desbloqueada en la galería!</div>
             <div class="menu-buttons-group" style="margin-top: 15px;">
                 <button class="btn" id="next-level-btn">Siguiente Nivel</button>
@@ -585,6 +583,9 @@
         const jumpStatus = document.getElementById('jumpStatus');
         const missionTitleEl = document.getElementById('mission-title');
         const missionDescEl = document.getElementById('mission-desc');
+        const victoryTitle = document.getElementById('victoryTitle');
+        const victoryDesc = document.getElementById('victoryDesc');
+        const nextLevelBtn = document.getElementById('next-level-btn');
 
         const startScreen = document.getElementById('start-screen');
         const gameoverScreen = document.getElementById('gameover-screen');
@@ -599,8 +600,9 @@
         let stars = 0;
         let lives = 3;
         let currentLevel = 1;
+        const maxLevels = 10;
         let distanceTraveled = 0;
-        let levelGoalDistance = 2500;
+        let levelGoalDistance = 3500;
         let spawnTimer = 0;
 
         let currentMission = {
@@ -872,7 +874,7 @@
                 clouds.push({
                     x: Math.random() * canvas.width,
                     y: 40 + Math.random() * 100,
-                    speed: 0.5 + Math.random() * 0.8,
+                    speed: 0.4 + Math.random() * 0.6,
                     scale: 0.6 + Math.random() * 0.8
                 });
             }
@@ -983,11 +985,13 @@
 
         function drawWorldBackground(dt) {
             let gMult = dt * 60;
+            let worldSpeedMultiplier = 3.0 + ((currentLevel - 1) * 0.35);
+
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            if (currentLevel === 1) {
+            if (currentLevel <= 3) {
                 skyGrad.addColorStop(0, '#2e1a47');
                 skyGrad.addColorStop(1, '#5c1d4a');
-            } else if (currentLevel === 2) {
+            } else if (currentLevel <= 7) {
                 skyGrad.addColorStop(0, '#0f2027');
                 skyGrad.addColorStop(1, '#203a43');
             } else {
@@ -999,7 +1003,7 @@
 
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             clouds.forEach(cloud => {
-                cloud.x -= cloud.speed * gMult;
+                cloud.x -= (cloud.speed * 0.8) * gMult;
                 if (cloud.x < -60) cloud.x = canvas.width + 60;
 
                 ctx.beginPath();
@@ -1010,7 +1014,7 @@
             });
 
             backgroundScenery.forEach(item => {
-                item.x -= (4 + (currentLevel * 0.4)) * gMult;
+                item.x -= worldSpeedMultiplier * gMult;
                 if (item.x < -50) {
                     item.x = canvas.width + 50;
                     item.scale = 0.7 + Math.random() * 0.6;
@@ -1065,12 +1069,14 @@
 
         function spawnEntities() {
             spawnTimer++;
-            let maxObstaclesOnScreen = Math.min(2 + Math.floor(currentLevel / 2), 3);
-            let spawnInterval = Math.max(90 - (currentLevel * 10), 50);
+            let maxObstaclesOnScreen = Math.min(2 + Math.floor(currentLevel / 3), 3);
+            let spawnInterval = Math.max(95 - (currentLevel * 4), 55);
 
             if (spawnTimer > spawnInterval && obstacles.length < maxObstaclesOnScreen) {
                 spawnTimer = 0;
                 let isGummy = Math.random() > 0.4;
+                let speedScale = 3.0 + ((currentLevel - 1) * 0.35);
+
                 if (isGummy) {
                     let personalities = ['aggressive', 'defensive', 'erratic'];
                     let chosenPersonality = personalities[Math.floor(Math.random() * personalities.length)];
@@ -1081,8 +1087,8 @@
                         width: 36,
                         height: 30,
                         type: 'gummy',
-                        baseSpeed: 3.5 + (currentLevel * 0.3),
-                        vx: -(3.5 + (currentLevel * 0.3)),
+                        baseSpeed: speedScale,
+                        vx: -speedScale,
                         vy: 0,
                         gravity: 0.5,
                         isGrounded: true,
@@ -1100,7 +1106,7 @@
                         height: 25,
                         type: 'spike',
                         spikeCount: spikeCount,
-                        vx: -(4 + (currentLevel * 0.4))
+                        vx: -(speedScale + 0.4)
                     });
                 }
             }
@@ -1113,13 +1119,14 @@
                 else if (randType < 0.39) itemType = 'powerup_magnet';
                 else if (randType < 0.45) itemType = 'powerup_jump';
 
+                let collectibleSpeed = 3.5 + ((currentLevel - 1) * 0.3);
                 collectibles.push({
                     x: canvas.width + 50,
                     y: 190 + Math.random() * 110,
                     width: 24,
                     height: 24,
                     type: itemType,
-                    speed: 4.0,
+                    speed: collectibleSpeed,
                     bobTimer: Math.random() * Math.PI
                 });
             }
@@ -1129,7 +1136,8 @@
             if (gameState !== 'PLAYING') return;
 
             let gMult = dt * 60;
-            distanceTraveled += (4 + (currentLevel * 0.4)) * gMult;
+            let travelSpeed = 3.5 + ((currentLevel - 1) * 0.35);
+            distanceTraveled += travelSpeed * gMult;
 
             Object.keys(powerups).forEach(key => {
                 if (powerups[key].active) {
@@ -1171,23 +1179,23 @@
                     if (obs.defensiveStep > 0) {
                         obs.defensiveStep -= gMult;
                         if (obs.defensiveStep <= 0) {
-                            obs.vx = -(obs.baseSpeed * 2.0); 
+                            obs.vx = -(obs.baseSpeed * 1.8); 
                         }
                     } else {
                         obs.actionTimer -= gMult;
                         if (obs.isGrounded && obs.actionTimer <= 0) {
                             if (obs.personality === 'aggressive') {
-                                obs.vy = -9.5;
-                                obs.vx = -(obs.baseSpeed * 1.8);
+                                obs.vy = -9.0;
+                                obs.vx = -(obs.baseSpeed * 1.6);
                                 obs.isGrounded = false;
                             } else if (obs.personality === 'defensive') {
                                 obs.vx = obs.baseSpeed * 0.8; 
                                 obs.defensiveStep = 12; 
-                                obs.vy = -6;
+                                obs.vy = -5.5;
                                 obs.isGrounded = false;
                             } else { 
-                                obs.vy = -8.5;
-                                obs.vx = -(obs.baseSpeed * 1.4);
+                                obs.vy = -8.0;
+                                obs.vx = -(obs.baseSpeed * 1.3);
                                 obs.isGrounded = false;
                             }
                             obs.actionTimer = Math.random() * 50 + 20;
@@ -1195,7 +1203,7 @@
                     }
 
                     if (obs.x > canvas.width + 80) {
-                        obs.vx = -obs.baseSpeed * 1.5;
+                        obs.vx = -obs.baseSpeed * 1.3;
                     }
 
                     obs.x += obs.vx * gMult;
@@ -1440,7 +1448,7 @@
             lives = 3;
             currentLevel = 1;
             distanceTraveled = 0;
-            levelGoalDistance = 2500;
+            levelGoalDistance = 3500;
             spawnTimer = 0;
             obstacles = [];
             collectibles = [];
@@ -1486,19 +1494,31 @@
                 photoUnlockedMsg.style.display = 'none';
             }
 
+            if (currentLevel >= maxLevels) {
+                victoryTitle.textContent = '¡Juego Completado!';
+                victoryDesc.textContent = '¡Felicidades, has superado todos los niveles del mundo de los dulces!';
+                nextLevelBtn.style.display = 'none';
+            } else {
+                victoryTitle.textContent = '¡Nivel Superado!';
+                victoryDesc.textContent = '¡Has completado el recorrido con éxito!';
+                nextLevelBtn.style.display = 'inline-block';
+            }
+
             victoryScreen.classList.remove('hidden');
         }
 
         function nextLevel() {
-            currentLevel++;
-            distanceTraveled = 0;
-            levelGoalDistance += 1000;
-            spawnTimer = 0;
-            obstacles = [];
-            collectibles = [];
-            activeParticles.length = 0;
-            victoryScreen.classList.add('hidden');
-            gameState = 'PLAYING';
+            if (currentLevel < maxLevels) {
+                currentLevel++;
+                distanceTraveled = 0;
+                levelGoalDistance += 800; // Incremento progresivo de la distancia de cada nivel
+                spawnTimer = 0;
+                obstacles = [];
+                collectibles = [];
+                activeParticles.length = 0;
+                victoryScreen.classList.add('hidden');
+                gameState = 'PLAYING';
+            }
         }
 
         function returnToMenu() {
