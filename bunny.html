@@ -200,7 +200,7 @@
             transform: scale(1.05);
             box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
         }
-        .gallery-slot img {
+        .gallery-slot canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -214,9 +214,6 @@
             right: 5px;
             font-size: 10px;
             color: rgba(255,255,255,0.6);
-            background: rgba(0,0,0,0.5);
-            padding: 1px 3px;
-            border-radius: 3px;
         }
         
         /* Visor de Foto Pantalla Completa */
@@ -237,10 +234,9 @@
         #photo-viewer.hidden {
             display: none;
         }
-        #photo-viewer img {
+        #photo-viewer canvas {
             width: 400px;
             height: 300px;
-            object-fit: cover;
             border-radius: 10px;
             border: 3px solid #ff1493;
             box-shadow: 0 0 30px rgba(255,20,147,0.5);
@@ -348,7 +344,7 @@
         <div id="victory-screen" class="screen hidden interactive-ui">
             <h1>¡Nivel Superado!</h1>
             <p>¡Has recolectado suficientes estrellas y completado el recorrido!</p>
-            <div style="font-size: 18px; margin: 5px 0;" id="photoUnlockedMsg">📸 ¡Nueva foto desbloqueada en la galería!</div>
+            <div style="font-size: 18px; margin: 5px 0;" id="photoUnlockedMsg">📸 ¡Nueva escena aleatoria desbloqueada en la galería!</div>
             <div class="menu-buttons-group" style="margin-top: 15px;">
                 <button class="btn" id="next-level-btn">Siguiente Nivel</button>
                 <button class="btn btn-secondary" id="victory-home-btn">Menú Principal</button>
@@ -358,16 +354,16 @@
         <!-- Pantalla de Galería -->
         <div id="gallery-screen" class="modal-screen hidden interactive-ui">
             <h1 style="font-size: 32px;">Galería de Recuerdos</h1>
-            <p>Capturas de pantalla reales guardadas al superar niveles.</p>
+            <p>Escenas aleatorias y variadas del mundo de los dulces.</p>
             <div class="gallery-grid" id="galleryGrid"></div>
             <button class="btn btn-secondary" id="close-gallery-btn" style="margin-top: 25px;">Volver</button>
         </div>
 
         <!-- Visor de Foto Pantalla Completa -->
         <div id="photo-viewer" class="hidden interactive-ui">
-            <h2 id="photoTitle" style="color: #ff69b4; margin: 0;">Recuerdo #1</h2>
-            <img id="viewerImg" src="" alt="Screenshot">
-            <button class="btn btn-secondary" id="close-viewer-btn">Cerrar Foto</button>
+            <h2 id="photoTitle" style="color: #ff69b4; margin: 0;">Recuerdo Aleatorio #1</h2>
+            <canvas id="viewerCanvas" width="400" height="300"></canvas>
+            <button class="btn btn-secondary" id="close-viewer-btn">Cerrar Escena</button>
         </div>
 
         <!-- Pantalla de Ruleta -->
@@ -497,8 +493,7 @@
         let savedData = {
             stars: 0,
             highScore: 0,
-            galleryUnlocked: [true, false, false, false, false, false, false, false, false, false],
-            galleryImages: new Array(10).fill(null) // Almacenará los screenshots en Base64
+            gallery: [true, false, false, false, false, false, false, false, false, false]
         };
 
         function loadGameData() {
@@ -507,7 +502,6 @@
                 try {
                     savedData = JSON.parse(data);
                     stars = savedData.stars || 0;
-                    if (!savedData.galleryImages) savedData.galleryImages = new Array(10).fill(null);
                 } catch(e) { console.error(e); }
             }
         }
@@ -543,6 +537,7 @@
             }
         }
 
+        // Personaje del Conejo
         const player = {
             x: 100,
             y: 300,
@@ -576,97 +571,82 @@
                     createParticles(this.x + this.width/2, this.y + this.height, '#ff9aef', 8);
                 }
             },
-            draw() {
-                ctx.save();
-                ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+            draw(targetCtx = ctx) {
+                targetCtx.save();
+                targetCtx.translate(this.width / 2, this.height / 2);
 
-                ctx.fillStyle = 'rgba(0,0,0,0.25)';
-                ctx.beginPath();
-                ctx.ellipse(0, this.height/2 - 2, 16, 5, 0, 0, Math.PI * 2);
-                ctx.fill();
+                targetCtx.fillStyle = 'rgba(0,0,0,0.25)';
+                targetCtx.beginPath();
+                targetCtx.ellipse(0, this.height/2 - 2, 16, 5, 0, 0, Math.PI * 2);
+                targetCtx.fill();
 
                 let earOffset = Math.sin(this.animTimer) * 4;
                 
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.ellipse(-9, -34 + earOffset, 6, 22, -0.15, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#f0e0f0';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.fillStyle = '#ffb6c1';
-                ctx.beginPath();
-                ctx.ellipse(-9, -34 + earOffset, 3, 14, -0.15, 0, Math.PI * 2);
-                ctx.fill();
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.ellipse(-9, -34 + earOffset, 6, 22, -0.15, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.strokeStyle = '#f0e0f0';
+                targetCtx.lineWidth = 1.5;
+                targetCtx.stroke();
+                targetCtx.fillStyle = '#ffb6c1';
+                targetCtx.beginPath();
+                targetCtx.ellipse(-9, -34 + earOffset, 3, 14, -0.15, 0, Math.PI * 2);
+                targetCtx.fill();
 
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.ellipse(9, -34 - earOffset, 6, 22, 0.15, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#f0e0f0';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-                ctx.fillStyle = '#ffb6c1';
-                ctx.beginPath();
-                ctx.ellipse(9, -34 - earOffset, 3, 14, 0.15, 0, Math.PI * 2);
-                ctx.fill();
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.ellipse(9, -34 - earOffset, 6, 22, 0.15, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.strokeStyle = '#f0e0f0';
+                targetCtx.lineWidth = 1.5;
+                targetCtx.stroke();
+                targetCtx.fillStyle = '#ffb6c1';
+                targetCtx.beginPath();
+                targetCtx.ellipse(9, -34 - earOffset, 3, 14, 0.15, 0, Math.PI * 2);
+                targetCtx.fill();
 
-                ctx.fillStyle = '#ff69b4';
-                ctx.beginPath();
-                ctx.roundRect(-16, -1, 32, 28, [12, 12, 14, 14]);
-                ctx.fill();
+                targetCtx.fillStyle = '#ff69b4';
+                targetCtx.beginPath();
+                targetCtx.roundRect(-16, -1, 32, 28, [12, 12, 14, 14]);
+                targetCtx.fill();
 
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(0, -1, 9, Math.PI, 0, false);
-                ctx.fill();
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.arc(0, -1, 9, Math.PI, 0, false);
+                targetCtx.fill();
 
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(0, -15, 18, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#f0e0f0';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.arc(0, -15, 18, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.strokeStyle = '#f0e0f0';
+                targetCtx.lineWidth = 2;
+                targetCtx.stroke();
 
-                ctx.fillStyle = 'rgba(255, 150, 180, 0.5)';
-                ctx.beginPath();
-                ctx.arc(-11, -11, 3.5, 0, Math.PI * 2);
-                ctx.arc(11, -11, 3.5, 0, Math.PI * 2);
-                ctx.fill();
+                targetCtx.fillStyle = 'rgba(255, 150, 180, 0.5)';
+                targetCtx.beginPath();
+                targetCtx.arc(-11, -11, 3.5, 0, Math.PI * 2);
+                targetCtx.arc(11, -11, 3.5, 0, Math.PI * 2);
+                targetCtx.fill();
 
-                ctx.fillStyle = '#3a1e2b';
-                ctx.beginPath();
-                ctx.arc(-6, -16, 2.5, 0, Math.PI * 2);
-                ctx.arc(6, -16, 2.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(-7, -17, 1.1, 0, Math.PI * 2);
-                ctx.arc(5, -17, 1.1, 0, Math.PI * 2);
-                ctx.fill();
+                targetCtx.fillStyle = '#3a1e2b';
+                targetCtx.beginPath();
+                targetCtx.arc(-6, -16, 2.5, 0, Math.PI * 2);
+                targetCtx.arc(6, -16, 2.5, 0, Math.PI * 2);
+                targetCtx.fill();
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.beginPath();
+                targetCtx.arc(-7, -17, 1.1, 0, Math.PI * 2);
+                targetCtx.arc(5, -17, 1.1, 0, Math.PI * 2);
+                targetCtx.fill();
 
-                ctx.fillStyle = '#ff8fa3';
-                ctx.beginPath();
-                ctx.arc(0, -11, 2.5, 0, Math.PI * 2);
-                ctx.fill();
+                targetCtx.fillStyle = '#ff8fa3';
+                targetCtx.beginPath();
+                targetCtx.arc(0, -11, 2.5, 0, Math.PI * 2);
+                targetCtx.fill();
 
-                ctx.strokeStyle = '#e0c0d0';
-                ctx.lineWidth = 1;
-                ctx.beginPath();
-                ctx.moveTo(-3, -11); ctx.lineTo(-12, -13);
-                ctx.moveTo(-3, -9); ctx.lineTo(-12, -8);
-                ctx.moveTo(3, -11); ctx.lineTo(12, -13);
-                ctx.moveTo(3, -9); ctx.lineTo(12, -8);
-                ctx.stroke();
-
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(-11, 23, 5.5, 0, Math.PI * 2);
-                ctx.arc(11, 23, 5.5, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.restore();
+                targetCtx.restore();
             }
         };
 
@@ -675,6 +655,7 @@
         let clouds = [];
         let backgroundScenery = [];
 
+        // Inicializar decoración del mundo con variedad de colores y tamaños en los hongos
         function initWorldScenery() {
             clouds = [];
             for (let i = 0; i < 5; i++) {
@@ -685,17 +666,113 @@
                     scale: 0.6 + Math.random() * 0.8
                 });
             }
+
             backgroundScenery = [];
-            for (let i = 0; i < 8; i++) {
+            const mushroomColors = ['#ff1493', '#9370db', '#00fa9a', '#00ffff', '#ffd700', '#ff4500'];
+            for (let i = 0; i < 9; i++) {
                 backgroundScenery.push({
-                    x: i * 120,
+                    x: i * 100,
                     y: 270,
-                    type: i % 2 === 0 ? 'candy_cane' : 'mushroom'
+                    type: i % 2 === 0 ? 'candy_cane' : 'mushroom',
+                    color: mushroomColors[Math.floor(Math.random() * mushroomColors.length)],
+                    scale: 0.7 + Math.random() * 0.6 // Tamaños variables (unos más grandes, otros más pequeños)
                 });
             }
         }
         initWorldScenery();
 
+        // Generador de Escenas aleatorias para la Galería
+        function drawPhotoContent(targetCtx, photoIndex, width, height) {
+            targetCtx.save();
+            let seed = (photoIndex + 1) * 93;
+            let rand = (val) => Math.abs(Math.sin(seed + val)) * 100;
+
+            let palettes = [
+                ['#1a0933', '#ff1493'],
+                ['#001133', '#00ffff'],
+                ['#330011', '#ff69b4'],
+                ['#2e1a47', '#ff70a6'],
+                ['#0f2027', '#203a43']
+            ];
+            let chosenPalette = palettes[photoIndex % palettes.length];
+            let skyGrad = targetCtx.createLinearGradient(0, 0, 0, height);
+            skyGrad.addColorStop(0, chosenPalette[0]);
+            skyGrad.addColorStop(1, chosenPalette[1]);
+            targetCtx.fillStyle = skyGrad;
+            targetCtx.fillRect(0, 0, width, height);
+
+            targetCtx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            for (let c = 0; c < 3; c++) {
+                let cx = (rand(c * 10) / 100) * width;
+                let cy = 30 + (rand(c * 20) / 100) * 80;
+                targetCtx.beginPath();
+                targetCtx.arc(cx, cy, 18, 0, Math.PI * 2);
+                targetCtx.arc(cx + 15, cy - 8, 14, 0, Math.PI * 2);
+                targetCtx.fill();
+            }
+
+            targetCtx.fillStyle = '#3d123d';
+            targetCtx.fillRect(0, height * 0.72, width, height * 0.28);
+
+            let floorGrad = targetCtx.createLinearGradient(0, height * 0.72, 0, height * 0.78);
+            floorGrad.addColorStop(0, '#ff9aef');
+            floorGrad.addColorStop(1, '#ff1493');
+            targetCtx.fillStyle = floorGrad;
+            targetCtx.fillRect(0, height * 0.72, width, 12);
+
+            let hasGummy = (photoIndex % 2 === 0);
+            let hasCandyCane = (photoIndex % 3 !== 0);
+
+            if (hasCandyCane) {
+                let caneX = width * (0.1 + (rand(5) / 100) * 0.3);
+                targetCtx.strokeStyle = '#ff69b4';
+                targetCtx.lineWidth = 4;
+                targetCtx.beginPath();
+                targetCtx.moveTo(caneX, height * 0.72);
+                targetCtx.lineTo(caneX, height * 0.5);
+                targetCtx.stroke();
+            }
+
+            if (hasGummy) {
+                let enemyX = width * (0.55 + (rand(15) / 100) * 0.3);
+                targetCtx.fillStyle = '#ff1493';
+                targetCtx.beginPath();
+                targetCtx.roundRect(enemyX, height * 0.58, 28, 24, 6);
+                targetCtx.fill();
+                targetCtx.fillStyle = '#ffffff';
+                targetCtx.fillRect(enemyX + 6, height * 0.61, 4, 4);
+                targetCtx.fillRect(enemyX + 18, height * 0.61, 4, 4);
+            }
+
+            targetCtx.save();
+            let bunnyX = width * (0.25 + (photoIndex % 3) * 0.15);
+            let bunnyY = height * 0.52 + (photoIndex % 2 === 0 ? -15 : 0);
+            targetCtx.translate(bunnyX, bunnyY);
+            targetCtx.scale(0.8, 0.8);
+            player.draw(targetCtx);
+            targetCtx.restore();
+
+            targetCtx.fillStyle = '#ffd700';
+            let itemX = width * (0.15 + (rand(35) / 100) * 0.7);
+            let itemY = height * (0.25 + (rand(45) / 100) * 0.3);
+            targetCtx.beginPath();
+            targetCtx.arc(itemX, itemY, 8, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            targetCtx.strokeStyle = '#ffffff';
+            targetCtx.lineWidth = 3;
+            targetCtx.strokeRect(6, 6, width - 12, height - 12);
+
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.font = 'bold 12px sans-serif';
+            targetCtx.shadowColor = 'rgba(0,0,0,0.8)';
+            targetCtx.shadowBlur = 4;
+            targetCtx.fillText(`Recuerdo #${photoIndex + 1}`, 15, 24);
+
+            targetCtx.restore();
+        }
+
+        // Renderizado del fondo con reciclaje de elementos que salen del mapa
         function drawWorldBackground() {
             let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
             if (currentLevel === 1) {
@@ -711,8 +788,12 @@
             ctx.fillStyle = skyGrad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+            // Actualizar y reciclar nubes (Salen a la izquierda y se recrean a la derecha)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
             clouds.forEach(cloud => {
+                cloud.x -= cloud.speed;
+                if (cloud.x < -60) cloud.x = canvas.width + 60;
+
                 ctx.beginPath();
                 ctx.arc(cloud.x, cloud.y, 25 * cloud.scale, 0, Math.PI * 2);
                 ctx.arc(cloud.x + 20 * cloud.scale, cloud.y - 10 * cloud.scale, 20 * cloud.scale, 0, Math.PI * 2);
@@ -720,7 +801,14 @@
                 ctx.fill();
             });
 
+            // Actualizar y reciclar elementos de escenografía (Bastones y hongos variados que se destruyen por la izquierda y aparecen por la derecha)
             backgroundScenery.forEach(item => {
+                item.x -= (4 + (currentLevel * 0.4));
+                if (item.x < -50) {
+                    item.x = canvas.width + 50;
+                    item.scale = 0.7 + Math.random() * 0.6; // Cambia de tamaño al reaparecer
+                }
+
                 if (item.type === 'candy_cane') {
                     ctx.strokeStyle = '#ff69b4';
                     ctx.lineWidth = 6;
@@ -730,12 +818,28 @@
                     ctx.arc(item.x + 8, 300, 8, Math.PI, 0, false);
                     ctx.stroke();
                 } else {
-                    ctx.fillStyle = '#ff1493';
+                    // Hongo de decoración variado en tamaño y color
+                    ctx.save();
+                    ctx.translate(item.x, 350);
+                    ctx.scale(item.scale, item.scale);
+                    
+                    // Sombrero del hongo (con su color único)
+                    ctx.fillStyle = item.color;
                     ctx.beginPath();
-                    ctx.ellipse(item.x, 340, 16, 12, 0, Math.PI, 0, false);
+                    ctx.ellipse(0, -10, 16, 12, 0, Math.PI, 0, false);
                     ctx.fill();
+                    
+                    // Lunares blancos del hongo
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(item.x - 4, 340, 8, 10);
+                    ctx.beginPath();
+                    ctx.arc(-5, -12, 2.5, 0, Math.PI * 2);
+                    ctx.arc(6, -10, 2, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Tallo del hongo
+                    ctx.fillStyle = '#f0e6ff';
+                    ctx.fillRect(-4, -10, 8, 10);
+                    ctx.restore();
                 }
             });
 
@@ -817,16 +921,6 @@
 
             distanceTraveled += 4 + (currentLevel * 0.4);
 
-            clouds.forEach(cloud => {
-                cloud.x -= cloud.speed;
-                if (cloud.x < -60) cloud.x = canvas.width + 60;
-            });
-
-            backgroundScenery.forEach(item => {
-                item.x -= (4 + (currentLevel * 0.4));
-                if (item.x < -30) item.x = canvas.width + 30;
-            });
-
             player.update();
             spawnEntities();
 
@@ -837,6 +931,7 @@
                 height: player.height - 12
             };
 
+            // Actualizar obstáculos (destruyéndose al salir de pantalla por la izquierda)
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 let obs = obstacles[i];
 
@@ -910,9 +1005,11 @@
                     }
                 }
 
+                // Destrucción limpia al salir por la izquierda
                 if (obs.x < -60) obstacles.splice(i, 1);
             }
 
+            // Actualizar Coleccionables (Destrucción limpia al salir por la izquierda)
             for (let i = collectibles.length - 1; i >= 0; i--) {
                 let col = collectibles[i];
                 col.x -= col.speed;
@@ -942,6 +1039,7 @@
                 if (col.x < -50) collectibles.splice(i, 1);
             }
 
+            // Actualizar Partículas
             for (let i = activeParticles.length - 1; i >= 0; i--) {
                 let p = activeParticles[i];
                 p.x += p.vx;
@@ -1031,7 +1129,10 @@
                 ctx.restore();
             });
 
-            player.draw();
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            player.draw(ctx);
+            ctx.restore();
 
             activeParticles.forEach(p => {
                 ctx.save();
@@ -1087,21 +1188,17 @@
             gameState = 'VICTORY';
             soundManager.playWin();
             
-            // --- CAPTURA DE SCREENSHOT REAL DEL JUEGO ---
             let photoIndexToUnlock = Math.min(currentLevel - 1, 9);
             let newlyUnlocked = false;
-            
-            if (!savedData.galleryUnlocked[photoIndexToUnlock]) {
-                savedData.galleryUnlocked[photoIndexToUnlock] = true;
-                // Tomamos la captura directa del canvas actual del juego en formato base64
-                savedData.galleryImages[photoIndexToUnlock] = canvas.toDataURL('image/png');
+            if (!savedData.gallery[photoIndexToUnlock]) {
+                savedData.gallery[photoIndexToUnlock] = true;
                 newlyUnlocked = true;
             }
             saveGameData();
 
             if (newlyUnlocked) {
                 photoUnlockedMsg.style.display = 'block';
-                photoUnlockedMsg.textContent = `📸 ¡Screenshot real del Nivel ${currentLevel} guardado en la galería!`;
+                photoUnlockedMsg.textContent = `📸 ¡Recuerdo aleatorio #${photoIndexToUnlock + 1} desbloqueado en la galería!`;
             } else {
                 photoUnlockedMsg.style.display = 'none';
             }
@@ -1130,10 +1227,10 @@
             gameState = 'START';
         }
 
-        // --- GESTIÓN DE GALERÍA CON SCREENSHOTS ---
         const galleryGrid = document.getElementById('galleryGrid');
         const photoViewer = document.getElementById('photo-viewer');
-        const viewerImg = document.getElementById('viewerImg');
+        const viewerCanvas = document.getElementById('viewerCanvas');
+        const viewerCtx = viewerCanvas.getContext('2d');
         const photoTitle = document.getElementById('photoTitle');
         const closeViewerBtn = document.getElementById('close-viewer-btn');
 
@@ -1143,11 +1240,14 @@
                 const slot = document.createElement('div');
                 slot.className = 'gallery-slot';
                 
-                if (savedData.galleryUnlocked[i] && savedData.galleryImages[i]) {
+                if (savedData.gallery[i]) {
                     slot.classList.add('unlocked');
-                    const img = document.createElement('img');
-                    img.src = savedData.galleryImages[i];
-                    slot.appendChild(img);
+                    const slotCanvas = document.createElement('canvas');
+                    slotCanvas.width = 90;
+                    slotCanvas.height = 90;
+                    const sCtx = slotCanvas.getContext('2d');
+                    drawPhotoContent(sCtx, i, 90, 90);
+                    slot.appendChild(slotCanvas);
 
                     slot.addEventListener('click', () => {
                         openPhotoViewer(i);
@@ -1169,8 +1269,8 @@
         }
 
         function openPhotoViewer(index) {
-            photoTitle.textContent = `Recuerdo Nivel #${index + 1}`;
-            viewerImg.src = savedData.galleryImages[index];
+            photoTitle.textContent = `Recuerdo Aleatorio #${index + 1}`;
+            drawPhotoContent(viewerCtx, index, 400, 300);
             photoViewer.classList.remove('hidden');
         }
 
@@ -1184,7 +1284,6 @@
         let currentRotation = 0;
 
         spinBtn.addEventListener('click', () => {
-            // Precio de la ruleta ajustado a 50 monedas
             if (stars < 50) {
                 rouletteResult.textContent = '¡No tienes suficientes estrellas! (Necesitas 50 ⭐)';
                 rouletteResult.style.color = '#ff4500';
@@ -1209,8 +1308,8 @@
                 let prizeMessage = '';
                 switch(randomSector) {
                     case 0:
-                        stars += 200;
-                        prizeMessage = '¡Felicidades! Ganaste 200 ⭐';
+                        stars += 300;
+                        prizeMessage = '¡Felicidades! Ganaste 300 ⭐';
                         break;
                     case 1:
                         score += 300;
@@ -1218,16 +1317,14 @@
                         break;
                     case 2:
                         let lockedIndices = [];
-                        savedData.galleryUnlocked.forEach((unlocked, idx) => { if (!unlocked) lockedIndices.push(idx); });
+                        savedData.gallery.forEach((unlocked, idx) => { if (!unlocked) lockedIndices.push(idx); });
                         if (lockedIndices.length > 0) {
                             let randomLock = lockedIndices[Math.floor(Math.random() * lockedIndices.length)];
-                            savedData.galleryUnlocked[randomLock] = true;
-                            // Generamos un screenshot de respaldo si gana una foto por ruleta
-                            savedData.galleryImages[randomLock] = canvas.toDataURL('image/png');
-                            prizeMessage = `¡Foto Especial Nivel #${randomLock + 1} desbloqueada!`;
+                            savedData.gallery[randomLock] = true;
+                            prizeMessage = `¡Recuerdo aleatorio #${randomLock + 1} desbloqueada!`;
                         } else {
-                            stars += 100;
-                            prizeMessage = '¡Galería llena! Premio de 100 ⭐';
+                            stars += 150;
+                            prizeMessage = '¡Galería llena! Premio de 150 ⭐';
                         }
                         break;
                     case 3:
@@ -1235,8 +1332,8 @@
                         prizeMessage = '¡Vida extra! ❤️ +1';
                         break;
                     case 4:
-                        stars += 50;
-                        prizeMessage = '¡Ganaste 50 ⭐!';
+                        stars += 100;
+                        prizeMessage = '¡Ganaste 100 ⭐!';
                         break;
                     case 5:
                         score += 150;
