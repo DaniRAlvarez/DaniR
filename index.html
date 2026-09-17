@@ -11,6 +11,7 @@
             --primary: #ff77bc;
             --secondary: #00ffff;
             --accent: #b55fe6;
+            --shop-color: #ffaa33;
             --bg-color: #0a0812;
             --card-bg: rgba(20, 15, 30, 0.55);
             --text: #ffffff;
@@ -172,6 +173,7 @@
             font-size: 0.85rem;
             letter-spacing: 1px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .link-btn:hover {
@@ -203,6 +205,94 @@
             background: var(--accent);
             color: #0a0812;
             box-shadow: 0 0 20px var(--accent);
+        }
+
+        .link-btn.shop-btn {
+            border-color: var(--shop-color);
+            background: rgba(255, 170, 51, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.shop-btn:hover {
+            background: var(--shop-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--shop-color);
+        }
+
+        /* Estilos del Panel Flotante (Modal Próximamente) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 8, 18, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: rgba(25, 18, 40, 0.95);
+            border: 1px solid var(--shop-color);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            width: 85%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--shop-color);
+            margin-bottom: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        .modal-text {
+            font-size: 0.9rem;
+            color: #d0b0e0;
+            margin-bottom: 1.8rem;
+            line-height: 1.5;
+        }
+
+        .modal-close-btn {
+            padding: 0.7rem 1.5rem;
+            background: var(--shop-color);
+            color: #0a0812;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);
+        }
+
+        .modal-close-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 170, 51, 0.7);
         }
 
         footer {
@@ -262,8 +352,22 @@
             <a href="https://www.facebook.com/DaniRAlvarez22" target="_blank" rel="noopener noreferrer" class="link-btn">
                 FACEBOOK
             </a>
+
+            <!-- Botón Tienda con activación del panel flotante -->
+            <a onclick="openModal()" class="link-btn shop-btn">
+                🛍️ TIENDA
+            </a>
         </div>
     </main>
+
+    <!-- Panel Flotante / Modal de Próximamente -->
+    <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event)">
+        <div class="modal-card">
+            <h3 class="modal-title">✨ TIENDA OFICIAL ✨</h3>
+            <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
+            <button class="modal-close-btn" onclick="closeModal()">ENTENDIDO</button>
+        </div>
+    </div>
 
     <footer style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;">
         <!-- Texto de copyright con espacio abajo -->
@@ -281,6 +385,22 @@
     </footer>
 
     <script>
+        /* Funciones para controlar el panel flotante de la tienda */
+        function openModal() {
+            document.getElementById('shopModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('shopModal').classList.remove('active');
+        }
+
+        function closeModalOnBg(event) {
+            // Si hace clic en el fondo oscuro (fuera de la tarjeta), se cierra
+            if (event.target.id === 'shopModal') {
+                closeModal();
+            }
+        }
+
         /* Animación del Fondo de Partículas Cíclico (Morado -> Blanco -> Morado) */
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
@@ -318,7 +438,6 @@
 
         let time = 0;
         function animate() {
-            // Oscilación suave para la opacidad entre 0.15 (blanco luminoso) y 0.55 (morado profundo)
             const fadeAlpha = 0.35 + 0.20 * Math.sin(time * 0.0008);
 
             ctx.fillStyle = `rgba(10, 8, 18, ${fadeAlpha})`;
@@ -343,7 +462,8 @@
                 const g = Math.floor(120 + 135 * Math.sin(p.colorShift * 2 + time * 0.0015));
                 const b = Math.floor(220 + 35 * Math.cos(time * 0.001));
 
-                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
+                cdnColor = `rgba(${r}, ${g}, ${b}, 0.6)`;
+                ctx.fillStyle = cdnColor;
                 ctx.beginPath();
                 ctx.arc(x, y, p.size, 0, 6.28);
                 ctx.fill();
