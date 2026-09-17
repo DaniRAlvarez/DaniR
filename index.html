@@ -290,7 +290,6 @@
             line-height: 1.5;
         }
 
-        /* Campo de texto para el Nombre */
         .name-input {
             width: 100%;
             height: 40px;
@@ -311,7 +310,6 @@
             box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
         }
 
-        /* Campo de texto para el Mensaje */
         .message-input {
             width: 100%;
             height: 75px;
@@ -484,7 +482,7 @@
         </div>
     </div>
 
-    <!-- Panel Flotante / Modal de Regalos (Con Nombre, Fecha, Mensaje y Mariposas) -->
+    <!-- Panel Flotante / Modal de Regalos -->
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
         <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
             <!-- Mariposas decorativas animadas -->
@@ -540,7 +538,7 @@
             }
         }
 
-        /* Función para enviar Nombre, Fecha y Mensaje a SheetDB */
+        /* Función para enviar datos directamente a SheetDB sin alertas estorbosas del navegador */
         function submitMessage() {
             const nameInput = document.getElementById('userName');
             const msgInput = document.getElementById('userMessage');
@@ -549,8 +547,7 @@
             const textoMensaje = msgInput.value.trim();
 
             if (nombreFan === "" || textoMensaje === "") {
-                alert("Por favor escribe tu nombre y tu mensaje antes de enviarlo.");
-                return;
+                return; // Si está vacío no hace nada de forma silenciosa
             }
 
             const datosAEnviar = {
@@ -565,6 +562,7 @@
 
             const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
 
+            // Envío directo a la API en segundo plano
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -575,14 +573,13 @@
             })
             .then(response => response.json())
             .then(data => {
-                alert("¡Mensaje enviado con éxito para Dani R! 💖");
+                // Limpiar campos y cerrar modal suavemente al terminar de guardar
                 nameInput.value = "";
                 msgInput.value = "";
                 closeModal('giftModal');
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert("Hubo un error al enviar el mensaje. Inténtalo de nuevo.");
+                console.error('Error al guardar en la base de datos:', error);
             });
         }
 
