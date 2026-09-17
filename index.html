@@ -284,7 +284,6 @@
             overflow: hidden;
         }
 
-        /* Modal específico para el muro (más ancho) */
         .modal-card.wall-card {
             max-width: 480px;
             max-height: 80vh;
@@ -311,7 +310,6 @@
             line-height: 1.5;
         }
 
-        /* Contenedor con scroll para los mensajes del muro */
         .messages-scroll-container {
             flex: 1;
             overflow-y: auto;
@@ -321,7 +319,6 @@
             text-align: left;
         }
 
-        /* Estilo personalizado de la barra de desplazamiento */
         .messages-scroll-container::-webkit-scrollbar {
             width: 5px;
         }
@@ -366,7 +363,7 @@
 
         .message-input {
             width: 100%;
-            height: 70px;
+            height: 65px;
             background: rgba(10, 8, 18, 0.6);
             border: 1px solid rgba(255, 85, 170, 0.4);
             border-radius: 10px;
@@ -387,18 +384,18 @@
 
         .modal-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
         }
 
         .modal-btn {
             flex: 1;
-            padding: 0.7rem 1rem;
+            padding: 0.6rem 0.4rem;
             border: none;
             border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -413,6 +410,17 @@
         .modal-btn.primary:hover {
             transform: scale(1.03);
             box-shadow: 0 0 22px rgba(255, 85, 170, 0.7);
+        }
+
+        .modal-btn.gift-action {
+            background: #ffcc00;
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+        }
+
+        .modal-btn.gift-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 204, 0, 0.7);
         }
 
         .modal-btn.secondary {
@@ -436,19 +444,25 @@
             box-shadow: 0 0 22px rgba(0, 255, 204, 0.7);
         }
 
-        /* Estilo para el aviso de éxito dentro del modal */
-        #successMessage {
+        /* Estilo para los avisos dentro del modal */
+        #successMessage, #giftNoticeMessage {
             display: none;
             background: rgba(85, 255, 170, 0.15);
             border: 1px solid #55ffaa;
             color: #55ffaa;
             padding: 0.8rem;
             border-radius: 10px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-family: 'Poppins', sans-serif;
             margin-bottom: 1rem;
             text-align: center;
             animation: fadeIn 0.3s ease;
+        }
+
+        #giftNoticeMessage {
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #ffcc00;
+            color: #ffcc00;
         }
 
         @keyframes fadeIn {
@@ -599,8 +613,9 @@
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
             <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu mensaje:</p>
             
-            <!-- Aviso visual de mensaje enviado (inicialmente oculto) -->
+            <!-- Avisos visuales dentro del modal (inicialmente ocultos) -->
             <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
+            <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial y único a Dani R. ¡Quédate pendiente! ✨</div>
 
             <!-- Campo para el Nombre -->
             <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
@@ -614,10 +629,11 @@
             <!-- Campo para el Mensaje -->
             <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
 
-            <!-- Botones alineados -->
+            <!-- Botones alineados (Botón de Enviar primero, Botón de Regalo a la derecha) -->
             <div class="modal-buttons" id="modalActionBtns">
                 <button class="modal-btn secondary" onclick="closeModal('giftModal')">CANCELAR</button>
                 <button class="modal-btn primary" onclick="submitMessage()">💬 ENVIAR</button>
+                <button class="modal-btn gift-action" onclick="mostrarAvisoRegalo()">🎁 REGALO</button>
             </div>
         </div>
     </div>
@@ -642,6 +658,7 @@
         function openModal(modalId) {
             if (modalId === 'giftModal') {
                 document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('giftNoticeMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'flex';
                 document.getElementById('userName').style.display = 'block';
                 document.getElementById('userVisibility').style.display = 'block';
@@ -662,6 +679,17 @@
             }
         }
 
+        /* Mostrar el aviso creativo de regalo próximamente sin usar alertas del navegador */
+        function mostrarAvisoRegalo() {
+            const giftNotice = document.getElementById('giftNoticeMessage');
+            giftNotice.style.display = 'block';
+
+            // Ocultar el aviso automáticamente después de 3.5 segundos
+            setTimeout(() => {
+                giftNotice.style.display = 'none';
+            }, 3500);
+        }
+
         /* Función para descargar, filtrar estrictamente por PUBLICO y mostrar los últimos 20 */
         function cargarMensajesPublicos() {
             const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
@@ -673,7 +701,6 @@
                 .then(data => {
                     contenedor.innerHTML = "";
 
-                    // FILTRO ESTRICTO: Solo deja pasar si VISIBILIDAD es exactamente "PUBLICO"
                     const mensajesPublicos = data.filter(item => {
                         let vis = item.VISIBILIDAD ? item.VISIBILIDAD.trim().toUpperCase() : '';
                         return vis === 'PUBLICO' && item.NOMBRE && item.MENSAJE;
@@ -684,7 +711,6 @@
                         return;
                     }
 
-                    // Invertimos para los más recientes arriba y cortamos a los últimos 20
                     const ultimosVeinte = mensajesPublicos.reverse().slice(0, 20);
 
                     ultimosVeinte.forEach(item => {
