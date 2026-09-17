@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cute Bunny Runner - Candy Coin World (HD Pro Edition)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #1a0933;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        #game-container {
+            position: relative;
+            width: 800px;
+            max-width: 100vw;
+            height: 450px;
+            max-height: 100vh;
+            background: #000;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .hud-stats {
+            display: flex;
+            gap: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 16px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .interactive-ui {
+            pointer-events: auto;
+        }
+        .btn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255, 20, 147, 0.4);
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 20, 147, 0.6);
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 9, 51, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+        .screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        h1 {
+            font-size: 42px;
+            margin: 0;
+            background: linear-gradient(to right, #ff9aef, #ff1493, #00ffff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+            text-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
+        }
+        p {
+            margin: 0;
+            font-size: 16px;
+            color: #ddd;
+            text-align: center;
+            max-width: 400px;
+        }
+        .controls-hint {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .key {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        
+        /* Modal de Galería y Ruleta */
+        .modal-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 5, 30, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 30px;
+            z-index: 20;
+            overflow-y: auto;
+            transition: opacity 0.3s ease;
+        }
+        .modal-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            max-width: 600px;
+        }
+        .gallery-slot {
+            width: 90px;
+            height: 90px;
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-slot.unlocked {
+            border: 2px solid #ff1493;
+            background: rgba(255, 20, 147, 0.1);
+        }
+        .gallery-slot.unlocked:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 20, 147, 0.5);
+        }
+        .gallery-slot canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-slot .lock-icon {
+            font-size: 24px;
+        }
+        .gallery-slot .slot-number {
+            position: absolute;
+            bottom: 2px;
+            right: 5px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Visor de Foto Pantalla Completa */
+        #photo-viewer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            gap: 15px;
+        }
+        #photo-viewer.hidden {
+            display: none;
+        }
+        #photo-viewer canvas {
+            width: 400px;
+            height: 300px;
+            border-radius: 10px;
+            border: 3px solid #ff1493;
+            box-shadow: 0 0 30px rgba(255,20,147,0.5);
+        }
+
+        /* Ruleta */
+        .roulette-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .roulette-wheel {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 6px solid #ff1493;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(255,20,147,0.4);
+            transition: transform 4s cubic-bezier(0.15, 0.85, 0.25, 1);
+            background: conic-gradient(
+                #ff69b4 0deg 60deg,
+                #9370db 60deg 120deg,
+                #00ffff 120deg 180deg,
+                #ff1493 180deg 240deg,
+                #8a2be2 240deg 300deg,
+                #00fa9a 300deg 360deg
+            );
+        }
+        .roulette-pointer {
+            position: absolute;
+            top: -10px;
+            left: calc(50% - 10px);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 20px solid #fff;
+            z-index: 5;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .menu-buttons-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #9370db, #483d8b);
+            box-shadow: 0 4px 15px rgba(147, 112, 219, 0.4);
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 6px 20px rgba(147, 112, 219, 0.6);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas" width="800" height="450"></canvas>
+        
+        <div class="ui-layer">
+            <div class="hud-top">
+                <div class="hud-stats">
+                    <div class="stat-item">🍬 <span id="scoreVal">0</span></div>
+                    <div class="stat-item">⭐ <span id="starsVal">0</span></div>
+                    <div class="stat-item">❤️ <span id="livesVal">3</span></div>
+                </div>
+                <div class="hud-stats">
+                    <div class="stat-item">Nivel <span id="levelVal">1</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen" class="screen interactive-ui">
+            <h1>Cute Bunny Runner</h1>
+            <p>¡Corre, salta, recolecta caramelos y colecciona fotos únicas en el mundo de los dulces!</p>
+            <div class="controls-hint">
+                <span class="key">ESPACIO / CLIC: Saltar</span>
+                <span class="key">DOBLE SALTO</span>
+            </div>
+            <div class="menu-buttons-group" style="margin-top: 15px;">
+                <button class="btn" id="start-btn">Jugar</button>
+                <button class="btn btn-secondary" id="gallery-menu-btn">Galería</button>
+                <button class="btn btn-secondary" id="roulette-menu-btn">Ruleta de la Suerte</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Game Over -->
+        <div id="gameover-screen" class="screen hidden interactive-ui">
+            <h1>¡Oh no!</h1>
+            <p>El conejito se tropezó con un obstáculo.</p>
+            <div style="font-size: 20px; margin: 10px 0;">Puntuación final: <span id="finalScore" style="color: #ff69b4; font-weight: bold;">0</span></div>
+            <div class="menu-buttons-group">
+                <button class="btn" id="restart-btn">Volver a Jugar</button>
+                <button class="btn btn-secondary" id="home-btn">Menú Principal</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Victoria por Nivel -->
+        <div id="victory-screen" class="screen hidden interactive-ui">
+            <h1>¡Nivel Superado!</h1>
+            <p>¡Has recolectado suficientes estrellas y completado el recorrido!</p>
+            <div style="font-size: 18px; margin: 5px 0;" id="photoUnlockedMsg">📸 ¡Nueva foto desbloqueada en la galería!</div>
+            <div class="menu-buttons-group" style="margin-top: 15px;">
+                <button class="btn" id="next-level-btn">Siguiente Nivel</button>
+                <button class="btn btn-secondary" id="victory-home-btn">Menú Principal</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de Galería -->
+        <div id="gallery-screen" class="modal-screen hidden interactive-ui">
+            <h1 style="font-size: 32px;">Galería de Recuerdos</h1>
+            <p>Fotos coleccionables desbloqueadas al superar niveles.</p>
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Se generan dinámicamente con JS (10 slots) -->
+            </div>
+            <button class="btn btn-secondary" id="close-gallery-btn" style="margin-top: 25px;">Volver</button>
+        </div>
+
+        <!-- Visor de Foto Pantalla Completa -->
+        <div id="photo-viewer" class="hidden interactive-ui">
+            <h2 id="photoTitle" style="color: #ff69b4; margin: 0;">Recuerdo #1</h2>
+            <canvas id="viewerCanvas" width="400" height="300"></canvas>
+            <button class="btn btn-secondary" id="close-viewer-btn">Cerrar Foto</button>
+        </div>
+
+        <!-- Pantalla de Ruleta -->
+        <div id="roulette-screen" class="modal-screen hidden interactive-ui">
+            <h1 style="font-size: 32px;">Ruleta de la Suerte</h1>
+            <p>Gasta 500 ⭐ para girar y ganar premios increíbles o fotos.</p>
+            <div class="roulette-container">
+                <div style="position: relative;">
+                    <div class="roulette-pointer"></div>
+                    <div class="roulette-wheel" id="rouletteWheel"></div>
+                </div>
+                <div id="rouletteResult" style="font-size: 18px; font-weight: bold; color: #00ffff; height: 25px;"></div>
+                <div class="menu-buttons-group">
+                    <button class="btn" id="spin-btn">Girar (500 ⭐)</button>
+                    <button class="btn btn-secondary" id="close-roulette-btn">Volver</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GESTIÓN DE AUDIO WEB API ---
+        class SoundManager {
+            constructor() {
+                this.ctx = null;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+                if (this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playJump() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.15);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.15);
+            }
+            playCoin() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(987.77, this.ctx.currentTime); // B5
+                osc.frequency.setValueAtTime(1318.51, this.ctx.currentTime + 0.08); // E6
+                gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.2);
+            }
+            playHit() {
+                this.init();
+                if (!this.ctx) return;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                osc.frequency.linearRampToValueAtTime(40, this.ctx.currentTime + 0.25);
+                gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.25);
+            }
+            playWin() {
+                this.init();
+                if (!this.ctx) return;
+                const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime + idx * 0.1);
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime + idx * 0.1);
+                    gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + idx * 0.1 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(this.ctx.currentTime + idx * 0.1);
+                    osc.stop(this.ctx.currentTime + idx * 0.1 + 0.25);
+                });
+            }
+        }
+
+        const soundManager = new SoundManager();
+
+        // --- MOTOR DEL JUEGO ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Referencias UI
+        const scoreValEl = document.getElementById('scoreVal');
+        const starsValEl = document.getElementById('starsVal');
+        const livesValEl = document.getElementById('livesVal');
+        const levelValEl = document.getElementById('levelVal');
+        const startScreen = document.getElementById('start-screen');
+        const gameoverScreen = document.getElementById('gameover-screen');
+        const victoryScreen = document.getElementById('victory-screen');
+        const galleryScreen = document.getElementById('gallery-screen');
+        const rouletteScreen = document.getElementById('roulette-screen');
+        const finalScoreEl = document.getElementById('finalScore');
+        const photoUnlockedMsg = document.getElementById('photoUnlockedMsg');
+
+        // Estados del Juego
+        let gameState = 'START'; // START, PLAYING, GAMEOVER, VICTORY
+        let score = 0;
+        let stars = 0;
+        let lives = 3;
+        let currentLevel = 1;
+        let gameTime = 0;
+        let distanceTraveled = 0;
+        let levelGoalDistance = 2500;
+
+        // Datos de Guardado & Galería (10 fotos)
+        let savedData = {
+            stars: 0,
+            highScore: 0,
+            gallery: [true, false, false, false, false, false, false, false, false, false] // Foto 1 desbloqueada por defecto
+        };
+
+        function loadGameData() {
+            const data = localStorage.getItem('bunnyRunnerData');
+            if (data) {
+                try {
+                    savedData = JSON.parse(data);
+                    stars = savedData.stars || 0;
+                } catch(e) { console.error(e); }
+            }
+        }
+        function saveGameData() {
+            savedData.stars = stars;
+            if (score > savedData.highScore) {
+                savedData.highScore = score;
+            }
+            localStorage.setItem('bunnyRunnerData', JSON.stringify(savedData));
+        }
+        loadGameData();
+
+        // Estructura original del Jugador (Conejo)
+        const player = {
+            x: 100,
+            y: 300,
+            width: 44,
+            height: 52,
+            vy: 0,
+            jumpPower: -11.5,
+            gravity: 0.55,
+            isGrounded: false,
+            jumpsLeft: 2,
+            ducking: false,
+            animTimer: 0,
+            update() {
+                this.vy += this.gravity;
+                this.y += this.vy;
+
+                // Suelo base
+                const groundLevel = 350;
+                if (this.y + this.height > groundLevel) {
+                    this.y = groundLevel - this.height;
+                    this.vy = 0;
+                    this.isGrounded = true;
+                    this.jumpsLeft = 2;
+                }
+                this.animTimer += 0.15;
+            },
+            jump() {
+                if (this.isGrounded || this.jumpsLeft > 0) {
+                    this.vy = this.jumpPower;
+                    this.isGrounded = false;
+                    this.jumpsLeft--;
+                    soundManager.playJump();
+                    createParticles(this.x + this.width/2, this.y + this.height, '#ff9aef', 8);
+                }
+            },
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+
+                // --- ESTRUCTURA ORIGINAL DEL DIBUJADO DEL CONEJO ---
+                // Sombra
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.beginPath();
+                ctx.ellipse(0, this.height/2 - 2, 18, 6, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Orejas
+                ctx.fillStyle = '#ffffff';
+                let earOffset = Math.sin(this.animTimer) * 3;
+                // Oreja izq
+                ctx.beginPath();
+                ctx.ellipse(-10, -32 + earOffset, 6, 20, -0.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#e0d0e0';
+                ctx.stroke();
+                // Interior oreja izq
+                ctx.fillStyle = '#ffb6c1';
+                ctx.beginPath();
+                ctx.ellipse(-10, -32 + earOffset, 3, 13, -0.1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Oreja der
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(10, -32 - earOffset, 6, 20, 0.1, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#e0d0e0';
+                ctx.stroke();
+                // Interior oreja der
+                ctx.fillStyle = '#ffb6c1';
+                ctx.beginPath();
+                ctx.ellipse(10, -32 - earOffset, 3, 13, 0.1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cuerpo / Vestido
+                ctx.fillStyle = '#ff69b4'; // Vestido rosa
+                ctx.beginPath();
+                ctx.roundRect(-16, -2, 32, 28, [10, 10, 14, 14]);
+                ctx.fill();
+
+                // Cuello / Encaje
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, -2, 10, Math.PI, 0, false);
+                ctx.fill();
+
+                // Cabeza
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(0, -14, 18, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#e0d0e0';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Ojos
+                ctx.fillStyle = '#4a2e35';
+                ctx.beginPath();
+                ctx.arc(-6, -16, 2.5, 0, Math.PI * 2);
+                ctx.arc(6, -16, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                // Brillo de ojos
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(-7, -17, 1, 0, Math.PI * 2);
+                ctx.arc(5, -17, 1, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Nariz y hocico
+                ctx.fillStyle = '#ffb6c1';
+                ctx.beginPath();
+                ctx.arc(0, -11, 3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Bigotes
+                ctx.strokeStyle = '#d0c0d0';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(-3, -11); ctx.lineTo(-12, -13);
+                ctx.moveTo(-3, -9); ctx.lineTo(-12, -8);
+                ctx.moveTo(3, -11); ctx.lineTo(12, -13);
+                ctx.moveTo(3, -9); ctx.lineTo(12, -8);
+                ctx.stroke();
+
+                // Patitas y manos
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(-12, 22, 6, 0, Math.PI * 2);
+                ctx.arc(12, 22, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        };
+
+        // Arreglos de entidades del mundo
+        let obstacles = [];
+        let collectibles = [];
+        let particles = [];
+        let clouds = [];
+        let backgroundScenery = [];
+
+        // Inicializar elementos decorativos del mundo
+        function initWorldScenery() {
+            clouds = [];
+            for (let i = 0; i < 5; i++) {
+                clouds.push({
+                    x: Math.random() * canvas.width,
+                    y: 40 + Math.random() * 100,
+                    speed: 0.5 + Math.random() * 0.8,
+                    scale: 0.6 + Math.random() * 0.8
+                });
+            }
+            backgroundScenery = [];
+            for (let i = 0; i < 8; i++) {
+                backgroundScenery.push({
+                    x: i * 120,
+                    y: 270,
+                    type: i % 2 === 0 ? 'candy_cane' : 'mushroom'
+                });
+            }
+        }
+        initWorldScenery();
+
+        function createParticles(x, y, color, count = 5) {
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    radius: 3 + Math.random() * 3,
+                    color: color,
+                    alpha: 1,
+                    decay: 0.03 + Math.random() * 0.03
+                });
+            }
+        }
+
+        // --- GENERADOR DE FOTOGRAFÍAS (Dibujado en Canvas para Galería) ---
+        function drawPhotoContent(targetCtx, photoIndex, width, height) {
+            targetCtx.save();
+            // Fondo temático según la foto
+            let grad = targetCtx.createLinearGradient(0, 0, 0, height);
+            if (photoIndex % 3 === 0) {
+                grad.addColorStop(0, '#1a0933'); grad.addColorStop(1, '#ff1493');
+            } else if (photoIndex % 3 === 1) {
+                grad.addColorStop(0, '#001133'); grad.addColorStop(1, '#00ffff');
+            } else {
+                grad.addColorStop(0, '#330011'); grad.addColorStop(1, '#ff69b4');
+            }
+            targetCtx.fillStyle = grad;
+            targetCtx.fillRect(0, 0, width, height);
+
+            // Estrellas de fondo en la foto
+            targetCtx.fillStyle = '#ffffff';
+            for (let i = 0; i < 20; i++) {
+                let px = (i * 37 + photoIndex * 19) % width;
+                let py = (i * 23 + photoIndex * 31) % height;
+                targetCtx.fillRect(px, py, 2, 2);
+            }
+
+            // Dibujar al conejito protagonista centrado conmemorativo
+            targetCtx.save();
+            targetCtx.translate(width / 2, height / 2 + 20);
+            targetCtx.scale(1.5, 1.5);
+
+            // Orejas
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.beginPath(); targetCtx.ellipse(-10, -32, 6, 20, -0.1, 0, Math.PI * 2); targetCtx.fill();
+            targetCtx.fillStyle = '#ffb6c1';
+            targetCtx.beginPath(); targetCtx.ellipse(-10, -32, 3, 13, -0.1, 0, Math.PI * 2); targetCtx.fill();
+
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.beginPath(); targetCtx.ellipse(10, -32, 6, 20, 0.1, 0, Math.PI * 2); targetCtx.fill();
+            targetCtx.fillStyle = '#ffb6c1';
+            targetCtx.beginPath(); targetCtx.ellipse(10, -32, 3, 13, 0.1, 0, Math.PI * 2); targetCtx.fill();
+
+            // Cuerpo
+            targetCtx.fillStyle = photoIndex % 2 === 0 ? '#ff69b4' : '#00ffff';
+            targetCtx.beginPath(); targetCtx.roundRect(-16, -2, 32, 28, [10, 10, 14, 14]); targetCtx.fill();
+
+            // Cabeza
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.beginPath(); targetCtx.arc(0, -14, 18, 0, Math.PI * 2); targetCtx.fill();
+
+            // Ojos felices
+            targetCtx.fillStyle = '#4a2e35';
+            targetCtx.beginPath();
+            targetCtx.arc(-6, -16, 2.5, 0, Math.PI * 2);
+            targetCtx.arc(6, -16, 2.5, 0, Math.PI * 2);
+            targetCtx.fill();
+
+            // Nariz
+            targetCtx.fillStyle = '#ffb6c1';
+            targetCtx.beginPath(); targetCtx.arc(0, -11, 3, 0, Math.PI * 2); targetCtx.fill();
+
+            targetCtx.restore();
+
+            // Marco decorativo y texto de la foto
+            targetCtx.strokeStyle = '#ffffff';
+            targetCtx.lineWidth = 4;
+            targetCtx.strokeRect(10, 10, width - 20, height - 20);
+
+            targetCtx.fillStyle = '#ffffff';
+            targetCtx.font = 'bold 14px sans-serif';
+            targetCtx.shadowColor = 'rgba(0,0,0,0.8)';
+            targetCtx.shadowBlur = 4;
+            targetCtx.fillText(`Recuerdo #${photoIndex + 1}`, 20, 35);
+
+            targetCtx.restore();
+        }
+
+        // --- RENDERIZADO DEL MUNDO Y PERSONAJES (Estructura Original) ---
+        function drawWorldBackground() {
+            // Cielo degradado dinámico según nivel
+            let skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            if (currentLevel === 1) {
+                skyGrad.addColorStop(0, '#2e1a47');
+                skyGrad.addColorStop(1, '#5c1d4a');
+            } else if (currentLevel === 2) {
+                skyGrad.addColorStop(0, '#0f2027');
+                skyGrad.addColorStop(1, '#203a43');
+            } else {
+                skyGrad.addColorStop(0, '#4a0e2e');
+                skyGrad.addColorStop(1, '#1a0933');
+            }
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Nubes de fondo con estructura original
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            clouds.forEach(cloud => {
+                ctx.beginPath();
+                ctx.arc(cloud.x, cloud.y, 25 * cloud.scale, 0, Math.PI * 2);
+                ctx.arc(cloud.x + 20 * cloud.scale, cloud.y - 10 * cloud.scale, 20 * cloud.scale, 0, Math.PI * 2);
+                ctx.arc(cloud.x + 40 * cloud.scale, cloud.y, 22 * cloud.scale, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            // Elementos de escenografía del mundo (Bastones de caramelo y setas)
+            backgroundScenery.forEach(item => {
+                if (item.type === 'candy_cane') {
+                    // Estructura original bastón de caramelo
+                    ctx.strokeStyle = '#ff69b4';
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(item.x, 350);
+                    ctx.lineTo(item.x, 300);
+                    ctx.arc(item.x + 8, 300, 8, Math.PI, 0, false);
+                    ctx.stroke();
+                } else {
+                    // Estructura original seta
+                    ctx.fillStyle = '#ff1493';
+                    ctx.beginPath();
+                    ctx.ellipse(item.x, 340, 16, 12, 0, Math.PI, 0, false);
+                    ctx.fill();
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(item.x - 4, 340, 8, 10);
+                }
+            });
+
+            // Suelo Principal (Candy Land Floor)
+            ctx.fillStyle = '#3d123d';
+            ctx.fillRect(0, 350, canvas.width, 100);
+
+            // Borde superior del suelo con glaseado brillante
+            let floorGrad = ctx.createLinearGradient(0, 350, 0, 365);
+            floorGrad.addColorStop(0, '#ff9aef');
+            floorGrad.addColorStop(1, '#ff1493');
+            ctx.fillStyle = floorGrad;
+            ctx.fillRect(0, 350, canvas.width, 15);
+
+            // Ondas de glaseado decorativas en el suelo
+            ctx.fillStyle = '#ffffff';
+            for (let i = 0; i < canvas.width; i += 40) {
+                ctx.beginPath();
+                ctx.arc(i + 20, 365, 8, 0, Math.PI, false);
+                ctx.fill();
+            }
+        }
+
+        // --- LÓGICA DE OBSTÁCULOS Y COLECCIONABLES (Estructura Original) ---
+        function spawnEntities() {
+            if (Math.random() < 0.018 + (currentLevel * 0.003)) {
+                // Obstáculo (Gominola enemiga o bloque espinoso de caramelo)
+                let type = Math.random() > 0.5 ? 'gummy' : 'spike';
+                obstacles.push({
+                    x: canvas.width + 50,
+                    y: type === 'gummy' ? 320 : 310,
+                    width: type === 'gummy' ? 36 : 30,
+                    height: type === 'gummy' ? 30 : 40,
+                    type: type,
+                    speed: 4 + (currentLevel * 0.5)
+                });
+            }
+
+            if (Math.random() < 0.025) {
+                // Coleccionable (Caramelo / Estrella)
+                let isStar = Math.random() < 0.2;
+                collectibles.push({
+                    x: canvas.width + 50,
+                    y: 200 + Math.random() * 100,
+                    width: 24,
+                    height: 24,
+                    type: isStar ? 'star' : 'candy',
+                    speed: 4 + (currentLevel * 0.5),
+                    bobTimer: Math.random() * Math.PI
+                });
+            }
+        }
+
+        // --- BUCLE PRINCIPAL ---
+        function updateGame() {
+            if (gameState !== 'PLAYING') return;
+
+            gameTime++;
+            distanceTraveled += 4 + (currentLevel * 0.5);
+
+            // Actualizar nubes
+            clouds.forEach(cloud => {
+                cloud.x -= cloud.speed;
+                if (cloud.x < -60) cloud.x = canvas.width + 60;
+            });
+
+            // Actualizar escenografía fondo
+            backgroundScenery.forEach(item => {
+                item.x -= (4 + (currentLevel * 0.5));
+                if (item.x < -30) item.x = canvas.width + 30;
+            });
+
+            player.update();
+            spawnEntities();
+
+            // Actualizar Obstáculos
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                let obs = obstacles[i];
+                obs.x -= obs.speed;
+
+                // Colisión con Jugador
+                if (
+                    player.x < obs.x + obs.width &&
+                    player.x + player.width > obs.x &&
+                    player.y < obs.y + obs.height &&
+                    player.y + player.height > obs.y
+                ) {
+                    // Si cae sobre el enemigo gominola (mecánica de doble salto / rebote)
+                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - player.vy <= obs.y + 10) {
+                        obstacles.splice(i, 1);
+                        player.vy = -8; // rebote
+                        score += 50;
+                        soundManager.playCoin();
+                        createParticles(obs.x + obs.width/2, obs.y, '#00ffff', 10);
+                        continue;
+                    } else {
+                        // Daño
+                        obstacles.splice(i, 1);
+                        lives--;
+                        soundManager.playHit();
+                        createParticles(player.x + player.width/2, player.y + player.height/2, '#ff0000', 12);
+                        if (lives <= 0) {
+                            triggerGameOver();
+                        }
+                    }
+                }
+
+                if (obs.x < -50) obstacles.splice(i, 1);
+            }
+
+            // Actualizar Coleccionables
+            for (let i = collectibles.length - 1; i >= 0; i--) {
+                let col = collectibles[i];
+                col.x -= col.speed;
+                col.bobTimer += 0.1;
+                let currentY = col.y + Math.sin(col.bobTimer) * 4;
+
+                // Colisión Coleccionable
+                if (
+                    player.x < col.x + col.width &&
+                    player.x + player.width > col.x &&
+                    player.y < col.y + col.height &&
+                    player.y + player.height > col.y
+                ) {
+                    if (col.type === 'star') {
+                        stars += 1;
+                        score += 100;
+                        soundManager.playWin();
+                        createParticles(col.x, currentY, '#ffd700', 8);
+                    } else {
+                        score += 20;
+                        soundManager.playCoin();
+                        createParticles(col.x, currentY, '#ff69b4', 6);
+                    }
+                    collectibles.splice(i, 1);
+                    continue;
+                }
+
+                if (col.x < -50) collectibles.splice(i, 1);
+            }
+
+            // Actualizar Partículas
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= p.decay;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            // Actualizar HUD en pantalla
+            scoreValEl.textContent = score;
+            starsValEl.textContent = stars;
+            livesValEl.textContent = lives;
+            levelValEl.textContent = currentLevel;
+
+            // Condición de Victoria de Nivel
+            if (distanceTraveled >= levelGoalDistance) {
+                triggerVictory();
+            }
+        }
+
+        function renderGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawWorldBackground();
+
+            // Dibujar Coleccionables (Estructura Original)
+            collectibles.forEach(col => {
+                ctx.save();
+                let currentY = col.y + Math.sin(col.bobTimer) * 4;
+                if (col.type === 'star') {
+                    // Estrella
+                    ctx.fillStyle = '#ffd700';
+                    ctx.beginPath();
+                    ctx.arc(col.x + 12, currentY + 12, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '12px sans-serif';
+                    ctx.fillText('⭐', col.x + 4, currentY + 16);
+                } else {
+                    // Caramelo / Gominola dulce
+                    ctx.fillStyle = '#ff1493';
+                    ctx.beginPath();
+                    ctx.roundRect(col.x, currentY + 4, 24, 16, 6);
+                    ctx.fill();
+                    // Envoltorio extremos
+                    ctx.fillStyle = '#00ffff';
+                    ctx.beginPath();
+                    ctx.moveTo(col.x, currentY + 12); ctx.lineTo(col.x - 6, currentY + 6); ctx.lineTo(col.x - 6, currentY + 18);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.moveTo(col.x + 24, currentY + 12); ctx.lineTo(col.x + 30, currentY + 6); ctx.lineTo(col.x + 30, currentY + 18);
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
+
+            // Dibujar Obstáculos (Estructura Original)
+            obstacles.forEach(obs => {
+                ctx.save();
+                if (obs.type === 'gummy') {
+                    // Enemigo Gominola Osito
+                    ctx.fillStyle = '#8a2be2';
+                    ctx.beginPath();
+                    ctx.roundRect(obs.x, obs.y, obs.width, obs.height, 10);
+                    ctx.fill();
+                    // Ojos malignos
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(obs.x + 8, obs.y + 8, 4, 4);
+                    ctx.fillRect(obs.x + 24, obs.y + 8, 4, 4);
+                } else {
+                    // Bloque espinoso de caramelo
+                    ctx.fillStyle = '#ff4500';
+                    ctx.beginPath();
+                    ctx.moveTo(obs.x, obs.y + obs.height);
+                    ctx.lineTo(obs.x + obs.width / 2, obs.y);
+                    ctx.lineTo(obs.x + obs.width, obs.y + obs.height);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
+
+            // Dibujar Jugador (Conejo - Estructura Original intacta)
+            player.draw();
+
+            // Dibujar Partículas
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // Barra de Progreso del Nivel
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(canvas.width / 2 - 100, 15, 200, 8);
+            let progress = Math.min(1, distanceTraveled / levelGoalDistance);
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(canvas.width / 2 - 100, 15, 200 * progress, 8);
+        }
+
+        function gameLoop() {
+            updateGame();
+            renderGame();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- GESTIÓN DE PANTALLAS Y ESTADOS ---
+        function startGame() {
+            score = 0;
+            lives = 3;
+            currentLevel = 1;
+            distanceTraveled = 0;
+            levelGoalDistance = 2500;
+            obstacles = [];
+            collectibles = [];
+            particles = [];
+            player.y = 300;
+            player.vy = 0;
+
+            startScreen.classList.add('hidden');
+            gameoverScreen.classList.add('hidden');
+            victoryScreen.classList.add('hidden');
+            gameState = 'PLAYING';
+            soundManager.init();
+        }
+
+        function triggerGameOver() {
+            gameState = 'GAMEOVER';
+            finalScoreEl.textContent = score;
+            saveGameData();
+            gameoverScreen.classList.remove('hidden');
+        }
+
+        function triggerVictory() {
+            gameState = 'VICTORY';
+            soundManager.playWin();
+            
+            // Desbloquear foto correspondiente al nivel completado (si existe de 1 a 10)
+            let photoIndexToUnlock = Math.min(currentLevel - 1, 9);
+            let newlyUnlocked = false;
+            if (!savedData.gallery[photoIndexToUnlock]) {
+                savedData.gallery[photoIndexToUnlock] = true;
+                newlyUnlocked = true;
+            }
+            saveGameData();
+
+            if (newlyUnlocked) {
+                photoUnlockedMsg.style.display = 'block';
+                photoUnlockedMsg.textContent = `📸 ¡Recuerdo #${photoIndexToUnlock + 1} desbloqueado en la galería!`;
+            } else {
+                photoUnlockedMsg.style.display = 'none';
+            }
+
+            victoryScreen.classList.remove('hidden');
+        }
+
+        function nextLevel() {
+            currentLevel++;
+            distanceTraveled = 0;
+            levelGoalDistance += 1000;
+            obstacles = [];
+            collectibles = [];
+            victoryScreen.classList.add('hidden');
+            gameState = 'PLAYING';
+        }
+
+        function returnToMenu() {
+            startScreen.classList.remove('hidden');
+            gameoverScreen.classList.add('hidden');
+            victoryScreen.classList.add('hidden');
+            galleryScreen.classList.add('hidden');
+            rouletteScreen.classList.add('hidden');
+            gameState = 'START';
+        }
+
+        // --- SISTEMA DE GALERÍA Y RULETA ---
+        const galleryGrid = document.getElementById('galleryGrid');
+        const photoViewer = document.getElementById('photo-viewer');
+        const viewerCanvas = document.getElementById('viewerCanvas');
+        const viewerCtx = viewerCanvas.getContext('2d');
+        const photoTitle = document.getElementById('photoTitle');
+        const closeViewerBtn = document.getElementById('close-viewer-btn');
+
+        function buildGallery() {
+            galleryGrid.innerHTML = '';
+            for (let i = 0; i < 10; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'gallery-slot';
+                
+                if (savedData.gallery[i]) {
+                    slot.classList.add('unlocked');
+                    const slotCanvas = document.createElement('canvas');
+                    slotCanvas.width = 90;
+                    slotCanvas.height = 90;
+                    const sCtx = slotCanvas.getContext('2d');
+                    drawPhotoContent(sCtx, i, 90, 90);
+                    slot.appendChild(slotCanvas);
+
+                    slot.addEventListener('click', () => {
+                        openPhotoViewer(i);
+                    });
+                } else {
+                    const lock = document.createElement('div');
+                    lock.className = 'lock-icon';
+                    lock.textContent = '🔒';
+                    slot.appendChild(lock);
+                }
+
+                const num = document.createElement('span');
+                num.className = 'slot-number';
+                num.textContent = `#${i+1}`;
+                slot.appendChild(num);
+
+                galleryGrid.appendChild(slot);
+            }
+        }
+
+        function openPhotoViewer(index) {
+            photoTitle.textContent = `Recuerdo #${index + 1}`;
+            drawPhotoContent(viewerCtx, index, 400, 300);
+            photoViewer.classList.remove('hidden');
+        }
+
+        closeViewerBtn.addEventListener('click', () => {
+            photoViewer.classList.add('hidden');
+        });
+
+        // Ruleta de la Suerte
+        const rouletteWheel = document.getElementById('rouletteWheel');
+        const spinBtn = document.getElementById('spin-btn');
+        const rouletteResult = document.getElementById('rouletteResult');
+        let currentRotation = 0;
+
+        spinBtn.addEventListener('click', () => {
+            if (stars < 500) {
+                rouletteResult.textContent = '¡No tienes suficientes estrellas! (Necesitas 500 ⭐)';
+                rouletteResult.style.color = '#ff4500';
+                return;
+            }
+
+            stars -= 500;
+            saveGameData();
+            starsValEl.textContent = stars;
+            spinBtn.disabled = true;
+            rouletteResult.textContent = '¡Girando...!';
+            rouletteResult.style.color = '#00ffff';
+
+            // Seleccionar premio aleatorio (6 sectores de 60 grados)
+            let randomSector = Math.floor(Math.random() * 6);
+            let extraSpins = 360 * 5;
+            let targetDegree = currentRotation + extraSpins + (randomSector * 60) + 30;
+            currentRotation = targetDegree;
+            rouletteWheel.style.transform = `rotate(${currentRotation}deg)`;
+
+            setTimeout(() => {
+                spinBtn.disabled = false;
+                let prizeMessage = '';
+                switch(randomSector) {
+                    case 0:
+                        stars += 1000;
+                        prizeMessage = '¡Felicidades! Ganaste 1000 ⭐';
+                        break;
+                    case 1:
+                        score += 500;
+                        prizeMessage = '¡Bono de Puntuación! +500 pts';
+                        break;
+                    case 2:
+                        // Desbloquear foto aleatoria
+                        let lockedIndices = [];
+                        savedData.gallery.forEach((unlocked, idx) => { if (!unlocked) lockedIndices.push(idx); });
+                        if (lockedIndices.length > 0) {
+                            let randomLock = lockedIndices[Math.floor(Math.random() * lockedIndices.length)];
+                            savedData.gallery[randomLock] = true;
+                            prizeMessage = `¡Foto Especial #${randomLock + 1} desbloqueada!`;
+                        } else {
+                            stars += 300;
+                            prizeMessage = '¡Galería llena! Premio de 300 ⭐';
+                        }
+                        break;
+                    case 3:
+                        lives += 1;
+                        prizeMessage = '¡Vida extra! ❤️ +1';
+                        break;
+                    case 4:
+                        stars += 200;
+                        prizeMessage = '¡Ganaste 200 ⭐!';
+                        break;
+                    case 5:
+                        score += 200;
+                        prizeMessage = '¡Pequeño bono! +200 pts';
+                        break;
+                }
+                saveGameData();
+                rouletteResult.textContent = prizeMessage;
+                rouletteResult.style.color = '#ff69b4';
+            }, 4000);
+        });
+
+        // --- EVENT LISTENERS DE BOTONES Y CONTROLES ---
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('restart-btn').addEventListener('click', startGame);
+        document.getElementById('home-btn').addEventListener('click', returnToMenu);
+        document.getElementById('victory-home-btn').addEventListener('click', returnToMenu);
+        document.getElementById('next-level-btn').addEventListener('click', nextLevel);
+
+        document.getElementById('gallery-menu-btn').addEventListener('click', () => {
+            buildGallery();
+            galleryScreen.classList.remove('hidden');
+        });
+        document.getElementById('close-gallery-btn').addEventListener('click', () => {
+            galleryScreen.classList.add('hidden');
+        });
+
+        document.getElementById('roulette-menu-btn').addEventListener('click', () => {
+            rouletteResult.textContent = '';
+            rouletteScreen.classList.remove('hidden');
+        });
+        document.getElementById('close-roulette-btn').addEventListener('click', () => {
+            rouletteScreen.classList.add('hidden');
+        });
+
+        // Controles de Teclado y Táctil
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+                if (gameState === 'PLAYING') {
+                    player.jump();
+                }
+                e.preventDefault();
+            }
+        });
+
+        canvas.addEventListener('click', () => {
+            if (gameState === 'PLAYING') {
+                player.jump();
+            }
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            if (gameState === 'PLAYING') {
+                player.jump();
+            }
+            e.preventDefault();
+        }, { passive: false });
+
+        // Iniciar bucle del juego
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>
