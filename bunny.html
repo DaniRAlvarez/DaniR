@@ -222,7 +222,7 @@
             border: 1px solid rgba(255,255,255,0.3);
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 14px;
+            font-size: 13px;
             font-family: monospace;
         }
         
@@ -407,9 +407,10 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Corre, salta sobre plataformas flotantes, esquiva abismos, recolecta caramelos gigantes y supera los niveles del mundo de los dulces!</p>
+            <p>¡Corre, muévete adelante/atrás, salta, esquiva pinchos estáticos y gominolas inteligentes!</p>
             <div class="controls-hint">
-                <span class="key">ESPACIO / CLIC / TOQUE: Saltar (Doble Salto)</span>
+                <span class="key">ESPACIO / ARRIBA: Saltar</span>
+                <span class="key">IZQ / DER: Moverse</span>
             </div>
             <div class="menu-buttons-group" style="margin-top: 15px;">
                 <button class="btn" id="start-btn">Jugar</button>
@@ -421,7 +422,7 @@
         <!-- Pantalla de Game Over -->
         <div id="gameover-screen" class="screen hidden interactive-ui">
             <h1>¡Oh no!</h1>
-            <p>El conejito cayó al abismo o tropezó con un obstáculo.</p>
+            <p>El conejito cayó al abismo, chocó con un pincho o fue atrapado.</p>
             <div style="font-size: 20px; margin: 10px 0;">Puntuación final: <span id="finalScore" style="color: #ff69b4; font-weight: bold;">0</span></div>
             <div class="menu-buttons-group">
                 <button class="btn" id="restart-btn">Volver a Jugar</button>
@@ -605,8 +606,10 @@
         let spawnTimer = 0;
 
         let floorSegments = [];
-        let platforms = []; // Plataformas flotantes en el aire
+        let platforms = [];
         let backgroundScenery = [];
+
+        let keys = { left: false, right: false };
 
         function initFloorForLevel() {
             floorSegments = [];
@@ -619,11 +622,10 @@
                 let segmentLength = 450 + Math.random() * 550;
                 floorSegments.push({ start: currentX, end: currentX + segmentLength });
                 
-                // Añadir plataformas elevadas flotantes sobre algunos segmentos de suelo o huecos
                 if (currentLevel >= 2 && Math.random() < 0.6) {
                     let platWidth = 120 + Math.random() * 80;
                     let platX = currentX + (segmentLength / 2) - (platWidth / 2);
-                    let platY = 230 + (Math.random() * 30 - 15); // Altura elevada accesible mediante doble salto
+                    let platY = 230 + (Math.random() * 30 - 15);
                     platforms.push({ start: platX, end: platX + platWidth, y: platY });
                 }
 
@@ -678,7 +680,7 @@
             const missionPool = [
                 { type: 'candies', target: 8, text: 'Recolecta 8 caramelos', rewardType: 'stars', rewardAmount: 5 },
                 { type: 'stars', target: 3, text: 'Consigue 3 estrellas ⭐', rewardType: 'stars', rewardAmount: 10 },
-                { type: 'gummies', target: 3, text: 'Derrota a 3 gominolas saltando', rewardType: 'score', rewardAmount: 200 }
+                { type: 'gummies', target: 3, text: 'Derrota a 3 gominolas inteligentes', rewardType: 'score', rewardAmount: 200 }
             ];
             let template = missionPool[Math.floor(Math.random() * missionPool.length)];
             currentMission.type = template.type;
@@ -792,6 +794,19 @@
                 this.vy += this.gravity * gMultiplier;
                 this.y += this.vy * gMultiplier;
 
+                let moveSpeed = 4.5 * gMultiplier;
+                if (keys.right) {
+                    this.x += moveSpeed;
+                    if (this.x > canvas.width * 0.65) {
+                        this.x = canvas.width * 0.65;
+                        distanceTraveled += moveSpeed * 0.5;
+                    }
+                }
+                if (keys.left) {
+                    this.x -= moveSpeed;
+                    if (this.x < 50) this.x = 50;
+                }
+
                 const groundLevel = 350;
                 let bunnyCenterBottomX = this.x + this.width / 2;
                 let bunnyWorldX = distanceTraveled + bunnyCenterBottomX;
@@ -799,7 +814,6 @@
 
                 let landedOnPlatform = false;
 
-                // Comprobación de colisión con plataformas elevadas
                 if (this.vy >= 0) {
                     for (let plat of platforms) {
                         let platScreenStart = plat.start - distanceTraveled;
@@ -1130,21 +1144,19 @@
                 }
             });
 
-            // Dibujar Plataformas Elevadas Flotantes
             platforms.forEach(plat => {
                 let screenStart = plat.start - distanceTraveled;
                 let screenEnd = plat.end - distanceTraveled;
 
                 if (screenEnd > 0 && screenStart < canvas.width) {
-                    ctx.fillStyle = '#9370db'; // Color estético lila/morado dulce
+                    ctx.fillStyle = '#9370db';
                     ctx.shadowColor = '#9370db';
                     ctx.shadowBlur = 8;
                     ctx.beginPath();
                     ctx.roundRect(screenStart, plat.y, plat.end - plat.start, 14, 6);
                     ctx.fill();
-                    ctx.shadowBlur = 0; // Resetear sombra
+                    ctx.shadowBlur = 0;
 
-                    // Borde brillante superior de la plataforma
                     ctx.fillStyle = '#00ffff';
                     ctx.fillRect(screenStart + 4, plat.y, plat.end - plat.start - 8, 3);
                 }
@@ -1198,7 +1210,7 @@
                 }
 
                 let isGummy = Math.random() > 0.4;
-                let speedScale = 3.0 + ((currentLevel - 1) * 0.35);
+                let speedScale = 2.8 + ((currentLevel - 1) * 0.3);
 
                 if (isGummy) {
                     let personalities = ['aggressive', 'defensive', 'erratic'];
@@ -1217,19 +1229,23 @@
                         isGrounded: true,
                         personality: chosenPersonality,
                         actionTimer: Math.random() * 40 + 20,
-                        defensiveStep: 0
+                        defensiveStep: 0,
+                        aiState: 'patrol'
                     });
                 } else {
                     let spikeCount = Math.random() > 0.5 ? 2 : 3;
                     let spikeWidth = spikeCount * 14;
+                    // Los pinchos no tienen vida ni velocidad propia, están pegados al suelo y fijos al mundo
+                    let spikeWorldX = distanceTraveled + canvas.width + 50;
                     obstacles.push({
+                        worldX: spikeWorldX, // Posición fija absoluta en el mundo del juego
                         x: canvas.width + 50,
                         y: 325,
                         width: spikeWidth,
                         height: 25,
                         type: 'spike',
                         spikeCount: spikeCount,
-                        vx: -(speedScale + 0.4)
+                        vx: 0 // Sin velocidad propia, se mueven únicamente con el scroll del mundo
                     });
                 }
             }
@@ -1245,12 +1261,10 @@
                     else if (randType < 0.45) itemType = 'powerup_jump';
 
                     let collectibleSpeed = 3.5 + ((currentLevel - 1) * 0.3);
-                    
-                    // Probabilidad de que aparezca sobre una plataforma elevada flotante si existe alguna cercana
                     let targetY = 190 + Math.random() * 110;
                     let nearbyPlat = platforms.find(p => p.start <= spawnWorldX + 100 && p.end >= spawnWorldX - 100);
                     if (nearbyPlat && Math.random() < 0.5) {
-                        targetY = nearbyPlat.y - 40; // Colocar encima de la plataforma flotante
+                        targetY = nearbyPlat.y - 40;
                     }
 
                     collectibles.push({
@@ -1310,39 +1324,42 @@
                         obs.isGrounded = true;
                     }
 
-                    if (obs.defensiveStep > 0) {
-                        obs.defensiveStep -= gMult;
-                        if (obs.defensiveStep <= 0) {
-                            obs.vx = -(obs.baseSpeed * 1.8); 
-                        }
-                    } else {
-                        obs.actionTimer -= gMult;
-                        if (obs.isGrounded && obs.actionTimer <= 0) {
-                            if (obs.personality === 'aggressive') {
-                                obs.vy = -9.0;
-                                obs.vx = -(obs.baseSpeed * 1.6);
-                                obs.isGrounded = false;
-                            } else if (obs.personality === 'defensive') {
-                                obs.vx = obs.baseSpeed * 0.8; 
-                                obs.defensiveStep = 12; 
-                                obs.vy = -5.5;
-                                obs.isGrounded = false;
-                            } else { 
-                                obs.vy = -8.0;
-                                obs.vx = -(obs.baseSpeed * 1.3);
-                                obs.isGrounded = false;
-                            }
-                            obs.actionTimer = Math.random() * 50 + 20;
-                        }
-                    }
+                    let distanceToPlayer = obs.x - player.x;
 
-                    if (obs.x > canvas.width + 80) {
-                        obs.vx = -obs.baseSpeed * 1.3;
+                    if (distanceToPlayer > 0 && distanceToPlayer < 280) {
+                        obs.aiState = 'chase';
+                        obs.vx = - (obs.baseSpeed * 1.6);
+                    } else if (distanceToPlayer < 0 && distanceToPlayer > -120) {
+                        obs.aiState = 'retreat';
+                        obs.vx = obs.baseSpeed * 0.9; 
+                    } else {
+                        obs.aiState = 'patrol';
+                        if (obs.defensiveStep > 0) {
+                            obs.defensiveStep -= gMult;
+                            if (obs.defensiveStep <= 0) {
+                                obs.vx = -(obs.baseSpeed * 1.5); 
+                            }
+                        } else {
+                            obs.actionTimer -= gMult;
+                            if (obs.isGrounded && obs.actionTimer <= 0) {
+                                if (obs.personality === 'aggressive') {
+                                    obs.vy = -8.5;
+                                    obs.vx = -(obs.baseSpeed * 1.5);
+                                    obs.isGrounded = false;
+                                } else { 
+                                    obs.vy = -7.5;
+                                    obs.vx = -(obs.baseSpeed * 1.2);
+                                    obs.isGrounded = false;
+                                }
+                                obs.actionTimer = Math.random() * 50 + 20;
+                            }
+                        }
                     }
 
                     obs.x += obs.vx * gMult;
                 } else {
-                    obs.x += obs.vx * gMult;
+                    // PINCHOS: Estáticos y pegados al suelo, se mueven únicamente con la velocidad del scroll del mundo
+                    obs.x -= travelSpeed * gMult;
                 }
 
                 if (
@@ -1518,7 +1535,7 @@
                     ctx.translate(obs.x + obs.width / 2, obs.y + obs.height / 2);
                     ctx.scale(stretchX, stretchY);
 
-                    ctx.fillStyle = '#ff1493';
+                    ctx.fillStyle = obs.aiState === 'chase' ? '#ff0055' : '#ff1493';
                     ctx.beginPath();
                     ctx.roundRect(-obs.width / 2, -obs.height / 2, obs.width, obs.height, 10);
                     ctx.fill();
@@ -1533,6 +1550,7 @@
                     ctx.fillRect(-obs.width / 2 + 9, -obs.height / 2 + 9, 2, 2);
                     ctx.fillRect(-obs.width / 2 + 24, -obs.height / 2 + 9, 2, 2);
                 } else {
+                    // PINCHOS: Estáticos, pegados al suelo de forma fija
                     ctx.fillStyle = '#ff4500';
                     ctx.strokeStyle = '#ff1493';
                     ctx.lineWidth = 2;
@@ -1601,6 +1619,7 @@
             powerups.shield.active = false;
             powerups.magnet.active = false;
             powerups.superJump.active = false;
+            player.x = 100;
             player.y = 300;
             player.vy = 0;
 
@@ -1839,12 +1858,19 @@
         });
 
         window.addEventListener('keydown', (e) => {
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
             if (e.code === 'Space' || e.code === 'ArrowUp') {
                 if (gameState === 'PLAYING') {
                     player.jump();
                 }
                 e.preventDefault();
             }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
         });
 
         canvas.addEventListener('pointerdown', (e) => {
