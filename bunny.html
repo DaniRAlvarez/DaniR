@@ -407,10 +407,10 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Corre, muévete adelante/atrás, salta, esquiva pinchos estáticos y gominolas inteligentes!</p>
+            <p>¡Toca los extremos izquierdo/derecho en móviles (o usa A/D) para moverte! ¡Salta y supera los niveles!</p>
             <div class="controls-hint">
-                <span class="key">ESPACIO / ARRIBA: Saltar</span>
-                <span class="key">IZQ / DER: Moverse</span>
+                <span class="key">TOCAR EXTREMOS / A-D: Moverse</span>
+                <span class="key">CENTRO / ESPACIO: Saltar</span>
             </div>
             <div class="menu-buttons-group" style="margin-top: 15px;">
                 <button class="btn" id="start-btn">Jugar</button>
@@ -422,7 +422,7 @@
         <!-- Pantalla de Game Over -->
         <div id="gameover-screen" class="screen hidden interactive-ui">
             <h1>¡Oh no!</h1>
-            <p>El conejito cayó al abismo, chocó con un pincho o fue atrapado.</p>
+            <p>El conejito cayó al abismo o fue atrapado.</p>
             <div style="font-size: 20px; margin: 10px 0;">Puntuación final: <span id="finalScore" style="color: #ff69b4; font-weight: bold;">0</span></div>
             <div class="menu-buttons-group">
                 <button class="btn" id="restart-btn">Volver a Jugar</button>
@@ -794,17 +794,15 @@
                 this.vy += this.gravity * gMultiplier;
                 this.y += this.vy * gMultiplier;
 
-                let moveSpeed = 4.5 * gMultiplier;
+                // Movimiento horizontal independiente y desacoplado del scroll del mundo
+                let moveSpeed = 5.0 * gMultiplier;
                 if (keys.right) {
                     this.x += moveSpeed;
-                    if (this.x > canvas.width * 0.65) {
-                        this.x = canvas.width * 0.65;
-                        distanceTraveled += moveSpeed * 0.5;
-                    }
+                    if (this.x > canvas.width * 0.75) this.x = canvas.width * 0.75; // Límite derecho en pantalla
                 }
                 if (keys.left) {
                     this.x -= moveSpeed;
-                    if (this.x < 50) this.x = 50;
+                    if (this.x < 40) this.x = 40; // Límite izquierdo en pantalla
                 }
 
                 const groundLevel = 350;
@@ -1235,17 +1233,15 @@
                 } else {
                     let spikeCount = Math.random() > 0.5 ? 2 : 3;
                     let spikeWidth = spikeCount * 14;
-                    // Los pinchos no tienen vida ni velocidad propia, están pegados al suelo y fijos al mundo
+                    // PINCHOS FIJOS AL MUNDO: Posición absoluta en coordenadas del mundo
                     let spikeWorldX = distanceTraveled + canvas.width + 50;
                     obstacles.push({
-                        worldX: spikeWorldX, // Posición fija absoluta en el mundo del juego
-                        x: canvas.width + 50,
+                        worldX: spikeWorldX,
                         y: 325,
                         width: spikeWidth,
                         height: 25,
                         type: 'spike',
-                        spikeCount: spikeCount,
-                        vx: 0 // Sin velocidad propia, se mueven únicamente con el scroll del mundo
+                        spikeCount: spikeCount
                     });
                 }
             }
@@ -1358,19 +1354,23 @@
 
                     obs.x += obs.vx * gMult;
                 } else {
-                    // PINCHOS: Estáticos y pegados al suelo, se mueven únicamente con la velocidad del scroll del mundo
-                    obs.x -= travelSpeed * gMult;
+                    // PINCHOS: Fijos al mundo, se renderizan mediante su `worldX` menos la distancia recorrida
+                    // Esto evita que se muevan con el movimiento horizontal manual del jugador
                 }
 
+                // Cálculo de colisión para gominolas y pinchos
+                let obsScreenX = obs.type === 'gummy' ? obs.x : (obs.worldX - distanceTraveled);
+                let obsScreenY = obs.y;
+
                 if (
-                    pBox.x < obs.x + obs.width &&
-                    pBox.x + pBox.width > obs.x &&
-                    pBox.y < obs.y + obs.height &&
-                    pBox.y + pBox.height > obs.y
+                    pBox.x < obsScreenX + obs.width &&
+                    pBox.x + pBox.width > obsScreenX &&
+                    pBox.y < obsScreenY + obs.height &&
+                    pBox.y + pBox.height > obsScreenY
                 ) {
-                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - (player.vy * gMult) <= obs.y + 14) {
-                        createParticles(obs.x + obs.width/2, obs.y + obs.height/2, '#ff1493', 15);
-                        createParticles(obs.x + obs.width/2, obs.y + obs.height/2, '#00ffff', 10);
+                    if (obs.type === 'gummy' && player.vy > 0 && player.y + player.height - (player.vy * gMult) <= obsScreenY + 14) {
+                        createParticles(obsScreenX + obs.width/2, obsScreenY + obs.height/2, '#ff1493', 15);
+                        createParticles(obsScreenX + obs.width/2, obsScreenY + obs.height/2, '#00ffff', 10);
                         
                         obstacles.splice(i, 1);
                         player.vy = -8;
@@ -1394,7 +1394,8 @@
                     }
                 }
 
-                if (obs.x < -60) obstacles.splice(i, 1);
+                let checkX = obs.type === 'gummy' ? obs.x : (obs.worldX - distanceTraveled);
+                if (checkX < -60) obstacles.splice(i, 1);
             }
 
             for (let i = collectibles.length - 1; i >= 0; i--) {
@@ -1550,13 +1551,14 @@
                     ctx.fillRect(-obs.width / 2 + 9, -obs.height / 2 + 9, 2, 2);
                     ctx.fillRect(-obs.width / 2 + 24, -obs.height / 2 + 9, 2, 2);
                 } else {
-                    // PINCHOS: Estáticos, pegados al suelo de forma fija
+                    // PINCHOS: Estáticos y fijos al mundo
+                    let spikeScreenX = obs.worldX - distanceTraveled;
                     ctx.fillStyle = '#ff4500';
                     ctx.strokeStyle = '#ff1493';
                     ctx.lineWidth = 2;
                     let pWidth = 14;
                     for (let s = 0; s < obs.spikeCount; s++) {
-                        let spikeX = obs.x + (s * pWidth);
+                        let spikeX = spikeScreenX + (s * pWidth);
                         ctx.beginPath();
                         ctx.moveTo(spikeX, obs.y + obs.height);
                         ctx.lineTo(spikeX + pWidth / 2, obs.y);
@@ -1857,6 +1859,7 @@
             rouletteScreen.classList.add('hidden');
         });
 
+        // Controles de teclado
         window.addEventListener('keydown', (e) => {
             if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
             if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -1873,10 +1876,28 @@
             if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
         });
 
+        // CONTROLES TÁCTILES MEJORADOS PARA MÓVILES: 
+        // Lado izquierdo = Moverse a la izquierda, Lado derecho = Moverse a la derecha, Toque rápido/Centro = Saltar
         canvas.addEventListener('pointerdown', (e) => {
             if (gameState === 'PLAYING') {
-                player.jump();
+                let rect = canvas.getBoundingClientRect();
+                let touchX = e.clientX - rect.left;
+                let relX = touchX / canvas.clientWidth;
+
+                if (relX < 0.3) {
+                    keys.left = true;
+                } else if (relX > 0.7) {
+                    keys.right = true;
+                } else {
+                    player.jump();
+                }
             }
+            e.preventDefault();
+        });
+
+        canvas.addEventListener('pointerup', (e) => {
+            keys.left = false;
+            keys.right = false;
             e.preventDefault();
         });
 
