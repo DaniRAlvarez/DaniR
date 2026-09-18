@@ -9,6 +9,7 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent; /* Elimina el destello molesto al tocar en móviles */
         }
         body {
             margin: 0;
@@ -407,10 +408,10 @@
         <!-- Pantalla de Inicio -->
         <div id="start-screen" class="screen interactive-ui">
             <h1>Cute Bunny Runner</h1>
-            <p>¡Toca los extremos izquierdo/derecho en móviles (o usa A/D) para moverte! ¡Salta y supera los niveles!</p>
+            <p>¡Toca casi toda la pantalla para saltar, y los bordes extremos para moverte!</p>
             <div class="controls-hint">
-                <span class="key">TOCAR EXTREMOS / A-D: Moverse</span>
-                <span class="key">CENTRO / ESPACIO: Saltar</span>
+                <span class="key">BORDES EXTREMOS: Moverse</span>
+                <span class="key">CENTRO: Saltar</span>
             </div>
             <div class="menu-buttons-group" style="margin-top: 15px;">
                 <button class="btn" id="start-btn">Jugar</button>
@@ -798,11 +799,11 @@
                 let moveSpeed = 5.0 * gMultiplier;
                 if (keys.right) {
                     this.x += moveSpeed;
-                    if (this.x > canvas.width * 0.75) this.x = canvas.width * 0.75; // Límite derecho en pantalla
+                    if (this.x > canvas.width * 0.75) this.x = canvas.width * 0.75;
                 }
                 if (keys.left) {
                     this.x -= moveSpeed;
-                    if (this.x < 40) this.x = 40; // Límite izquierdo en pantalla
+                    if (this.x < 40) this.x = 40;
                 }
 
                 const groundLevel = 350;
@@ -1233,7 +1234,7 @@
                 } else {
                     let spikeCount = Math.random() > 0.5 ? 2 : 3;
                     let spikeWidth = spikeCount * 14;
-                    // PINCHOS FIJOS AL MUNDO: Posición absoluta en coordenadas del mundo
+                    // PINCHOS: Fijos a la coordenada absoluta del mundo
                     let spikeWorldX = distanceTraveled + canvas.width + 50;
                     obstacles.push({
                         worldX: spikeWorldX,
@@ -1354,11 +1355,9 @@
 
                     obs.x += obs.vx * gMult;
                 } else {
-                    // PINCHOS: Fijos al mundo, se renderizan mediante su `worldX` menos la distancia recorrida
-                    // Esto evita que se muevan con el movimiento horizontal manual del jugador
+                    // PINCHOS: Permanecen estáticos en el mundo, no se aceleran ni se mueven por el desplazamiento manual del jugador
                 }
 
-                // Cálculo de colisión para gominolas y pinchos
                 let obsScreenX = obs.type === 'gummy' ? obs.x : (obs.worldX - distanceTraveled);
                 let obsScreenY = obs.y;
 
@@ -1551,7 +1550,7 @@
                     ctx.fillRect(-obs.width / 2 + 9, -obs.height / 2 + 9, 2, 2);
                     ctx.fillRect(-obs.width / 2 + 24, -obs.height / 2 + 9, 2, 2);
                 } else {
-                    // PINCHOS: Estáticos y fijos al mundo
+                    // PINCHOS: Estáticos y pegados al suelo de forma fija en el mundo
                     let spikeScreenX = obs.worldX - distanceTraveled;
                     ctx.fillStyle = '#ff4500';
                     ctx.strokeStyle = '#ff1493';
@@ -1859,7 +1858,6 @@
             rouletteScreen.classList.add('hidden');
         });
 
-        // Controles de teclado
         window.addEventListener('keydown', (e) => {
             if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
             if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -1876,17 +1874,16 @@
             if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
         });
 
-        // CONTROLES TÁCTILES MEJORADOS PARA MÓVILES: 
-        // Lado izquierdo = Moverse a la izquierda, Lado derecho = Moverse a la derecha, Toque rápido/Centro = Saltar
+        // Controles táctiles optimizados: Extremos izquierdo (15%) y derecho (15%) para avanzar/retroceder, centro para saltar
         canvas.addEventListener('pointerdown', (e) => {
             if (gameState === 'PLAYING') {
                 let rect = canvas.getBoundingClientRect();
                 let touchX = e.clientX - rect.left;
                 let relX = touchX / canvas.clientWidth;
 
-                if (relX < 0.3) {
+                if (relX < 0.15) {
                     keys.left = true;
-                } else if (relX > 0.7) {
+                } else if (relX > 0.85) {
                     keys.right = true;
                 } else {
                     player.jump();
