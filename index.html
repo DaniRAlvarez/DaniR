@@ -1,82 +1,1145 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dani R - Sitio Oficial</title>
+    <title>Dani R | Profile</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            text-align: center;
-            padding: 50px;
+        :root {
+            --primary: #ff77bc;
+            --secondary: #00ffff;
+            --accent: #b55fe6;
+            --shop-color: #ffaa33;
+            --gift-color: #ff55aa;
+            --wall-color: #00ffcc;
+            --sub-color: #ff4455;
+            --bg-color: #0a0812;
+            --card-bg: rgba(20, 15, 30, 0.55);
+            --text: #ffffff;
         }
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #ff3366;
-            color: white;
-            border: none;
-            border-radius: 8px;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: var(--bg-color) !important;
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas#bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background-color: var(--bg-color);
+        }
+
+        /* Encabezado */
+        header {
+            width: 100%;
+            max-width: 1100px;
+            padding: 2rem 1.5rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1.title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary), 0 0 20px var(--accent);
             cursor: pointer;
-            transition: background 0.3s;
+            user-select: none;
+            transition: transform 0.2s ease;
         }
-        button:hover {
-            background-color: #e02b5b;
+
+        h1.title:active {
+            transform: scale(0.95);
         }
-        #mensaje-estado {
-            margin-top: 20px;
-            font-size: 18px;
+
+        /* Banner Principal */
+        .banner-container {
+            width: 100%;
+            max-width: 1100px;
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .main-banner {
+            width: 100%;
+            max-height: 380px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 119, 188, 0.3);
+            box-shadow: 0 0 25px rgba(255, 119, 188, 0.25);
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .main-banner:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 35px rgba(0, 255, 255, 0.35);
+        }
+
+        /* Tarjeta de Perfil */
+        .profile-card {
+            width: 90%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 119, 188, 0.3);
+            border-radius: 24px;
+            padding: 2rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .profile-img-container {
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 1.2rem;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            box-shadow: 0 0 20px var(--primary);
+        }
+
+        .profile-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #0a0812;
+        }
+
+        .profile-name {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            color: #fff;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+        }
+
+        .profile-bio {
+            font-size: 0.85rem;
+            color: #d0b0e0;
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+        }
+
+        /* Estilo del Bloque de Presentación */
+        .intro-quote {
+            background: rgba(255, 119, 188, 0.05);
+            border-left: 3px solid var(--primary);
+            border-right: 3px solid var(--secondary);
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1.8rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #f3e8ff;
+            font-style: italic;
+            box-shadow: inset 0 0 10px rgba(181, 95, 230, 0.15);
+        }
+
+        /* Botones de Redes Sociales y Enlaces */
+        .links-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .link-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 0.9rem 1.5rem;
+            background: rgba(255, 119, 188, 0.08);
+            border: 1px solid var(--primary);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .link-btn:hover {
+            background: var(--primary);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .link-btn.gallery-btn {
+            border-color: var(--secondary);
+            background: rgba(0, 255, 255, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.gallery-btn:hover {
+            background: var(--secondary);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--secondary);
+        }
+
+        .link-btn.game-btn {
+            border-color: var(--accent);
+            background: rgba(181, 95, 230, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.game-btn:hover {
+            background: var(--accent);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .link-btn.shop-btn {
+            border-color: var(--shop-color);
+            background: rgba(255, 170, 51, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.shop-btn:hover {
+            background: var(--shop-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--shop-color);
+        }
+
+        .link-btn.gift-btn {
+            border-color: var(--gift-color);
+            background: rgba(255, 85, 170, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.gift-btn:hover {
+            background: var(--gift-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--gift-color);
+        }
+
+        .link-btn.wall-btn {
+            border-color: var(--wall-color);
+            background: rgba(0, 255, 204, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.wall-btn:hover {
+            background: var(--wall-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--wall-color);
+        }
+
+        .link-btn.sub-btn {
+            border-color: var(--sub-color);
+            background: rgba(255, 68, 85, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.sub-btn:hover {
+            background: var(--sub-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--sub-color);
+        }
+
+        /* Estilos del Panel Flotante (Modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 8, 18, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: rgba(25, 18, 40, 0.95);
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 2.2rem 1.8rem;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(255, 119, 188, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .modal-card.wall-card {
+            max-width: 480px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
+
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        .modal-text {
+            font-size: 0.85rem;
+            color: #d0b0e0;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .messages-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 320px;
+            margin-bottom: 1.2rem;
+            padding-right: 5px;
+            text-align: left;
+        }
+
+        .messages-scroll-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .messages-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        .fan-message-card {
+            background: rgba(255, 119, 188, 0.05);
+            border: 1px solid rgba(255, 119, 188, 0.25);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 10px rgba(255, 119, 188, 0.05);
+        }
+
+        .name-input, .visibility-select, .email-input {
+            width: 100%;
+            height: 40px;
+            background: rgba(10, 8, 18, 0.6);
+            border: 1px solid rgba(255, 85, 170, 0.4);
+            border-radius: 10px;
+            padding: 0 0.8rem;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .email-input {
+            border-color: rgba(255, 68, 85, 0.4);
+        }
+        .email-input:focus {
+            border-color: var(--sub-color);
+            box-shadow: 0 0 10px rgba(255, 68, 85, 0.3);
+        }
+
+        .visibility-select option {
+            background: #1a1228;
+            color: #fff;
+        }
+
+        .name-input:focus, .visibility-select:focus {
+            border-color: var(--gift-color);
+            box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
+        }
+
+        .message-input {
+            width: 100%;
+            height: 65px;
+            background: rgba(10, 8, 18, 0.6);
+            border: 1px solid rgba(255, 85, 170, 0.4);
+            border-radius: 10px;
+            padding: 0.8rem;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            resize: none;
+            margin-bottom: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .message-input:focus {
+            border-color: var(--gift-color);
+            box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .modal-buttons-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 0.6rem 0.4rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn.full-width {
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 0.7rem;
+        }
+
+        .modal-btn.primary {
+            background: var(--gift-color);
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(255, 85, 170, 0.4);
+        }
+
+        .modal-btn.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 85, 170, 0.7);
+        }
+
+        .modal-btn.gift-action {
+            background: #ffcc00;
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+        }
+
+        .modal-btn.gift-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 204, 0, 0.7);
+        }
+
+        .modal-btn.sub-action {
+            background: var(--sub-color);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 68, 85, 0.4);
+        }
+
+        .modal-btn.sub-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 68, 85, 0.7);
+        }
+
+        .modal-btn.unsubscribe-action {
+            background: rgba(255, 68, 85, 0.15);
+            color: #ff8892;
+            border: 1px solid rgba(255, 68, 85, 0.4);
+        }
+
+        .modal-btn.unsubscribe-action:hover {
+            background: rgba(255, 68, 85, 0.3);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .modal-btn.danger-action {
+            background: #ff3344;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 51, 68, 0.5);
+        }
+
+        .modal-btn.danger-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 51, 68, 0.8);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.03);
+        }
+
+        .modal-btn.wall-action {
+            background: var(--wall-color);
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+        .modal-btn.wall-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(0, 255, 204, 0.7);
+        }
+
+        /* Estilos para los avisos dentro del modal */
+        #successMessage, #giftNoticeMessage, #subSuccessMessage, #subUnsubMessage {
+            display: none;
+            background: rgba(85, 255, 170, 0.15);
+            border: 1px solid #55ffaa;
+            color: #55ffaa;
+            padding: 0.8rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1rem;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        #giftNoticeMessage {
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+
+        #subSuccessMessage {
+            background: rgba(255, 68, 85, 0.15);
+            border-color: var(--sub-color);
+            color: #ff8892;
+        }
+
+        #subUnsubMessage {
+            background: rgba(255, 165, 0, 0.15);
+            border-color: #ffa500;
+            color: #ffcc66;
+        }
+
+        /* Contenedor de la Advertencia de Anulación (Inicialmente oculto) */
+        #confirmUnsubBox {
+            display: none;
+            background: rgba(255, 68, 85, 0.1);
+            border: 1px dashed var(--sub-color);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mariposas flotantes animadas */
+        .butterfly {
+            position: absolute;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: flyButterfly 4s infinite ease-in-out;
+            opacity: 0.8;
+        }
+
+        @keyframes flyButterfly {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            50% {
+                transform: translate(60px, -70px) rotate(15deg) scale(1.2);
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-40px, -140px) rotate(-15deg) scale(0.8);
+                opacity: 0;
+            }
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            font-size: 0.75rem;
+            color: #a080b0;
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
-    <h1>¡Bienvenido a la página de Dani R!</h1>
-    <p>Haz clic en el botón para notificar el nuevo contenido a tus suscriptores.</p>
-    
-    <!-- Botón para disparar la notificación -->
-    <button onclick="enviarNotificacion()">📢 Notificar Nuevo Contenido</button>
-    
-    <div id="mensaje-estado"></div>
+    <canvas id="bg-canvas"></canvas>
+
+    <header>
+        <!-- Atajo secreto: Haz triple clic en el título DANI R para activar las notificaciones -->
+        <h1 class="title" onclick="verificarDispararNotificaciones()" title="Haz triple clic aquí para notificar a tus fans">DANI R</h1>
+    </header>
+
+    <!-- Banner Principal -->
+    <section class="banner-container">
+        <img src="FotosWeb/banner.png" alt="Dani R Banner Principal" class="main-banner">
+    </section>
+
+    <!-- Contenido del Perfil -->
+    <main class="profile-card">
+        <div class="profile-img-container">
+            <img src="FotosWeb/perfil.jpg" alt="Dani R" class="profile-img">
+        </div>
+
+        <h2 class="profile-name">Dani R</h2>
+        <p class="profile-bio">Digital Creator ✨ • Cozy & Aesthetic Vibes 🌙</p>
+
+        <!-- Bloque de Presentación -->
+        <blockquote class="intro-quote">
+            "Hola, Yo soy Dani R. Belleza, estilo y una mirada que dice más que mil palabras. ¿Te quedas a descubrir el resto? Te va a encantar."
+        </blockquote>
+
+        <div class="links-container">
+            <!-- Enlace a la Galería Multimedia -->
+            <a href="index1.html" class="link-btn gallery-btn">
+                🖼️ VER GALERÍA MULTIMEDIA
+            </a>
+
+            <!-- Enlace a Minijuegos -->
+            <a href="bunny.html" class="link-btn game-btn">
+                🎮 MINIJUEGOS: BUNNY
+            </a>
+
+            <!-- Redes Sociales Oficiales -->
+            <a href="https://www.tiktok.com/@dani_r_alvarez" target="_blank" rel="noopener noreferrer" class="link-btn">
+                TIKTOK
+            </a>
+            <a href="https://www.instagram.com/dani.r.alvarez/" target="_blank" rel="noopener noreferrer" class="link-btn">
+                INSTAGRAM
+            </a>
+            <a href="https://www.facebook.com/DaniRAlvarez22" target="_blank" rel="noopener noreferrer" class="link-btn">
+                FACEBOOK
+            </a>
+
+            <!-- Botón Tienda -->
+            <a onclick="openModal('shopModal')" class="link-btn shop-btn">
+                🛍️ TIENDA
+            </a>
+
+            <!-- Botón Muro de Fans -->
+            <a onclick="openModal('wallModal')" class="link-btn wall-btn">
+                💬 MURO DE FANS
+            </a>
+
+            <!-- Botón Regalos -->
+            <a onclick="openModal('giftModal')" class="link-btn gift-btn">
+                🎁 REGALOS
+            </a>
+
+            <!-- Botón Suscripción al puro final -->
+            <a onclick="openModal('subModal')" class="link-btn sub-btn">
+                🔔 SUSCRÍBETE
+            </a>
+        </div>
+    </main>
+
+    <!-- Panel Flotante / Modal de Tienda -->
+    <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event, 'shopModal')">
+        <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
+            <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
+            <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812; box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);">ENTENDIDO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Flotante / Modal del Muro de Mensajes Públicos -->
+    <div id="wallModal" class="modal-overlay" onclick="closeModalOnBg(event, 'wallModal')">
+        <div class="modal-card wall-card" style="border-color: var(--wall-color); box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);">
+            <h3 class="modal-title" style="color: var(--wall-color);">💬 MURO DE FANS 💬</h3>
+            <p class="modal-text">Últimos mensajes públicos para Dani R:</p>
+            
+            <div id="listaMensajesPublicos" class="messages-scroll-container">
+                <p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="modal-btn wall-action" onclick="closeModal('wallModal')">CERRAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Flotante / Modal de Regalos -->
+    <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
+        <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
+            <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
+            <span class="butterfly" style="top: 85%; left: 70%; animation-delay: 1.5s;">🦋</span>
+            <span class="butterfly" style="top: 75%; left: 45%; animation-delay: 2.8s;">🦋</span>
+
+            <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
+            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu mensaje:</p>
+            
+            <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
+            <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial y único a Dani R. ¡Quédate pendiente! ✨</div>
+
+            <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
+
+            <select id="userVisibility" class="visibility-select">
+                <option value="PUBLICO">Público (Visible en el muro) 💖</option>
+                <option value="PRIVADO">Privado (Solo para Dani R) 🌙</option>
+            </select>
+
+            <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
+
+            <div class="modal-buttons" id="modalActionBtns">
+                <button class="modal-btn secondary" onclick="closeModal('giftModal')">CANCELAR</button>
+                <button class="modal-btn primary" onclick="submitMessage()">💬 ENVIAR</button>
+                <button class="modal-btn gift-action" onclick="mostrarAvisoRegalo()">🎁 REGALO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel Flotante / Modal de Suscripción -->
+    <div id="subModal" class="modal-overlay" onclick="closeModalOnBg(event, 'subModal')">
+        <div class="modal-card" style="border-color: var(--sub-color); box-shadow: 0 0 30px rgba(255, 68, 85, 0.3);">
+            <h3 class="modal-title" style="color: var(--sub-color);">🔔 SUSCRÍBETE 🔔</h3>
+            <p class="modal-text">Recibe notificaciones acerca de mi contenido exclusivo.</p>
+            
+            <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@ al círculo exclusivo. ✨</div>
+            <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista de suscripción. ¡Te extrañaremos!</div>
+
+            <!-- Campo de correo normal -->
+            <input type="email" id="userEmail" class="email-input" placeholder="Ingresa tu correo electrónico...">
+
+            <!-- Caja de Advertencia y Confirmación para Anular Suscripción -->
+            <div id="confirmUnsubBox">
+                <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem; line-height: 1.4;">
+                    ¿Estás seguro de que deseas anular tu correo electrónico? No recibirás notificaciones de Dani R.
+                </p>
+                <div style="display: flex; gap: 8px;">
+                    <button class="modal-btn secondary" onclick="cancelarConfirmacionUnsub()">VOLVER</button>
+                    <button class="modal-btn danger-action" onclick="unsubscribeUser()">SÍ, ANULAR</button>
+                </div>
+            </div>
+
+            <!-- Botones principales del modal -->
+            <div class="modal-buttons-column" id="subActionBtns">
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <button class="modal-btn secondary" onclick="closeModal('subModal')">CANCELAR</button>
+                    <button class="modal-btn sub-action" onclick="submitSubscription()">📩 SUSCRIBIRME</button>
+                </div>
+                <button class="modal-btn unsubscribe-action full-width" onclick="mostrarConfirmacionUnsub()">🗑️ ANULAR SUSCRIPCIÓN</button>
+            </div>
+        </div>
+    </div>
+
+    <footer style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;">
+        <p style="margin-bottom: 12px; text-align: center;">© Dani R • Official Page</p>
+        
+        <div style="display: flex; justify-content: center;">
+            <a href="https://www.freecounterstat.com" title="website hit counter" target="_blank">
+                <img src="https://counter11.optistats.ovh/private/freecounterstat.php?c=81uhpk3tuae43h19qh8m144ldhz39z69" border="0" title="website hit counter" alt="website hit counter" style="width: 55px; height: auto; opacity: 0.6; filter: drop-shadow(0 0 4px rgba(255, 119, 188, 0.3)); display: block;">
+            </a>
+        </div>
+
+        <p style="margin-top: 12px; font-size: 0.7rem; color: #b55fe6; letter-spacing: 2px; text-align: center; width: 100%;">FANS</p>
+    </footer>
 
     <script>
-        function enviarNotificacion() {
-            const estadoDiv = document.getElementById("mensaje-estado");
-            estadoDiv.innerHTML = "⏳ Procesando solicitud y enviando correos...";
-            estadoDiv.style.color = "#ffcc00";
+        /* Funciones para controlar los paneles flotantes */
+        function openModal(modalId) {
+            if (modalId === 'giftModal') {
+                document.getElementById('successMessage').style.display = 'none';
+                document.getElementById('giftNoticeMessage').style.display = 'none';
+                document.getElementById('modalActionBtns').style.display = 'flex';
+                document.getElementById('userName').style.display = 'block';
+                document.getElementById('userVisibility').style.display = 'block';
+                document.getElementById('userMessage').style.display = 'block';
+            } else if (modalId === 'subModal') {
+                document.getElementById('subSuccessMessage').style.display = 'none';
+                document.getElementById('subUnsubMessage').style.display = 'none';
+                document.getElementById('subActionBtns').style.display = 'flex';
+                document.getElementById('userEmail').style.display = 'block';
+                document.getElementById('confirmUnsubBox').style.display = 'none';
+            } else if (modalId === 'wallModal') {
+                cargarMensajesPublicos();
+            }
+            document.getElementById(modalId).classList.add('active');
+        }
 
-            // ⚠️ REEMPLAZA ESTA URL CON TU URL DE DESPLIEGUE WEB DE APPS SCRIPT
-            const URL_APPS_SCRIPT = "AQUÍ_PEGAS_TU_URL_DE_APLICACION_WEB";
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
 
-            fetch(URL_APPS_SCRIPT)
+        function closeModalOnBg(event, modalId) {
+            if (event.target.id === modalId) {
+                closeModal(modalId);
+            }
+        }
+
+        function mostrarAvisoRegalo() {
+            const giftNotice = document.getElementById('giftNoticeMessage');
+            giftNotice.style.display = 'block';
+            setTimeout(() => {
+                giftNotice.style.display = 'none';
+            }, 3500);
+        }
+
+        /* 🚀 FUNCIÓN SECRETA PARA DISPARAR EL SCRIPT DE CORREOS DESDE LA WEB SIN BLOQUEO CORS */
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function verificarDispararNotificaciones() {
+            clickCount++;
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 600);
+            } else if (clickCount === 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+
+                let clave = prompt("🔐 Panel de Creadora: Introduce tu clave secreta para notificar a los nuevos fans:");
+                if (clave !== "Dani2026") {
+                    alert("❌ Contraseña incorrecta.");
+                    return;
+                }
+
+                const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
+
+                alert("🚀 Procesando envíos... Los correos se están enviando a los nuevos suscriptores en segundo plano.");
+
+                // Usamos modo 'no-cors' para evitar que el navegador bloquee la respuesta de Google
+                fetch(scriptWebUrl, { method: 'GET', mode: 'no-cors' })
+                    .then(() => {
+                        alert("✨ ¡Orden enviada con éxito! Revisa tu Google Sheets en unos segundos para ver cómo se van marcando como 'Enviado'. 💖");
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Hubo un error de conexión al disparar el script.");
+                    });
+            }
+        }
+
+        /* Mostrar la advertencia de anulación */
+        function mostrarConfirmacionUnsub() {
+            const correo = document.getElementById('userEmail').value.trim();
+            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
+                alert("Por favor ingresa primero el correo electrónico que deseas dar de baja.");
+                return;
+            }
+            document.getElementById('subActionBtns').style.display = 'none';
+            document.getElementById('confirmUnsubBox').style.display = 'block';
+        }
+
+        /* Volver atrás desde la advertencia */
+        function cancelarConfirmacionUnsub() {
+            document.getElementById('confirmUnsubBox').style.display = 'none';
+            document.getElementById('subActionBtns').style.display = 'flex';
+        }
+
+        /* Función para enviar el correo y guardarlo en la columna E (CORREO) de SheetDB */
+        function submitSubscription() {
+            const emailInput = document.getElementById('userEmail');
+            const correo = emailInput.value.trim();
+
+            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
+                alert("Por favor ingresa un correo electrónico válido.");
+                return;
+            }
+
+            const datosSuscripcion = {
+                data: [
+                    {
+                        CORREO: correo
+                    }
+                ]
+            };
+
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosSuscripcion)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userEmail').style.display = 'none';
+                document.getElementById('subActionBtns').style.display = 'none';
+                document.getElementById('confirmUnsubBox').style.display = 'none';
+                document.getElementById('subSuccessMessage').style.display = 'block';
+
+                emailInput.value = "";
+
+                setTimeout(() => {
+                    closeModal('subModal');
+                }, 2500);
+            })
+            .catch(error => {
+                console.error('Error al registrar la suscripción:', error);
+                alert("Hubo un error al suscribirte. Inténtalo más tarde.");
+            });
+        }
+
+        /* Función para anular la suscripción borrando el correo de SheetDB tras confirmar */
+        function unsubscribeUser() {
+            const emailInput = document.getElementById('userEmail');
+            const correo = emailInput.value.trim();
+
+            const apiUrl = `https://sheetdb.io/api/v1/1ff9t301skbih/CORREO/${encodeURIComponent(correo)}`;
+
+            fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userEmail').style.display = 'none';
+                document.getElementById('confirmUnsubBox').style.display = 'none';
+                document.getElementById('subUnsubMessage').style.display = 'block';
+
+                emailInput.value = "";
+
+                setTimeout(() => {
+                    closeModal('subModal');
+                }, 2500);
+            })
+            .catch(error => {
+                console.error('Error al anular la suscripción:', error);
+                alert("Hubo un error al procesar tu solicitud. Inténtalo más tarde.");
+            });
+        }
+
+        /* Función para descargar, filtrar estrictamente por PUBLICO y mostrar los últimos 20 */
+        function cargarMensajesPublicos() {
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+            const contenedor = document.getElementById('listaMensajesPublicos');
+            contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>';
+
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
-                    // Validamos si el servidor devolvió un bloqueo por tiempo
-                    if (data.ESTADO === "bloqueado" || data.status === "bloqueado") {
-                        estadoDiv.innerHTML = "⚠️ " + data.mensaje;
-                        estadoDiv.style.color = "#ff4444";
-                        alert("⚠️ " + data.mensaje);
-                    } 
-                    // Validamos si el envío fue exitoso
-                    else if (data.ESTADO === "success" || data.status === "success") {
-                        estadoDiv.innerHTML = "✅ ¡Correos enviados con éxito a " + data.enviados + " suscriptores!";
-                        estadoDiv.style.color = "#00C851";
-                        alert("✅ ¡Éxito! Se enviaron " + data.enviados + " correos.");
-                    } else {
-                        estadoDiv.innerHTML = "❓ Respuesta inesperada del servidor.";
-                        estadoDiv.style.color = "#ffbb33";
+                    contenedor.innerHTML = "";
+
+                    const mensajesPublicos = data.filter(item => {
+                        let vis = item.VISIBILIDAD ? item.VISIBILIDAD.trim().toUpperCase() : '';
+                        return vis === 'PUBLICO' && item.NOMBRE && item.MENSAJE;
+                    });
+
+                    if (mensajesPublicos.length === 0) {
+                        contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Aún no hay mensajes públicos. ¡Sé el primero en dejar uno! 💖</p>';
+                        return;
                     }
+
+                    const ultimosVeinte = mensajesPublicos.reverse().slice(0, 20);
+
+                    ultimosVeinte.forEach(item => {
+                        let tarjeta = document.createElement('div');
+                        tarjeta.className = 'fan-message-card';
+                        
+                        tarjeta.innerHTML = `
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <strong style="color: var(--primary); font-size: 0.8rem;">✨ ${item.NOMBRE}</strong>
+                                <span style="font-size: 0.6rem; color: #a080b0;">${item.FECHA || ''}</span>
+                            </div>
+                            <p style="font-size: 0.8rem; color: #f3e8ff; line-height: 1.4; word-break: break-word;">${item.MENSAJE}</p>
+                        `;
+                        contenedor.appendChild(tarjeta);
+                    });
                 })
                 .catch(error => {
-                    console.error("Error:", error);
-                    estadoDiv.innerHTML = "❌ Ocurrió un error al conectar con el servidor.";
-                    estadoDiv.style.color = "#ff4444";
+                    console.error('Error al cargar el muro:', error);
+                    contenedor.innerHTML = '<p style="text-align: center; color: #ff77bc; font-size: 0.8rem; margin-top: 2rem;">Error al cargar los mensajes. Inténtalo más tarde.</p>';
                 });
         }
-    </script>
 
+        /* Función para enviar datos a SheetDB incluyendo la visibilidad */
+        function submitMessage() {
+            const nameInput = document.getElementById('userName');
+            const visibilitySelect = document.getElementById('userVisibility');
+            const msgInput = document.getElementById('userMessage');
+            
+            const nombreFan = nameInput.value.trim();
+            const visibilidad = visibilitySelect.value;
+            const textoMensaje = msgInput.value.trim();
+
+            if (nombreFan === "" || textoMensaje === "") {
+                alert("Por favor completa tu nombre y tu mensaje.");
+                return;
+            }
+
+            const hoy = new Date().toLocaleDateString();
+            let controlEnvios = JSON.parse(localStorage.getItem('limiteMensajesDaniR')) || { fecha: hoy, count: 0 };
+
+            if (controlEnvios.fecha !== hoy) {
+                controlEnvios = { fecha: hoy, count: 0 };
+            }
+
+            if (controlEnvios.count >= 2) {
+                alert("💖 ¡Ya has enviado tus 2 mensajes permitidos para el día de hoy! Vuelve mañana para dejar más cariño.");
+                return;
+            }
+
+            const datosAEnviar = {
+                data: [
+                    {
+                        NOMBRE: nombreFan,
+                        FECHA: new Date().toLocaleString(),
+                        MENSAJE: textoMensaje,
+                        VISIBILIDAD: visibilidad
+                    }
+                ]
+            };
+
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosAEnviar)
+            })
+            .then(response => response.json())
+            .then(data => {
+                controlEnvios.count++;
+                localStorage.setItem('limiteMensajesDaniR', JSON.stringify(controlEnvios));
+
+                document.getElementById('userName').style.display = 'none';
+                document.getElementById('userVisibility').style.display = 'none';
+                document.getElementById('userMessage').style.display = 'none';
+                document.getElementById('modalActionBtns').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+
+                nameInput.value = "";
+                msgInput.value = "";
+
+                setTimeout(() => {
+                    closeModal('giftModal');
+                }, 2500);
+            })
+            .catch(error => {
+                console.error('Error al conectar con la base de datos:', error);
+                alert("Hubo un error al enviar el mensaje. Revisa tu conexión.");
+            });
+        }
+
+        /* Animación del Fondo de Partículas Cíclico */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let w, h, centerX, centerY;
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            centerX = w / 2;
+            centerY = h / 2;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        let infParticles = [];
+        const count = 100;
+
+        function getFeminineInfinity(t, scale) {
+            const x = scale * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
+            const y = scale * Math.sin(t) * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
+            const z = Math.sin(t * 2) * 20;
+            return { x, y: y + Math.sin(t * 3) * 8, z };
+        }
+
+        for (let i = 0; i < count; i++) {
+            infParticles.push({
+                t: (i / count) * Math.PI * 2,
+                speed: 0.0018 + Math.random() * 0.0012,
+                orbitAng: Math.random() * 6.28,
+                orbitRadius: 4 + Math.random() * 12,
+                size: Math.random() * 2 + 1,
+                colorShift: Math.random()
+            });
+        }
+
+        let time = 0;
+        function animate() {
+            const fadeAlpha = 0.35 + 0.20 * Math.sin(time * 0.0008);
+
+            ctx.fillStyle = `rgba(10, 8, 18, ${fadeAlpha})`;
+            ctx.fillRect(0, 0, w, h);
+
+            const scale = Math.min(w, h) * (w < 768 ? 0.45 : 0.4);
+
+            ctx.globalCompositeOperation = 'lighter';
+
+            infParticles.forEach(p => {
+                p.t += p.speed;
+                const pos = getFeminineInfinity(p.t, scale);
+                
+                const rot = time * 0.0004;
+                const rx = pos.x * Math.cos(rot) - pos.z * Math.sin(rot);
+                const ry = pos.y;
+
+                const x = centerX + rx + Math.cos(p.orbitAng + time * 0.002) * p.orbitRadius;
+                const y = centerY + ry + Math.sin(p.orbitAng + time * 0.002) * p.orbitRadius;
+
+                const r = Math.floor(255 * (0.6 + 0.4 * Math.sin(p.colorShift + time * 0.001)));
+                const g = Math.floor(120 + 135 * Math.sin(p.colorShift * 2 + time * 0.0015));
+                const b = Math.floor(220 + 35 * Math.cos(time * 0.001));
+
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, 6.28);
+                ctx.fill();
+            });
+
+            time += 16;
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 </body>
 </html>
