@@ -821,7 +821,7 @@
             }, 3500);
         }
 
-        /* 🚀 FUNCIÓN SINCRONIZADA PARA DISPARAR EL SCRIPT DE CORREOS Y LEER EL ESTADO REAL */
+        /* 🚀 FUNCIÓN SINCRONIZADA PARA DISPARAR EL SCRIPT DE CORREOS Y LEER LOS 4 ESTADOS */
         let clickCount = 0;
         let clickTimer = null;
 
@@ -845,21 +845,24 @@
 
                 alert("🚀 Conectando con Google Apps Script para validar estado y envíos...");
 
-                // Hacemos fetch normal (sin no-cors) para procesar el JSON devuelto por el servidor
                 fetch(scriptWebUrl, { method: 'GET' })
                     .then(response => response.json())
                     .then(data => {
                         if (data.ESTADO === "bloqueado") {
-                            alert("⏳ BLOQUEO ACTIVO:\n\n" + data.mensaje);
-                        } else if (data.ESTADO === "success") {
-                            alert("✨ ¡ÉXITO! " + data.mensaje + " Revisa tu Google Sheet y tu bandeja.");
+                            alert("⏳ [BLOQUEADO]:\n\n" + data.mensaje);
+                        } else if (data.ESTADO === "enviado" || data.ESTADO === "success") {
+                            alert("✨ [ENVIADO CON ÉXITO]: " + data.mensaje);
+                        } else if (data.ESTADO === "pendiente") {
+                            alert("🔄 [PENDIENTE]: " + data.mensaje);
+                        } else if (data.ESTADO === "vacio") {
+                            alert("📝 [VACÍO]: " + data.mensaje);
                         } else {
                             alert("Estado recibido: " + JSON.stringify(data));
                         }
                     })
                     .catch(error => {
                         console.error("Error al consultar el script:", error);
-                        alert("⚠️ Hubo un error de conexión o de CORS con el script de Google. Asegúrate de que la URL de despliegue sea correcta y esté actualizada a la última versión.");
+                        alert("⚠️ Hubo un error de conexión o de CORS con el script de Google. Asegúrate de que la URL de despliegue sea correcta y esté actualizada.");
                     });
             }
         }
