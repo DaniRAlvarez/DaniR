@@ -741,7 +741,7 @@
             }, 3500);
         }
 
-        /* Función para enviar la suscripción de correo (puedes apuntarla a SheetDB o una tabla de correos) */
+        /* Función para enviar el correo y guardarlo en la columna E (CORREO) de SheetDB */
         function submitSubscription() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
@@ -751,17 +751,40 @@
                 return;
             }
 
-            // Ocultar input y botones, mostrar éxito
-            document.getElementById('userEmail').style.display = 'none';
-            document.getElementById('subActionBtns').style.display = 'none';
-            document.getElementById('subSuccessMessage').style.display = 'block';
+            const datosSuscripcion = {
+                data: [
+                    {
+                        CORREO: correo
+                    }
+                ]
+            };
 
-            emailInput.value = "";
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
 
-            // Cerrar modal tras 2.5 segundos
-            setTimeout(() => {
-                closeModal('subModal');
-            }, 2500);
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datosSuscripcion)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userEmail').style.display = 'none';
+                document.getElementById('subActionBtns').style.display = 'none';
+                document.getElementById('subSuccessMessage').style.display = 'block';
+
+                emailInput.value = "";
+
+                setTimeout(() => {
+                    closeModal('subModal');
+                }, 2500);
+            })
+            .catch(error => {
+                console.error('Error al registrar la suscripción:', error);
+                alert("Hubo un error al suscribirte. Inténtalo más tarde.");
+            });
         }
 
         /* Función para descargar, filtrar estrictamente por PUBLICO y mostrar los últimos 20 */
