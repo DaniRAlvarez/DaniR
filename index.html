@@ -87,13 +87,7 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 119, 188, 0.3);
             box-shadow: 0 0 25px rgba(255, 119, 188, 0.25);
-            transition: all 0.3s ease;
             display: block;
-        }
-
-        .main-banner:hover {
-            border-color: var(--secondary);
-            box-shadow: 0 0 35px rgba(0, 255, 255, 0.35);
         }
 
         .profile-card {
@@ -154,7 +148,6 @@
             line-height: 1.6;
             color: #f3e8ff;
             font-style: italic;
-            box-shadow: inset 0 0 10px rgba(181, 95, 230, 0.15);
         }
 
         .links-container {
@@ -188,18 +181,12 @@
             transform: translateY(-2px);
         }
 
-        .link-btn.gallery-btn { border-color: var(--secondary); background: rgba(0, 255, 255, 0.08); color: #ffffff; }
-        .link-btn.gallery-btn:hover { background: var(--secondary); color: #0a0812; box-shadow: 0 0 20px var(--secondary); }
-        .link-btn.game-btn { border-color: var(--accent); background: rgba(181, 95, 230, 0.08); color: #ffffff; }
-        .link-btn.game-btn:hover { background: var(--accent); color: #0a0812; box-shadow: 0 0 20px var(--accent); }
-        .link-btn.shop-btn { border-color: var(--shop-color); background: rgba(255, 170, 51, 0.08); color: #ffffff; }
-        .link-btn.shop-btn:hover { background: var(--shop-color); color: #0a0812; box-shadow: 0 0 20px var(--shop-color); }
-        .link-btn.gift-btn { border-color: var(--gift-color); background: rgba(255, 85, 170, 0.08); color: #ffffff; }
-        .link-btn.gift-btn:hover { background: var(--gift-color); color: #0a0812; box-shadow: 0 0 20px var(--gift-color); }
-        .link-btn.wall-btn { border-color: var(--wall-color); background: rgba(0, 255, 204, 0.08); color: #ffffff; }
-        .link-btn.wall-btn:hover { background: var(--wall-color); color: #0a0812; box-shadow: 0 0 20px var(--wall-color); }
-        .link-btn.sub-btn { border-color: var(--sub-color); background: rgba(255, 68, 85, 0.08); color: #ffffff; }
-        .link-btn.sub-btn:hover { background: var(--sub-color); color: #0a0812; box-shadow: 0 0 20px var(--sub-color); }
+        .link-btn.gallery-btn { border-color: var(--secondary); background: rgba(0, 255, 255, 0.08); }
+        .link-btn.game-btn { border-color: var(--accent); background: rgba(181, 95, 230, 0.08); }
+        .link-btn.shop-btn { border-color: var(--shop-color); background: rgba(255, 170, 51, 0.08); }
+        .link-btn.wall-btn { border-color: var(--wall-color); background: rgba(0, 255, 204, 0.08); }
+        .link-btn.gift-btn { border-color: var(--gift-color); background: rgba(255, 85, 170, 0.08); }
+        .link-btn.sub-btn { border-color: var(--sub-color); background: rgba(255, 68, 85, 0.08); }
 
         .modal-overlay {
             position: fixed;
@@ -209,7 +196,6 @@
             height: 100vh;
             background: rgba(10, 8, 18, 0.8);
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -233,17 +219,24 @@
             max-width: 400px;
             text-align: center;
             box-shadow: 0 0 30px rgba(255, 119, 188, 0.3);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .modal-card.wall-card { max-width: 480px; max-height: 80vh; display: flex; flex-direction: column; }
-        .modal-overlay.active .modal-card { transform: translateY(0); }
 
-        .modal-title { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; color: var(--primary); margin-bottom: 0.8rem; letter-spacing: 2px; }
-        .modal-text { font-size: 0.85rem; color: #d0b0e0; margin-bottom: 1rem; line-height: 1.5; }
+        .modal-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary);
+            margin-bottom: 0.8rem;
+            letter-spacing: 2px;
+        }
+
+        .modal-text {
+            font-size: 0.85rem;
+            color: #d0b0e0;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
 
         .messages-scroll-container {
             flex: 1;
@@ -254,9 +247,6 @@
             text-align: left;
         }
 
-        .messages-scroll-container::-webkit-scrollbar { width: 5px; }
-        .messages-scroll-container::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-
         .fan-message-card {
             background: rgba(255, 119, 188, 0.05);
             border: 1px solid rgba(255, 119, 188, 0.25);
@@ -265,13 +255,12 @@
             margin-bottom: 10px;
         }
 
-        .name-input, .visibility-select, .email-input {
+        .name-input, .visibility-select, .email-input, .message-input {
             width: 100%;
-            height: 40px;
             background: rgba(10, 8, 18, 0.6);
             border: 1px solid rgba(255, 85, 170, 0.4);
             border-radius: 10px;
-            padding: 0 0.8rem;
+            padding: 0.8rem;
             color: #fff;
             font-family: 'Poppins', sans-serif;
             font-size: 0.85rem;
@@ -280,27 +269,8 @@
         }
 
         .email-input { border-color: rgba(255, 68, 85, 0.4); }
-        .email-input:focus { border-color: var(--sub-color); box-shadow: 0 0 10px rgba(255, 68, 85, 0.3); }
-
         .visibility-select option { background: #1a1228; color: #fff; }
-        .name-input:focus, .visibility-select:focus { border-color: var(--gift-color); box-shadow: 0 0 10px rgba(255, 85, 170, 0.3); }
-
-        .message-input {
-            width: 100%;
-            height: 65px;
-            background: rgba(10, 8, 18, 0.6);
-            border: 1px solid rgba(255, 85, 170, 0.4);
-            border-radius: 10px;
-            padding: 0.8rem;
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem;
-            resize: none;
-            margin-bottom: 1.0rem;
-            outline: none;
-        }
-
-        .message-input:focus { border-color: var(--gift-color); box-shadow: 0 0 10px rgba(255, 85, 170, 0.3); }
+        .message-input { height: 65px; resize: none; }
 
         .modal-buttons { display: flex; gap: 8px; justify-content: center; }
         .modal-buttons-column { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
@@ -312,20 +282,19 @@
             border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
             font-size: 0.65rem;
-            letter-spacing: 0.5px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
         .modal-btn.full-width { width: 100%; padding: 0.7rem; font-size: 0.7rem; }
-        .modal-btn.primary { background: var(--gift-color); color: #0a0812; box-shadow: 0 0 15px rgba(255, 85, 170, 0.4); }
-        .modal-btn.gift-action { background: #ffcc00; color: #0a0812; box-shadow: 0 0 15px rgba(255, 204, 0, 0.4); }
-        .modal-btn.sub-action { background: var(--sub-color); color: #fff; box-shadow: 0 0 15px rgba(255, 68, 85, 0.4); }
+        .modal-btn.primary { background: var(--gift-color); color: #0a0812; }
+        .modal-btn.gift-action { background: #ffcc00; color: #0a0812; }
+        .modal-btn.sub-action { background: var(--sub-color); color: #fff; }
         .modal-btn.unsubscribe-action { background: rgba(255, 68, 85, 0.15); color: #ff8892; border: 1px solid rgba(255, 68, 85, 0.4); }
-        .modal-btn.danger-action { background: #ff3344; color: #fff; box-shadow: 0 0 15px rgba(255, 51, 68, 0.5); }
+        .modal-btn.danger-action { background: #ff3344; color: #fff; }
         .modal-btn.secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .modal-btn.wall-action { background: var(--wall-color); color: #0a0812; box-shadow: 0 0 15px rgba(0, 255, 204, 0.4); }
+        .modal-btn.wall-action { background: var(--wall-color); color: #0a0812; }
 
         #successMessage, #giftNoticeMessage, #subSuccessMessage, #subUnsubMessage {
             display: none;
@@ -338,7 +307,6 @@
             margin-bottom: 1rem;
             text-align: center;
         }
-
         #giftNoticeMessage { background: rgba(255, 204, 0, 0.15); border-color: #ffcc00; color: #ffcc00; }
         #subSuccessMessage { background: rgba(255, 68, 85, 0.15); border-color: var(--sub-color); color: #ff8892; }
         #subUnsubMessage { background: rgba(255, 165, 0, 0.15); border-color: #ffa500; color: #ffcc66; }
@@ -352,29 +320,7 @@
             margin-bottom: 1rem;
         }
 
-        .butterfly {
-            position: absolute;
-            font-size: 1.2rem;
-            pointer-events: none;
-            animation: flyButterfly 4s infinite ease-in-out;
-            opacity: 0.8;
-        }
-
-        @keyframes flyButterfly {
-            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
-            20% { opacity: 1; }
-            50% { transform: translate(60px, -70px) rotate(15deg) scale(1.2); }
-            80% { opacity: 1; }
-            100% { transform: translate(-40px, -140px) rotate(-15deg) scale(0.8); opacity: 0; }
-        }
-
-        footer {
-            margin-top: auto;
-            padding: 2rem;
-            font-size: 0.75rem;
-            color: #a080b0;
-            letter-spacing: 1px;
-        }
+        footer { margin-top: auto; padding: 2rem; font-size: 0.75rem; color: #a080b0; letter-spacing: 1px; text-align: center; }
     </style>
 </head>
 <body>
@@ -382,7 +328,8 @@
     <canvas id="bg-canvas"></canvas>
 
     <header>
-        <h1 class="title" onclick="verificarDispararNotificaciones()" title="Haz triple clic aquí para notificar a tus fans">DANI R</h1>
+        <!-- Triple clic secreto para evaluar el script -->
+        <h1 class="title" onclick="verificarDispararNotificaciones()">DANI R</h1>
     </header>
 
     <section class="banner-container">
@@ -416,42 +363,36 @@
 
     <!-- Modales -->
     <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event, 'shopModal')">
-        <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
+        <div class="modal-card" style="border-color: var(--shop-color);">
             <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
-            <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
-            <div class="modal-buttons">
-                <button class="modal-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812;">ENTENDIDO</button>
-            </div>
+            <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente más novedades!</p>
+            <button class="modal-btn full-width" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812;">ENTENDIDO</button>
         </div>
     </div>
 
     <div id="wallModal" class="modal-overlay" onclick="closeModalOnBg(event, 'wallModal')">
-        <div class="modal-card wall-card" style="border-color: var(--wall-color); box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);">
+        <div class="modal-card wall-card" style="border-color: var(--wall-color);">
             <h3 class="modal-title" style="color: var(--wall-color);">💬 MURO DE FANS 💬</h3>
-            <p class="modal-text">Últimos mensajes públicos para Dani R:</p>
             <div id="listaMensajesPublicos" class="messages-scroll-container">
                 <p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>
             </div>
-            <div class="modal-buttons">
-                <button class="modal-btn wall-action" onclick="closeModal('wallModal')">CERRAR</button>
-            </div>
+            <button class="modal-btn wall-action full-width" onclick="closeModal('wallModal')">CERRAR</button>
         </div>
     </div>
 
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
-        <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
-            <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
-            <span class="butterfly" style="top: 85%; left: 70%; animation-delay: 1.5s;">🦋</span>
+        <div class="modal-card" style="border-color: var(--gift-color);">
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
-            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu mensaje:</p>
             <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
-            <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial y único a Dani R! ✨</div>
+            <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial a Dani R!</div>
+
             <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
             <select id="userVisibility" class="visibility-select">
                 <option value="PUBLICO">Público (Visible en el muro) 💖</option>
                 <option value="PRIVADO">Privado (Solo para Dani R) 🌙</option>
             </select>
             <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
+
             <div class="modal-buttons" id="modalActionBtns">
                 <button class="modal-btn secondary" onclick="closeModal('giftModal')">CANCELAR</button>
                 <button class="modal-btn primary" onclick="submitMessage()">💬 ENVIAR</button>
@@ -461,19 +402,21 @@
     </div>
 
     <div id="subModal" class="modal-overlay" onclick="closeModalOnBg(event, 'subModal')">
-        <div class="modal-card" style="border-color: var(--sub-color); box-shadow: 0 0 30px rgba(255, 68, 85, 0.3);">
+        <div class="modal-card" style="border-color: var(--sub-color);">
             <h3 class="modal-title" style="color: var(--sub-color);">🔔 SUSCRÍBETE 🔔</h3>
-            <p class="modal-text">Recibe notificaciones acerca de mi contenido exclusivo.</p>
-            <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@ al círculo exclusivo. ✨</div>
-            <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista de suscripción. ¡Te extrañaremos!</div>
+            <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@. ✨</div>
+            <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista.</div>
+
             <input type="email" id="userEmail" class="email-input" placeholder="Ingresa tu correo electrónico...">
+
             <div id="confirmUnsubBox">
-                <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem; line-height: 1.4;">¿Estás seguro de que deseas anular tu correo electrónico?</p>
+                <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem;">¿Deseas anular tu correo? No recibirás notificaciones.</p>
                 <div style="display: flex; gap: 8px;">
                     <button class="modal-btn secondary" onclick="cancelarConfirmacionUnsub()">VOLVER</button>
                     <button class="modal-btn danger-action" onclick="unsubscribeUser()">SÍ, ANULAR</button>
                 </div>
             </div>
+
             <div class="modal-buttons-column" id="subActionBtns">
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <button class="modal-btn secondary" onclick="closeModal('subModal')">CANCELAR</button>
@@ -485,13 +428,7 @@
     </div>
 
     <footer>
-        <p style="margin-bottom: 12px; text-align: center;">© Dani R • Official Page</p>
-        <div style="display: flex; justify-content: center;">
-            <a href="https://www.freecounterstat.com" title="website hit counter" target="_blank">
-                <img src="https://counter11.optistats.ovh/private/freecounterstat.php?c=81uhpk3tuae43h19qh8m144ldhz39z69" border="0" alt="counter" style="width: 55px; opacity: 0.6;">
-            </a>
-        </div>
-        <p style="margin-top: 12px; font-size: 0.7rem; color: #b55fe6; letter-spacing: 2px; text-align: center;">FANS</p>
+        <p>© Dani R • Official Page</p>
     </footer>
 
     <script>
@@ -515,13 +452,8 @@
             document.getElementById(modalId).classList.add('active');
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        function closeModalOnBg(event, modalId) {
-            if (event.target.id === modalId) closeModal(modalId);
-        }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+        function closeModalOnBg(event, modalId) { if (event.target.id === modalId) closeModal(modalId); }
 
         function mostrarAvisoRegalo() {
             const giftNotice = document.getElementById('giftNoticeMessage');
@@ -529,10 +461,8 @@
             setTimeout(() => { giftNotice.style.display = 'none'; }, 3500);
         }
 
-        /* 🚀 FUNCIÓN BLINDADA PARA DISPARAR EL SCRIPT Y LEER CORRECTAMENTE EL ESTADO "enviado" */
         let clickCount = 0;
         let clickTimer = null;
-
         function verificarDispararNotificaciones() {
             clickCount++;
             if (clickCount === 1) {
@@ -540,42 +470,34 @@
             } else if (clickCount === 3) {
                 clearTimeout(clickTimer);
                 clickCount = 0;
+                let clave = confirm("🔐 ¿Deseas disparar el envío de correos pendientes desde Google Apps Script?");
+                if (!clave) return;
 
-                let clave = prompt("🔐 Panel de Creadora: Introduce tu clave secreta para notificar a los nuevos fans:");
-                if (clave !== "Dani2026") {
-                    alert("❌ Contraseña incorrecta.");
-                    return;
-                }
+                const scriptWebUrl = "TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI"; // Reemplaza por tu URL de despliegue
+                alert("🚀 Conectando con Google Apps Script...");
 
-                const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
-
-                alert("🚀 Conectando con Google Apps Script para validar estado y envíos...");
-
-                // Petición robusta compatible con el script actualizado
-                fetch(scriptWebUrl, { method: 'POST' })
+                fetch(scriptWebUrl, { method: 'GET' })
                     .then(response => response.json())
                     .then(data => {
-                        if (data.ESTADO === "bloqueado") {
+                        if (data.ESTADO === "BLOQUEADO") {
                             alert("⏳ BLOQUEO ACTIVO:\n\n" + data.mensaje);
-                        } else if (data.ESTADO === "enviado") {
-                            alert("✨ ¡ÉXITO! " + data.mensaje + " Revisa tu Google Sheet y tu bandeja.");
-                        } else if (data.ESTADO === "vacío") {
-                            alert("ℹ️ AVISO: " + data.mensaje);
+                        } else if (data.ESTADO === "ENVIADO") {
+                            alert("✨ ¡ÉXITO! " + data.mensaje);
                         } else {
-                            alert("Estado recibido: " + JSON.stringify(data));
+                            alert("Estado recibido: " + data.ESTADO + " - " + data.mensaje);
                         }
                     })
                     .catch(error => {
-                        console.error("Error al consultar el script:", error);
-                        alert("⚠️ Hubo un error de conexión con el script de Google. Verifica la URL de despliegue.");
+                        console.error("Error:", error);
+                        alert("⚠️ Error de conexión con el script.");
                     });
             }
         }
 
         function mostrarConfirmacionUnsub() {
             const correo = document.getElementById('userEmail').value.trim();
-            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
-                alert("Por favor ingresa primero el correo electrónico que deseas dar de baja.");
+            if (correo === "" || !correo.includes("@")) {
+                alert("Ingresa un correo electrónico válido.");
                 return;
             }
             document.getElementById('subActionBtns').style.display = 'none';
@@ -587,22 +509,32 @@
             document.getElementById('subActionBtns').style.display = 'flex';
         }
 
+        // Al suscribirse, se asigna ESTADO: "PENDIENTE" automáticamente para la Columna F
         function submitSubscription() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
-            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
+
+            if (correo === "" || !correo.includes("@")) {
                 alert("Por favor ingresa un correo electrónico válido.");
                 return;
             }
 
-            const datosSuscripcion = { data: [{ CORREO: correo }] };
+            const datosSuscripcion = {
+                data: [
+                    {
+                        CORREO: correo,
+                        ESTADO: "PENDIENTE"
+                    }
+                ]
+            };
+
             fetch('https://sheetdb.io/api/v1/1ff9t301skbih', {
                 method: 'POST',
                 headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                 body: JSON.stringify(datosSuscripcion)
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(res => res.json())
+            .then(() => {
                 document.getElementById('userEmail').style.display = 'none';
                 document.getElementById('subActionBtns').style.display = 'none';
                 document.getElementById('confirmUnsubBox').style.display = 'none';
@@ -610,7 +542,7 @@
                 emailInput.value = "";
                 setTimeout(() => { closeModal('subModal'); }, 2500);
             })
-            .catch(error => { console.error('Error:', error); alert("Hubo un error al suscribirte."); });
+            .catch(() => { alert("Hubo un error al suscribirte."); });
         }
 
         function unsubscribeUser() {
@@ -620,24 +552,22 @@
                 method: 'DELETE',
                 headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
             })
-            .then(response => response.json())
-            .then(data => {
+            .then(() => {
                 document.getElementById('userEmail').style.display = 'none';
                 document.getElementById('confirmUnsubBox').style.display = 'none';
                 document.getElementById('subUnsubMessage').style.display = 'block';
                 emailInput.value = "";
                 setTimeout(() => { closeModal('subModal'); }, 2500);
             })
-            .catch(error => { console.error('Error:', error); alert("Hubo un error al anular la suscripción."); });
+            .catch(() => { alert("Error al anular la suscripción."); });
         }
 
         function cargarMensajesPublicos() {
-            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
             const contenedor = document.getElementById('listaMensajesPublicos');
-            contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>';
+            contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando...</p>';
 
-            fetch(apiUrl)
-                .then(response => response.json())
+            fetch('https://sheetdb.io/api/v1/1ff9t301skbih')
+                .then(res => res.json())
                 .then(data => {
                     contenedor.innerHTML = "";
                     const mensajesPublicos = data.filter(item => {
@@ -646,28 +576,24 @@
                     });
 
                     if (mensajesPublicos.length === 0) {
-                        contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Aún no hay mensajes públicos. ¡Sé el primero en dejar uno! 💖</p>';
+                        contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Aún no hay mensajes públicos.</p>';
                         return;
                     }
 
-                    const ultimosVeinte = mensajesPublicos.reverse().slice(0, 20);
-                    ultimosVeinte.forEach(item => {
+                    mensajesPublicos.reverse().slice(0, 20).forEach(item => {
                         let tarjeta = document.createElement('div');
                         tarjeta.className = 'fan-message-card';
                         tarjeta.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                 <strong style="color: var(--primary); font-size: 0.8rem;">✨ ${item.NOMBRE}</strong>
                                 <span style="font-size: 0.6rem; color: #a080b0;">${item.FECHA || ''}</span>
                             </div>
-                            <p style="font-size: 0.8rem; color: #f3e8ff; line-height: 1.4; word-break: break-word;">${item.MENSAJE}</p>
+                            <p style="font-size: 0.8rem; color: #f3e8ff; word-break: break-word;">${item.MENSAJE}</p>
                         `;
                         contenedor.appendChild(tarjeta);
                     });
                 })
-                .catch(error => {
-                    console.error('Error:', error);
-                    contenedor.innerHTML = '<p style="text-align: center; color: #ff77bc; font-size: 0.8rem; margin-top: 2rem;">Error al cargar los mensajes.</p>';
-                });
+                .catch(() => { contenedor.innerHTML = '<p style="text-align: center; color: #ff77bc;">Error al cargar.</p>'; });
         }
 
         function submitMessage() {
@@ -680,29 +606,25 @@
             const textoMensaje = msgInput.value.trim();
 
             if (nombreFan === "" || textoMensaje === "") {
-                alert("Por favor completa tu nombre y tu mensaje.");
+                alert("Completa tu nombre y mensaje.");
                 return;
             }
 
-            const hoy = new Date().toLocaleDateString();
-            let controlEnvios = JSON.parse(localStorage.getItem('limiteMensajesDaniR')) || { fecha: hoy, count: 0 };
-            if (controlEnvios.fecha !== hoy) controlEnvios = { fecha: hoy, count: 0 };
+            const datosAEnviar = {
+                data: [{
+                    NOMBRE: nombreFan,
+                    FECHA: new Date().toLocaleString(),
+                    MENSAJE: textoMensaje,
+                    VISIBILIDAD: visibilidad
+                }]
+            };
 
-            if (controlEnvios.count >= 2) {
-                alert("💖 ¡Ya has enviado tus 2 mensajes permitidos para el día de hoy!");
-                return;
-            }
-
-            const datosAEnviar = { data: [{ NOMBRE: nombreFan, FECHA: new Date().toLocaleString(), MENSAJE: textoMensaje, VISIBILIDAD: visibilidad }] };
             fetch('https://sheetdb.io/api/v1/1ff9t301skbih', {
                 method: 'POST',
                 headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
                 body: JSON.stringify(datosAEnviar)
             })
-            .then(response => response.json())
-            .then(data => {
-                controlEnvios.count++;
-                localStorage.setItem('limiteMensajesDaniR', JSON.stringify(controlEnvios));
+            .then(() => {
                 document.getElementById('userName').style.display = 'none';
                 document.getElementById('userVisibility').style.display = 'none';
                 document.getElementById('userMessage').style.display = 'none';
@@ -712,63 +634,34 @@
                 msgInput.value = "";
                 setTimeout(() => { closeModal('giftModal'); }, 2500);
             })
-            .catch(error => { console.error('Error:', error); alert("Hubo un error al enviar el mensaje."); });
+            .catch(() => { alert("Error al enviar mensaje."); });
         }
 
+        // Fondo animado
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let w, h, centerX, centerY;
-        function resize() {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-            centerX = w / 2;
-            centerY = h / 2;
-        }
+        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; centerX = w / 2; centerY = h / 2; }
         window.addEventListener('resize', resize);
         resize();
 
         let infParticles = [];
-        const count = 100;
-        function getFeminineInfinity(t, scale) {
-            const x = scale * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
-            const y = scale * Math.sin(t) * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
-            const z = Math.sin(t * 2) * 20;
-            return { x, y: y + Math.sin(t * 3) * 8, z };
-        }
-
-        for (let i = 0; i < count; i++) {
-            infParticles.push({
-                t: (i / count) * Math.PI * 2,
-                speed: 0.0018 + Math.random() * 0.0012,
-                orbitAng: Math.random() * 6.28,
-                orbitRadius: 4 + Math.random() * 12,
-                size: Math.random() * 2 + 1,
-                colorShift: Math.random()
-            });
+        for (let i = 0; i < 80; i++) {
+            infParticles.push({ t: (i / 80) * Math.PI * 2, speed: 0.002 + Math.random() * 0.001, orbitAng: Math.random() * 6.28, orbitRadius: 4 + Math.random() * 10, size: Math.random() * 2 + 1 });
         }
 
         let time = 0;
         function animate() {
-            ctx.fillStyle = `rgba(10, 8, 18, 0.45)`;
+            ctx.fillStyle = 'rgba(10, 8, 18, 0.4)';
             ctx.fillRect(0, 0, w, h);
-            const scale = Math.min(w, h) * (w < 768 ? 0.45 : 0.4);
-            ctx.globalCompositeOperation = 'lighter';
-
+            const scale = Math.min(w, h) * 0.4;
             infParticles.forEach(p => {
                 p.t += p.speed;
-                const pos = getFeminineInfinity(p.t, scale);
-                const rot = time * 0.0004;
-                const rx = pos.x * Math.cos(rot) - pos.z * Math.sin(rot);
-                const ry = pos.y;
-                const x = centerX + rx + Math.cos(p.orbitAng + time * 0.002) * p.orbitRadius;
-                const y = centerY + ry + Math.sin(p.orbitAng + time * 0.002) * p.orbitRadius;
-
-                ctx.fillStyle = `rgba(255, 119, 188, 0.6)`;
-                ctx.beginPath();
-                ctx.arc(x, y, p.size, 0, 6.28);
-                ctx.fill();
+                const x = centerX + (scale * Math.cos(p.t) / (1 + Math.sin(p.t)**2));
+                const y = centerY + (scale * Math.sin(p.t) * Math.cos(p.t) / (1 + Math.sin(p.t)**2));
+                ctx.fillStyle = 'rgba(255, 119, 188, 0.6)';
+                ctx.beginPath(); ctx.arc(x, y, p.size, 0, 6.28); ctx.fill();
             });
-
             time += 16;
             requestAnimationFrame(animate);
         }
