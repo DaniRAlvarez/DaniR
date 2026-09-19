@@ -409,6 +409,13 @@
             justify-content: center;
         }
 
+        .modal-buttons-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
         .modal-btn {
             flex: 1;
             padding: 0.6rem 0.4rem;
@@ -420,6 +427,12 @@
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
+        }
+
+        .modal-btn.full-width {
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 0.7rem;
         }
 
         .modal-btn.primary {
@@ -455,6 +468,29 @@
             box-shadow: 0 0 22px rgba(255, 68, 85, 0.7);
         }
 
+        .modal-btn.unsubscribe-action {
+            background: rgba(255, 68, 85, 0.15);
+            color: #ff8892;
+            border: 1px solid rgba(255, 68, 85, 0.4);
+        }
+
+        .modal-btn.unsubscribe-action:hover {
+            background: rgba(255, 68, 85, 0.3);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .modal-btn.danger-action {
+            background: #ff3344;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 51, 68, 0.5);
+        }
+
+        .modal-btn.danger-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 51, 68, 0.8);
+        }
+
         .modal-btn.secondary {
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
@@ -477,7 +513,7 @@
         }
 
         /* Estilos para los avisos dentro del modal */
-        #successMessage, #giftNoticeMessage, #subSuccessMessage {
+        #successMessage, #giftNoticeMessage, #subSuccessMessage, #subUnsubMessage {
             display: none;
             background: rgba(85, 255, 170, 0.15);
             border: 1px solid #55ffaa;
@@ -501,6 +537,23 @@
             background: rgba(255, 68, 85, 0.15);
             border-color: var(--sub-color);
             color: #ff8892;
+        }
+
+        #subUnsubMessage {
+            background: rgba(255, 165, 0, 0.15);
+            border-color: #ffa500;
+            color: #ffcc66;
+        }
+
+        /* Contenedor de la Advertencia de Anulación (Inicialmente oculto) */
+        #confirmUnsubBox {
+            display: none;
+            background: rgba(255, 68, 85, 0.1);
+            border: 1px dashed var(--sub-color);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease;
         }
 
         @keyframes fadeIn {
@@ -678,15 +731,32 @@
     <div id="subModal" class="modal-overlay" onclick="closeModalOnBg(event, 'subModal')">
         <div class="modal-card" style="border-color: var(--sub-color); box-shadow: 0 0 30px rgba(255, 68, 85, 0.3);">
             <h3 class="modal-title" style="color: var(--sub-color);">🔔 SUSCRÍBETE 🔔</h3>
-            <p class="modal-text">Recibe novedades, avisos y contenido exclusivo directamente en tu correo:</p>
+            <p class="modal-text">Recibe notificaciones acerca de mi contenido exclusivo.</p>
             
             <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@ al círculo exclusivo. ✨</div>
+            <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista de suscripción. ¡Te extrañaremos!</div>
 
+            <!-- Campo de correo normal -->
             <input type="email" id="userEmail" class="email-input" placeholder="Ingresa tu correo electrónico...">
 
-            <div class="modal-buttons" id="subActionBtns">
-                <button class="modal-btn secondary" onclick="closeModal('subModal')">CANCELAR</button>
-                <button class="modal-btn sub-action" onclick="submitSubscription()">📩 SUSCRIBIRME</button>
+            <!-- Caja de Advertencia y Confirmación para Anular Suscripción -->
+            <div id="confirmUnsubBox">
+                <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem; line-height: 1.4;">
+                    ¿Estás seguro de que deseas anular tu correo electrónico? No recibirás notificaciones de Dani R.
+                </p>
+                <div style="display: flex; gap: 8px;">
+                    <button class="modal-btn secondary" onclick="cancelarConfirmacionUnsub()">VOLVER</button>
+                    <button class="modal-btn danger-action" onclick="unsubscribeUser()">SÍ, ANULAR</button>
+                </div>
+            </div>
+
+            <!-- Botones principales del modal -->
+            <div class="modal-buttons-column" id="subActionBtns">
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <button class="modal-btn secondary" onclick="closeModal('subModal')">CANCELAR</button>
+                    <button class="modal-btn sub-action" onclick="submitSubscription()">📩 SUSCRIBIRME</button>
+                </div>
+                <button class="modal-btn unsubscribe-action full-width" onclick="mostrarConfirmacionUnsub()">🗑️ ANULAR SUSCRIPCIÓN</button>
             </div>
         </div>
     </div>
@@ -715,8 +785,10 @@
                 document.getElementById('userMessage').style.display = 'block';
             } else if (modalId === 'subModal') {
                 document.getElementById('subSuccessMessage').style.display = 'none';
+                document.getElementById('subUnsubMessage').style.display = 'none';
                 document.getElementById('subActionBtns').style.display = 'flex';
                 document.getElementById('userEmail').style.display = 'block';
+                document.getElementById('confirmUnsubBox').style.display = 'none';
             } else if (modalId === 'wallModal') {
                 cargarMensajesPublicos();
             }
@@ -739,6 +811,24 @@
             setTimeout(() => {
                 giftNotice.style.display = 'none';
             }, 3500);
+        }
+
+        /* Mostrar la advertencia de anulación */
+        function mostrarConfirmacionUnsub() {
+            const correo = document.getElementById('userEmail').value.trim();
+            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
+                alert("Por favor ingresa primero el correo electrónico que deseas dar de baja.");
+                return;
+            }
+            // Ocultar botones principales y mostrar cuadro de advertencia
+            document.getElementById('subActionBtns').style.display = 'none';
+            document.getElementById('confirmUnsubBox').style.display = 'block';
+        }
+
+        /* Volver atrás desde la advertencia */
+        function cancelarConfirmacionUnsub() {
+            document.getElementById('confirmUnsubBox').style.display = 'none';
+            document.getElementById('subActionBtns').style.display = 'flex';
         }
 
         /* Función para enviar el correo y guardarlo en la columna E (CORREO) de SheetDB */
@@ -773,6 +863,7 @@
             .then(data => {
                 document.getElementById('userEmail').style.display = 'none';
                 document.getElementById('subActionBtns').style.display = 'none';
+                document.getElementById('confirmUnsubBox').style.display = 'none';
                 document.getElementById('subSuccessMessage').style.display = 'block';
 
                 emailInput.value = "";
@@ -784,6 +875,38 @@
             .catch(error => {
                 console.error('Error al registrar la suscripción:', error);
                 alert("Hubo un error al suscribirte. Inténtalo más tarde.");
+            });
+        }
+
+        /* Función para anular la suscripción borrando el correo de SheetDB tras confirmar */
+        function unsubscribeUser() {
+            const emailInput = document.getElementById('userEmail');
+            const correo = emailInput.value.trim();
+
+            const apiUrl = `https://sheetdb.io/api/v1/1ff9t301skbih/CORREO/${encodeURIComponent(correo)}`;
+
+            fetch(apiUrl, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('userEmail').style.display = 'none';
+                document.getElementById('confirmUnsubBox').style.display = 'none';
+                document.getElementById('subUnsubMessage').style.display = 'block';
+
+                emailInput.value = "";
+
+                setTimeout(() => {
+                    closeModal('subModal');
+                }, 2500);
+            })
+            .catch(error => {
+                console.error('Error al anular la suscripción:', error);
+                alert("Hubo un error al procesar tu solicitud. Inténtalo más tarde.");
             });
         }
 
