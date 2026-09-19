@@ -65,6 +65,13 @@
             letter-spacing: 3px;
             color: #fff;
             text-shadow: 0 0 10px var(--primary), 0 0 20px var(--accent);
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.2s ease;
+        }
+
+        h1.title:active {
+            transform: scale(0.95);
         }
 
         /* Banner Principal */
@@ -604,7 +611,8 @@
     <canvas id="bg-canvas"></canvas>
 
     <header>
-        <h1 class="title">DANI R</h1>
+        <!-- Atajo secreto: Haz triple clic en el título DANI R para activar las notificaciones -->
+        <h1 class="title" onclick="verificarDispararNotificaciones()" title="Haz triple clic aquí para notificar a tus fans">DANI R</h1>
     </header>
 
     <!-- Banner Principal -->
@@ -813,6 +821,46 @@
             }, 3500);
         }
 
+        /* 🚀 FUNCIÓN SECRETA PARA DISPARAR EL SCRIPT DE CORREOS DESDE LA WEB */
+        let clickCount = 0;
+        let clickTimer = null;
+
+        function verificarDispararNotificaciones() {
+            clickCount++;
+            if (clickCount === 1) {
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 600); // Ventana de tiempo para los clics
+            } else if (clickCount === 3) {
+                clearTimeout(clickTimer);
+                clickCount = 0;
+
+                let clave = prompt("🔐 Panel de Creadora: Introduce tu clave secreta para notificar a los nuevos fans:");
+                if (clave !== "Dani2026") {
+                    alert("❌ Contraseña incorrecta.");
+                    return;
+                }
+
+                const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
+
+                alert("🚀 Procesando envíos... El sistema está enviando los correos a los nuevos suscriptores y actualizando la hoja.");
+
+                fetch(scriptWebUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === "success") {
+                            alert(`✨ ¡Proceso completado con éxito! Se enviaron notificaciones a ${data.enviados} nuevos suscriptores.`);
+                        } else {
+                            alert("Hubo un error al procesar las notificaciones.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("No se pudo conectar con el servidor de Apps Script. Revisa tu conexión.");
+                    });
+            }
+        }
+
         /* Mostrar la advertencia de anulación */
         function mostrarConfirmacionUnsub() {
             const correo = document.getElementById('userEmail').value.trim();
@@ -820,7 +868,6 @@
                 alert("Por favor ingresa primero el correo electrónico que deseas dar de baja.");
                 return;
             }
-            // Ocultar botones principales y mostrar cuadro de advertencia
             document.getElementById('subActionBtns').style.display = 'none';
             document.getElementById('confirmUnsubBox').style.display = 'block';
         }
@@ -1026,7 +1073,7 @@
         }
 
         /* Animación del Fondo de Partículas Cíclico */
-        const canvas = document.getElementById('bg-canvas');
+        const canvas = destinationId = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
 
         let w, h, centerX, centerY;
