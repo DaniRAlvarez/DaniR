@@ -519,6 +519,7 @@
             box-shadow: 0 0 22px rgba(0, 255, 204, 0.7);
         }
 
+        /* Estilos para los avisos dentro del modal */
         #successMessage, #giftNoticeMessage, #subSuccessMessage, #subUnsubMessage {
             display: none;
             background: rgba(85, 255, 170, 0.15);
@@ -530,6 +531,7 @@
             font-family: 'Poppins', sans-serif;
             margin-bottom: 1rem;
             text-align: center;
+            animation: fadeIn 0.3s ease;
         }
 
         #giftNoticeMessage {
@@ -550,6 +552,7 @@
             color: #ffcc66;
         }
 
+        /* Contenedor de la Advertencia de Anulación (Inicialmente oculto) */
         #confirmUnsubBox {
             display: none;
             background: rgba(255, 68, 85, 0.1);
@@ -557,8 +560,15 @@
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1rem;
+            animation: fadeIn 0.3s ease;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mariposas flotantes animadas */
         .butterfly {
             position: absolute;
             font-size: 1.2rem;
@@ -568,11 +578,23 @@
         }
 
         @keyframes flyButterfly {
-            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
-            20% { opacity: 1; }
-            50% { transform: translate(60px, -70px) rotate(15deg) scale(1.2); }
-            80% { opacity: 1; }
-            100% { transform: translate(-40px, -140px) rotate(-15deg) scale(0.8); opacity: 0; }
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(0.8);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            50% {
+                transform: translate(60px, -70px) rotate(15deg) scale(1.2);
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-40px, -140px) rotate(-15deg) scale(0.8);
+                opacity: 0;
+            }
         }
 
         footer {
@@ -589,14 +611,16 @@
     <canvas id="bg-canvas"></canvas>
 
     <header>
-        <!-- Atajo secreto: Haz triple clic en el título DANI R para activar las notificaciones y evaluar el bloqueo con clave -->
+        <!-- Atajo secreto: Haz triple clic en el título DANI R para activar las notificaciones -->
         <h1 class="title" onclick="verificarDispararNotificaciones()" title="Haz triple clic aquí para notificar a tus fans">DANI R</h1>
     </header>
 
+    <!-- Banner Principal -->
     <section class="banner-container">
         <img src="FotosWeb/banner.png" alt="Dani R Banner Principal" class="main-banner">
     </section>
 
+    <!-- Contenido del Perfil -->
     <main class="profile-card">
         <div class="profile-img-container">
             <img src="FotosWeb/perfil.jpg" alt="Dani R" class="profile-img">
@@ -605,24 +629,56 @@
         <h2 class="profile-name">Dani R</h2>
         <p class="profile-bio">Digital Creator ✨ • Cozy & Aesthetic Vibes 🌙</p>
 
+        <!-- Bloque de Presentación -->
         <blockquote class="intro-quote">
             "Hola, Yo soy Dani R. Belleza, estilo y una mirada que dice más que mil palabras. ¿Te quedas a descubrir el resto? Te va a encantar."
         </blockquote>
 
         <div class="links-container">
-            <a href="index1.html" class="link-btn gallery-btn">🖼️ VER GALERÍA MULTIMEDIA</a>
-            <a href="bunny.html" class="link-btn game-btn">🎮 MINIJUEGOS: BUNNY</a>
-            <a href="https://www.tiktok.com/@dani_r_alvarez" target="_blank" rel="noopener noreferrer" class="link-btn">TIKTOK</a>
-            <a href="https://www.instagram.com/dani.r.alvarez/" target="_blank" rel="noopener noreferrer" class="link-btn">INSTAGRAM</a>
-            <a href="https://www.facebook.com/DaniRAlvarez22" target="_blank" rel="noopener noreferrer" class="link-btn">FACEBOOK</a>
-            <a onclick="openModal('shopModal')" class="link-btn shop-btn">🛍️ TIENDA</a>
-            <a onclick="openModal('wallModal')" class="link-btn wall-btn">💬 MURO DE FANS</a>
-            <a onclick="openModal('giftModal')" class="link-btn gift-btn">🎁 REGALOS</a>
-            <a onclick="openModal('subModal')" class="link-btn sub-btn">🔔 SUSCRÍBETE</a>
+            <!-- Enlace a la Galería Multimedia -->
+            <a href="index1.html" class="link-btn gallery-btn">
+                🖼️ VER GALERÍA MULTIMEDIA
+            </a>
+
+            <!-- Enlace a Minijuegos -->
+            <a href="bunny.html" class="link-btn game-btn">
+                🎮 MINIJUEGOS: BUNNY
+            </a>
+
+            <!-- Redes Sociales Oficiales -->
+            <a href="https://www.tiktok.com/@dani_r_alvarez" target="_blank" rel="noopener noreferrer" class="link-btn">
+                TIKTOK
+            </a>
+            <a href="https://www.instagram.com/dani.r.alvarez/" target="_blank" rel="noopener noreferrer" class="link-btn">
+                INSTAGRAM
+            </a>
+            <a href="https://www.facebook.com/DaniRAlvarez22" target="_blank" rel="noopener noreferrer" class="link-btn">
+                FACEBOOK
+            </a>
+
+            <!-- Botón Tienda -->
+            <a onclick="openModal('shopModal')" class="link-btn shop-btn">
+                🛍️ TIENDA
+            </a>
+
+            <!-- Botón Muro de Fans -->
+            <a onclick="openModal('wallModal')" class="link-btn wall-btn">
+                💬 MURO DE FANS
+            </a>
+
+            <!-- Botón Regalos -->
+            <a onclick="openModal('giftModal')" class="link-btn gift-btn">
+                🎁 REGALOS
+            </a>
+
+            <!-- Botón Suscripción al puro final -->
+            <a onclick="openModal('subModal')" class="link-btn sub-btn">
+                🔔 SUSCRÍBETE
+            </a>
         </div>
     </main>
 
-    <!-- Modales -->
+    <!-- Panel Flotante / Modal de Tienda -->
     <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event, 'shopModal')">
         <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
             <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
@@ -633,19 +689,23 @@
         </div>
     </div>
 
+    <!-- Panel Flotante / Modal del Muro de Mensajes Públicos -->
     <div id="wallModal" class="modal-overlay" onclick="closeModalOnBg(event, 'wallModal')">
         <div class="modal-card wall-card" style="border-color: var(--wall-color); box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);">
             <h3 class="modal-title" style="color: var(--wall-color);">💬 MURO DE FANS 💬</h3>
             <p class="modal-text">Últimos mensajes públicos para Dani R:</p>
+            
             <div id="listaMensajesPublicos" class="messages-scroll-container">
                 <p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>
             </div>
+
             <div class="modal-buttons">
                 <button class="modal-btn wall-action" onclick="closeModal('wallModal')">CERRAR</button>
             </div>
         </div>
     </div>
 
+    <!-- Panel Flotante / Modal de Regalos -->
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
         <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
             <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
@@ -654,14 +714,17 @@
 
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
             <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu mensaje:</p>
+            
             <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
             <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial y único a Dani R. ¡Quédate pendiente! ✨</div>
 
             <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
+
             <select id="userVisibility" class="visibility-select">
                 <option value="PUBLICO">Público (Visible en el muro) 💖</option>
                 <option value="PRIVADO">Privado (Solo para Dani R) 🌙</option>
             </select>
+
             <textarea id="userMessage" class="message-input" placeholder="Escribe tu mensaje aquí..."></textarea>
 
             <div class="modal-buttons" id="modalActionBtns">
@@ -672,15 +735,19 @@
         </div>
     </div>
 
+    <!-- Panel Flotante / Modal de Suscripción -->
     <div id="subModal" class="modal-overlay" onclick="closeModalOnBg(event, 'subModal')">
         <div class="modal-card" style="border-color: var(--sub-color); box-shadow: 0 0 30px rgba(255, 68, 85, 0.3);">
             <h3 class="modal-title" style="color: var(--sub-color);">🔔 SUSCRÍBETE 🔔</h3>
             <p class="modal-text">Recibe notificaciones acerca de mi contenido exclusivo.</p>
+            
             <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@ al círculo exclusivo. ✨</div>
             <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista de suscripción. ¡Te extrañaremos!</div>
 
+            <!-- Campo de correo normal -->
             <input type="email" id="userEmail" class="email-input" placeholder="Ingresa tu correo electrónico...">
 
+            <!-- Caja de Advertencia y Confirmación para Anular Suscripción -->
             <div id="confirmUnsubBox">
                 <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem; line-height: 1.4;">
                     ¿Estás seguro de que deseas anular tu correo electrónico? No recibirás notificaciones de Dani R.
@@ -691,6 +758,7 @@
                 </div>
             </div>
 
+            <!-- Botones principales del modal -->
             <div class="modal-buttons-column" id="subActionBtns">
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <button class="modal-btn secondary" onclick="closeModal('subModal')">CANCELAR</button>
@@ -703,15 +771,18 @@
 
     <footer style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;">
         <p style="margin-bottom: 12px; text-align: center;">© Dani R • Official Page</p>
+        
         <div style="display: flex; justify-content: center;">
             <a href="https://www.freecounterstat.com" title="website hit counter" target="_blank">
                 <img src="https://counter11.optistats.ovh/private/freecounterstat.php?c=81uhpk3tuae43h19qh8m144ldhz39z69" border="0" title="website hit counter" alt="website hit counter" style="width: 55px; height: auto; opacity: 0.6; filter: drop-shadow(0 0 4px rgba(255, 119, 188, 0.3)); display: block;">
             </a>
         </div>
+
         <p style="margin-top: 12px; font-size: 0.7rem; color: #b55fe6; letter-spacing: 2px; text-align: center; width: 100%;">FANS</p>
     </footer>
 
     <script>
+        /* Funciones para controlar los paneles flotantes */
         function openModal(modalId) {
             if (modalId === 'giftModal') {
                 document.getElementById('successMessage').style.display = 'none';
@@ -750,7 +821,7 @@
             }, 3500);
         }
 
-        /* 🚀 FUNCIÓN DE TRIPLE CLIC CON CONTRASEÑA Y PETICIÓN AL SCRIPT */
+        /* 🚀 FUNCIÓN SECRETA ACTUALIZADA CON GESTIÓN COMPLETA DE ESTADOS (pendiente, bloqueado, enviado, vacío) */
         let clickCount = 0;
         let clickTimer = null;
 
@@ -770,30 +841,39 @@
                     return;
                 }
 
-                const scriptWebUrl = "AQUI_PEGA_TU_URL_DE_GOOGLE_APPS_SCRIPT"; // Reemplaza por tu URL del Script
+                const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
 
-                alert("🚀 Conectando con Google Apps Script para validar estado y envíos...");
+                alert("⏳ [Estado: PENDIENTE] Verificando escudo anti-spam y procesando envíos...");
 
-                fetch(scriptWebUrl, { method: 'GET' })
+                fetch(scriptWebUrl)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.ESTADO === "BLOQUEADO") {
-                            alert("⏳ BLOQUEO ACTIVO:\n\n" + data.mensaje);
-                        } else if (data.ESTADO === "ENVIADO") {
-                            alert("✨ ¡ÉXITO! " + data.mensaje);
-                        } else if (data.ESTADO === "VACIO") {
-                            alert("ℹ️ AVISO: " + data.mensaje);
+                        const estadoActual = (data.ESTADO || data.status || "").toLowerCase();
+
+                        if (estadoActual === "bloqueado") {
+                            alert("⚠️ [Estado: BLOQUEADO] " + (data.mensaje || "Espera de seguridad activa. Intenta más tarde."));
+                        } else if (estadoActual === "enviado" || estadoActual === "success") {
+                            const totalEnviados = data.enviados !== undefined ? data.enviados : 0;
+                            if (totalEnviados === 0) {
+                                alert("📭 [Estado: VACÍO] No hay suscriptores nuevos pendientes de notificar.");
+                            } else {
+                                alert("✅ [Estado: ENVIADO] ¡Correos enviados con éxito! Total de correos nuevos notificados: " + totalEnviados);
+                            }
+                        } else if (estadoActual === "vacio") {
+                            alert("📭 [Estado: VACÍO] La lista de correos pendientes está vacía.");
                         } else {
-                            alert("Estado recibido: " + JSON.stringify(data));
+                            // Respuesta genérica por compatibilidad
+                            alert("✨ ¡Orden procesada con éxito por el servidor!");
                         }
                     })
                     .catch(error => {
-                        console.error("Error al consultar el script:", error);
-                        alert("⚠️ Hubo un error de conexión o de CORS con el script de Google.");
+                        console.error("Error:", error);
+                        alert("Hubo un error de conexión al conectar con el servidor de correos.");
                     });
             }
         }
 
+        /* Mostrar la advertencia de anulación */
         function mostrarConfirmacionUnsub() {
             const correo = document.getElementById('userEmail').value.trim();
             if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
@@ -804,12 +884,13 @@
             document.getElementById('confirmUnsubBox').style.display = 'block';
         }
 
+        /* Volver atrás desde la advertencia */
         function cancelarConfirmacionUnsub() {
             document.getElementById('confirmUnsubBox').style.display = 'none';
             document.getElementById('subActionBtns').style.display = 'flex';
         }
 
-        // Envía el correo y deja la Columna F en PENDIENTE
+        /* Función para enviar el correo y guardarlo en la columna E (CORREO) de SheetDB */
         function submitSubscription() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
@@ -822,8 +903,7 @@
             const datosSuscripcion = {
                 data: [
                     {
-                        CORREO: correo,
-                        ESTADO: "PENDIENTE"
+                        CORREO: correo
                     }
                 ]
             };
@@ -857,6 +937,7 @@
             });
         }
 
+        /* Función para anular la suscripción borrando el correo de SheetDB tras confirmar */
         function unsubscribeUser() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
@@ -888,7 +969,7 @@
             });
         }
 
-        // Filtra estrictamente por PUBLICO para el muro
+        /* Función para descargar, filtrar estrictamente por PUBLICO y mostrar los últimos 20 */
         function cargarMensajesPublicos() {
             const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
             const contenedor = document.getElementById('listaMensajesPublicos');
@@ -931,6 +1012,7 @@
                 });
         }
 
+        /* Función para enviar datos a SheetDB incluyendo la visibilidad */
         function submitMessage() {
             const nameInput = document.getElementById('userName');
             const visibilitySelect = document.getElementById('userVisibility');
@@ -942,6 +1024,18 @@
 
             if (nombreFan === "" || textoMensaje === "") {
                 alert("Por favor completa tu nombre y tu mensaje.");
+                return;
+            }
+
+            const hoy = new Date().toLocaleDateString();
+            let controlEnvios = JSON.parse(localStorage.getItem('limiteMensajesDaniR')) || { fecha: hoy, count: 0 };
+
+            if (controlEnvios.fecha !== hoy) {
+                controlEnvios = { fecha: hoy, count: 0 };
+            }
+
+            if (controlEnvios.count >= 2) {
+                alert("💖 ¡Ya has enviado tus 2 mensajes permitidos para el día de hoy! Vuelve mañana para dejar más cariño.");
                 return;
             }
 
@@ -968,6 +1062,9 @@
             })
             .then(response => response.json())
             .then(data => {
+                controlEnvios.count++;
+                localStorage.setItem('limiteMensajesDaniR', JSON.stringify(controlEnvios));
+
                 document.getElementById('userName').style.display = 'none';
                 document.getElementById('userVisibility').style.display = 'none';
                 document.getElementById('userMessage').style.display = 'none';
@@ -987,7 +1084,7 @@
             });
         }
 
-        /* Animación del Fondo */
+        /* Animación del Fondo de Partículas Cíclico */
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1025,10 +1122,12 @@
         let time = 0;
         function animate() {
             const fadeAlpha = 0.35 + 0.20 * Math.sin(time * 0.0008);
+
             ctx.fillStyle = `rgba(10, 8, 18, ${fadeAlpha})`;
             ctx.fillRect(0, 0, w, h);
 
             const scale = Math.min(w, h) * (w < 768 ? 0.45 : 0.4);
+
             ctx.globalCompositeOperation = 'lighter';
 
             infParticles.forEach(p => {
