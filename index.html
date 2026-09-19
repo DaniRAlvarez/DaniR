@@ -48,6 +48,7 @@
             background-color: var(--bg-color);
         }
 
+        /* Encabezado */
         header {
             width: 100%;
             max-width: 1100px;
@@ -73,6 +74,7 @@
             transform: scale(0.95);
         }
 
+        /* Banner Principal */
         .banner-container {
             width: 100%;
             max-width: 1100px;
@@ -87,9 +89,16 @@
             border-radius: 20px;
             border: 1px solid rgba(255, 119, 188, 0.3);
             box-shadow: 0 0 25px rgba(255, 119, 188, 0.25);
+            transition: all 0.3s ease;
             display: block;
         }
 
+        .main-banner:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 35px rgba(0, 255, 255, 0.35);
+        }
+
+        /* Tarjeta de Perfil */
         .profile-card {
             width: 90%;
             max-width: 600px;
@@ -137,6 +146,7 @@
             line-height: 1.5;
         }
 
+        /* Estilo del Bloque de Presentación */
         .intro-quote {
             background: rgba(255, 119, 188, 0.05);
             border-left: 3px solid var(--primary);
@@ -148,8 +158,10 @@
             line-height: 1.6;
             color: #f3e8ff;
             font-style: italic;
+            box-shadow: inset 0 0 10px rgba(181, 95, 230, 0.15);
         }
 
+        /* Botones de Redes Sociales y Enlaces */
         .links-container {
             display: flex;
             flex-direction: column;
@@ -181,13 +193,79 @@
             transform: translateY(-2px);
         }
 
-        .link-btn.gallery-btn { border-color: var(--secondary); background: rgba(0, 255, 255, 0.08); }
-        .link-btn.game-btn { border-color: var(--accent); background: rgba(181, 95, 230, 0.08); }
-        .link-btn.shop-btn { border-color: var(--shop-color); background: rgba(255, 170, 51, 0.08); }
-        .link-btn.wall-btn { border-color: var(--wall-color); background: rgba(0, 255, 204, 0.08); }
-        .link-btn.gift-btn { border-color: var(--gift-color); background: rgba(255, 85, 170, 0.08); }
-        .link-btn.sub-btn { border-color: var(--sub-color); background: rgba(255, 68, 85, 0.08); }
+        .link-btn.gallery-btn {
+            border-color: var(--secondary);
+            background: rgba(0, 255, 255, 0.08);
+            color: #ffffff;
+        }
 
+        .link-btn.gallery-btn:hover {
+            background: var(--secondary);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--secondary);
+        }
+
+        .link-btn.game-btn {
+            border-color: var(--accent);
+            background: rgba(181, 95, 230, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.game-btn:hover {
+            background: var(--accent);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--accent);
+        }
+
+        .link-btn.shop-btn {
+            border-color: var(--shop-color);
+            background: rgba(255, 170, 51, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.shop-btn:hover {
+            background: var(--shop-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--shop-color);
+        }
+
+        .link-btn.gift-btn {
+            border-color: var(--gift-color);
+            background: rgba(255, 85, 170, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.gift-btn:hover {
+            background: var(--gift-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--gift-color);
+        }
+
+        .link-btn.wall-btn {
+            border-color: var(--wall-color);
+            background: rgba(0, 255, 204, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.wall-btn:hover {
+            background: var(--wall-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--wall-color);
+        }
+
+        .link-btn.sub-btn {
+            border-color: var(--sub-color);
+            background: rgba(255, 68, 85, 0.08);
+            color: #ffffff;
+        }
+
+        .link-btn.sub-btn:hover {
+            background: var(--sub-color);
+            color: #0a0812;
+            box-shadow: 0 0 20px var(--sub-color);
+        }
+
+        /* Estilos del Panel Flotante (Modal) */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -196,6 +274,7 @@
             height: 100vh;
             background: rgba(10, 8, 18, 0.8);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -219,9 +298,22 @@
             max-width: 400px;
             text-align: center;
             box-shadow: 0 0 30px rgba(255, 119, 188, 0.3);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .modal-card.wall-card { max-width: 480px; max-height: 80vh; display: flex; flex-direction: column; }
+        .modal-card.wall-card {
+            max-width: 480px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0);
+        }
 
         .modal-title {
             font-family: 'Orbitron', sans-serif;
@@ -247,16 +339,59 @@
             text-align: left;
         }
 
+        .messages-scroll-container::-webkit-scrollbar {
+            width: 5px;
+        }
+        .messages-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
         .fan-message-card {
             background: rgba(255, 119, 188, 0.05);
             border: 1px solid rgba(255, 119, 188, 0.25);
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 10px;
+            box-shadow: 0 0 10px rgba(255, 119, 188, 0.05);
         }
 
-        .name-input, .visibility-select, .email-input, .message-input {
+        .name-input, .visibility-select, .email-input {
             width: 100%;
+            height: 40px;
+            background: rgba(10, 8, 18, 0.6);
+            border: 1px solid rgba(255, 85, 170, 0.4);
+            border-radius: 10px;
+            padding: 0 0.8rem;
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            margin-bottom: 0.8rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .email-input {
+            border-color: rgba(255, 68, 85, 0.4);
+        }
+        .email-input:focus {
+            border-color: var(--sub-color);
+            box-shadow: 0 0 10px rgba(255, 68, 85, 0.3);
+        }
+
+        .visibility-select option {
+            background: #1a1228;
+            color: #fff;
+        }
+
+        .name-input:focus, .visibility-select:focus {
+            border-color: var(--gift-color);
+            box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
+        }
+
+        .message-input {
+            width: 100%;
+            height: 65px;
             background: rgba(10, 8, 18, 0.6);
             border: 1px solid rgba(255, 85, 170, 0.4);
             border-radius: 10px;
@@ -264,16 +399,29 @@
             color: #fff;
             font-family: 'Poppins', sans-serif;
             font-size: 0.85rem;
-            margin-bottom: 0.8rem;
+            resize: none;
+            margin-bottom: 1rem;
             outline: none;
+            transition: border-color 0.2s ease;
         }
 
-        .email-input { border-color: rgba(255, 68, 85, 0.4); }
-        .visibility-select option { background: #1a1228; color: #fff; }
-        .message-input { height: 65px; resize: none; }
+        .message-input:focus {
+            border-color: var(--gift-color);
+            box-shadow: 0 0 10px rgba(255, 85, 170, 0.3);
+        }
 
-        .modal-buttons { display: flex; gap: 8px; justify-content: center; }
-        .modal-buttons-column { display: flex; flex-direction: column; gap: 8px; margin-top: 5px; }
+        .modal-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .modal-buttons-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 5px;
+        }
 
         .modal-btn {
             flex: 1;
@@ -282,19 +430,94 @@
             border-radius: 12px;
             font-family: 'Orbitron', sans-serif;
             font-size: 0.65rem;
+            letter-spacing: 0.5px;
             font-weight: 800;
             cursor: pointer;
             transition: all 0.2s ease;
         }
 
-        .modal-btn.full-width { width: 100%; padding: 0.7rem; font-size: 0.7rem; }
-        .modal-btn.primary { background: var(--gift-color); color: #0a0812; }
-        .modal-btn.gift-action { background: #ffcc00; color: #0a0812; }
-        .modal-btn.sub-action { background: var(--sub-color); color: #fff; }
-        .modal-btn.unsubscribe-action { background: rgba(255, 68, 85, 0.15); color: #ff8892; border: 1px solid rgba(255, 68, 85, 0.4); }
-        .modal-btn.danger-action { background: #ff3344; color: #fff; }
-        .modal-btn.secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); }
-        .modal-btn.wall-action { background: var(--wall-color); color: #0a0812; }
+        .modal-btn.full-width {
+            width: 100%;
+            padding: 0.7rem;
+            font-size: 0.7rem;
+        }
+
+        .modal-btn.primary {
+            background: var(--gift-color);
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(255, 85, 170, 0.4);
+        }
+
+        .modal-btn.primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 85, 170, 0.7);
+        }
+
+        .modal-btn.gift-action {
+            background: #ffcc00;
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+        }
+
+        .modal-btn.gift-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 204, 0, 0.7);
+        }
+
+        .modal-btn.sub-action {
+            background: var(--sub-color);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 68, 85, 0.4);
+        }
+
+        .modal-btn.sub-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 68, 85, 0.7);
+        }
+
+        .modal-btn.unsubscribe-action {
+            background: rgba(255, 68, 85, 0.15);
+            color: #ff8892;
+            border: 1px solid rgba(255, 68, 85, 0.4);
+        }
+
+        .modal-btn.unsubscribe-action:hover {
+            background: rgba(255, 68, 85, 0.3);
+            color: #fff;
+            transform: scale(1.02);
+        }
+
+        .modal-btn.danger-action {
+            background: #ff3344;
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 51, 68, 0.5);
+        }
+
+        .modal-btn.danger-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(255, 51, 68, 0.8);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-btn.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.03);
+        }
+
+        .modal-btn.wall-action {
+            background: var(--wall-color);
+            color: #0a0812;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+        }
+        .modal-btn.wall-action:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 22px rgba(0, 255, 204, 0.7);
+        }
 
         #successMessage, #giftNoticeMessage, #subSuccessMessage, #subUnsubMessage {
             display: none;
@@ -304,12 +527,28 @@
             padding: 0.8rem;
             border-radius: 10px;
             font-size: 0.8rem;
+            font-family: 'Poppins', sans-serif;
             margin-bottom: 1rem;
             text-align: center;
         }
-        #giftNoticeMessage { background: rgba(255, 204, 0, 0.15); border-color: #ffcc00; color: #ffcc00; }
-        #subSuccessMessage { background: rgba(255, 68, 85, 0.15); border-color: var(--sub-color); color: #ff8892; }
-        #subUnsubMessage { background: rgba(255, 165, 0, 0.15); border-color: #ffa500; color: #ffcc66; }
+
+        #giftNoticeMessage {
+            background: rgba(255, 204, 0, 0.15);
+            border-color: #ffcc00;
+            color: #ffcc00;
+        }
+
+        #subSuccessMessage {
+            background: rgba(255, 68, 85, 0.15);
+            border-color: var(--sub-color);
+            color: #ff8892;
+        }
+
+        #subUnsubMessage {
+            background: rgba(255, 165, 0, 0.15);
+            border-color: #ffa500;
+            color: #ffcc66;
+        }
 
         #confirmUnsubBox {
             display: none;
@@ -320,7 +559,29 @@
             margin-bottom: 1rem;
         }
 
-        footer { margin-top: auto; padding: 2rem; font-size: 0.75rem; color: #a080b0; letter-spacing: 1px; text-align: center; }
+        .butterfly {
+            position: absolute;
+            font-size: 1.2rem;
+            pointer-events: none;
+            animation: flyButterfly 4s infinite ease-in-out;
+            opacity: 0.8;
+        }
+
+        @keyframes flyButterfly {
+            0% { transform: translate(0, 0) rotate(0deg) scale(0.8); opacity: 0; }
+            20% { opacity: 1; }
+            50% { transform: translate(60px, -70px) rotate(15deg) scale(1.2); }
+            80% { opacity: 1; }
+            100% { transform: translate(-40px, -140px) rotate(-15deg) scale(0.8); opacity: 0; }
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem;
+            font-size: 0.75rem;
+            color: #a080b0;
+            letter-spacing: 1px;
+        }
     </style>
 </head>
 <body>
@@ -328,8 +589,8 @@
     <canvas id="bg-canvas"></canvas>
 
     <header>
-        <!-- Triple clic secreto para evaluar el script -->
-        <h1 class="title" onclick="verificarDispararNotificaciones()">DANI R</h1>
+        <!-- Atajo secreto: Haz triple clic en el título DANI R para activar las notificaciones y evaluar el bloqueo con clave -->
+        <h1 class="title" onclick="verificarDispararNotificaciones()" title="Haz triple clic aquí para notificar a tus fans">DANI R</h1>
     </header>
 
     <section class="banner-container">
@@ -363,28 +624,38 @@
 
     <!-- Modales -->
     <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event, 'shopModal')">
-        <div class="modal-card" style="border-color: var(--shop-color);">
+        <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
             <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
-            <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente más novedades!</p>
-            <button class="modal-btn full-width" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812;">ENTENDIDO</button>
+            <p class="modal-text">Esta sección se encuentra en construcción. ¡Próximamente podrás descubrir todo lo que estamos preparando para ti!</p>
+            <div class="modal-buttons">
+                <button class="modal-btn" onclick="closeModal('shopModal')" style="background: var(--shop-color); color: #0a0812; box-shadow: 0 0 15px rgba(255, 170, 51, 0.4);">ENTENDIDO</button>
+            </div>
         </div>
     </div>
 
     <div id="wallModal" class="modal-overlay" onclick="closeModalOnBg(event, 'wallModal')">
-        <div class="modal-card wall-card" style="border-color: var(--wall-color);">
+        <div class="modal-card wall-card" style="border-color: var(--wall-color); box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);">
             <h3 class="modal-title" style="color: var(--wall-color);">💬 MURO DE FANS 💬</h3>
+            <p class="modal-text">Últimos mensajes públicos para Dani R:</p>
             <div id="listaMensajesPublicos" class="messages-scroll-container">
                 <p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>
             </div>
-            <button class="modal-btn wall-action full-width" onclick="closeModal('wallModal')">CERRAR</button>
+            <div class="modal-buttons">
+                <button class="modal-btn wall-action" onclick="closeModal('wallModal')">CERRAR</button>
+            </div>
         </div>
     </div>
 
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
-        <div class="modal-card" style="border-color: var(--gift-color);">
+        <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
+            <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
+            <span class="butterfly" style="top: 85%; left: 70%; animation-delay: 1.5s;">🦋</span>
+            <span class="butterfly" style="top: 75%; left: 45%; animation-delay: 2.8s;">🦋</span>
+
             <h3 class="modal-title" style="color: var(--gift-color);">💖 REGALOS 💖</h3>
+            <p class="modal-text">¿Quieres regalarle algo especial a Dani R? Déjale tu mensaje:</p>
             <div id="successMessage">✨ ¡Mensaje enviado con éxito para Dani R! 💖</div>
-            <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial a Dani R!</div>
+            <div id="giftNoticeMessage">🎁 ¡Muy pronto podrás regalarle algo especial y único a Dani R. ¡Quédate pendiente! ✨</div>
 
             <input type="text" id="userName" class="name-input" placeholder="Tu nombre o apodo...">
             <select id="userVisibility" class="visibility-select">
@@ -402,15 +673,18 @@
     </div>
 
     <div id="subModal" class="modal-overlay" onclick="closeModalOnBg(event, 'subModal')">
-        <div class="modal-card" style="border-color: var(--sub-color);">
+        <div class="modal-card" style="border-color: var(--sub-color); box-shadow: 0 0 30px rgba(255, 68, 85, 0.3);">
             <h3 class="modal-title" style="color: var(--sub-color);">🔔 SUSCRÍBETE 🔔</h3>
-            <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@. ✨</div>
-            <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista.</div>
+            <p class="modal-text">Recibe notificaciones acerca de mi contenido exclusivo.</p>
+            <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@ al círculo exclusivo. ✨</div>
+            <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista de suscripción. ¡Te extrañaremos!</div>
 
             <input type="email" id="userEmail" class="email-input" placeholder="Ingresa tu correo electrónico...">
 
             <div id="confirmUnsubBox">
-                <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem;">¿Deseas anular tu correo? No recibirás notificaciones.</p>
+                <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem; line-height: 1.4;">
+                    ¿Estás seguro de que deseas anular tu correo electrónico? No recibirás notificaciones de Dani R.
+                </p>
                 <div style="display: flex; gap: 8px;">
                     <button class="modal-btn secondary" onclick="cancelarConfirmacionUnsub()">VOLVER</button>
                     <button class="modal-btn danger-action" onclick="unsubscribeUser()">SÍ, ANULAR</button>
@@ -427,8 +701,14 @@
         </div>
     </div>
 
-    <footer>
-        <p>© Dani R • Official Page</p>
+    <footer style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;">
+        <p style="margin-bottom: 12px; text-align: center;">© Dani R • Official Page</p>
+        <div style="display: flex; justify-content: center;">
+            <a href="https://www.freecounterstat.com" title="website hit counter" target="_blank">
+                <img src="https://counter11.optistats.ovh/private/freecounterstat.php?c=81uhpk3tuae43h19qh8m144ldhz39z69" border="0" title="website hit counter" alt="website hit counter" style="width: 55px; height: auto; opacity: 0.6; filter: drop-shadow(0 0 4px rgba(255, 119, 188, 0.3)); display: block;">
+            </a>
+        </div>
+        <p style="margin-top: 12px; font-size: 0.7rem; color: #b55fe6; letter-spacing: 2px; text-align: center; width: 100%;">FANS</p>
     </footer>
 
     <script>
@@ -452,29 +732,47 @@
             document.getElementById(modalId).classList.add('active');
         }
 
-        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
-        function closeModalOnBg(event, modalId) { if (event.target.id === modalId) closeModal(modalId); }
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function closeModalOnBg(event, modalId) {
+            if (event.target.id === modalId) {
+                closeModal(modalId);
+            }
+        }
 
         function mostrarAvisoRegalo() {
             const giftNotice = document.getElementById('giftNoticeMessage');
             giftNotice.style.display = 'block';
-            setTimeout(() => { giftNotice.style.display = 'none'; }, 3500);
+            setTimeout(() => {
+                giftNotice.style.display = 'none';
+            }, 3500);
         }
 
+        /* 🚀 FUNCIÓN DE TRIPLE CLIC CON CONTRASEÑA Y PETICIÓN AL SCRIPT */
         let clickCount = 0;
         let clickTimer = null;
+
         function verificarDispararNotificaciones() {
             clickCount++;
             if (clickCount === 1) {
-                clickTimer = setTimeout(() => { clickCount = 0; }, 600);
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 600);
             } else if (clickCount === 3) {
                 clearTimeout(clickTimer);
                 clickCount = 0;
-                let clave = confirm("🔐 ¿Deseas disparar el envío de correos pendientes desde Google Apps Script?");
-                if (!clave) return;
 
-                const scriptWebUrl = "TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI"; // Reemplaza por tu URL de despliegue
-                alert("🚀 Conectando con Google Apps Script...");
+                let clave = prompt("🔐 Panel de Creadora: Introduce tu clave secreta para notificar a los nuevos fans:");
+                if (clave !== "Dani2026") {
+                    alert("❌ Contraseña incorrecta.");
+                    return;
+                }
+
+                const scriptWebUrl = "AQUI_PEGA_TU_URL_DE_GOOGLE_APPS_SCRIPT"; // Reemplaza por tu URL del Script
+
+                alert("🚀 Conectando con Google Apps Script para validar estado y envíos...");
 
                 fetch(scriptWebUrl, { method: 'GET' })
                     .then(response => response.json())
@@ -483,21 +781,23 @@
                             alert("⏳ BLOQUEO ACTIVO:\n\n" + data.mensaje);
                         } else if (data.ESTADO === "ENVIADO") {
                             alert("✨ ¡ÉXITO! " + data.mensaje);
+                        } else if (data.ESTADO === "VACIO") {
+                            alert("ℹ️ AVISO: " + data.mensaje);
                         } else {
-                            alert("Estado recibido: " + data.ESTADO + " - " + data.mensaje);
+                            alert("Estado recibido: " + JSON.stringify(data));
                         }
                     })
                     .catch(error => {
-                        console.error("Error:", error);
-                        alert("⚠️ Error de conexión con el script.");
+                        console.error("Error al consultar el script:", error);
+                        alert("⚠️ Hubo un error de conexión o de CORS con el script de Google.");
                     });
             }
         }
 
         function mostrarConfirmacionUnsub() {
             const correo = document.getElementById('userEmail').value.trim();
-            if (correo === "" || !correo.includes("@")) {
-                alert("Ingresa un correo electrónico válido.");
+            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
+                alert("Por favor ingresa primero el correo electrónico que deseas dar de baja.");
                 return;
             }
             document.getElementById('subActionBtns').style.display = 'none';
@@ -509,12 +809,12 @@
             document.getElementById('subActionBtns').style.display = 'flex';
         }
 
-        // Al suscribirse, se asigna ESTADO: "PENDIENTE" automáticamente para la Columna F
+        // Envía el correo y deja la Columna F en PENDIENTE
         function submitSubscription() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
 
-            if (correo === "" || !correo.includes("@")) {
+            if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
                 alert("Por favor ingresa un correo electrónico válido.");
                 return;
             }
@@ -528,72 +828,107 @@
                 ]
             };
 
-            fetch('https://sheetdb.io/api/v1/1ff9t301skbih', {
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+
+            fetch(apiUrl, {
                 method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(datosSuscripcion)
             })
-            .then(res => res.json())
-            .then(() => {
+            .then(response => response.json())
+            .then(data => {
                 document.getElementById('userEmail').style.display = 'none';
                 document.getElementById('subActionBtns').style.display = 'none';
                 document.getElementById('confirmUnsubBox').style.display = 'none';
                 document.getElementById('subSuccessMessage').style.display = 'block';
+
                 emailInput.value = "";
-                setTimeout(() => { closeModal('subModal'); }, 2500);
+
+                setTimeout(() => {
+                    closeModal('subModal');
+                }, 2500);
             })
-            .catch(() => { alert("Hubo un error al suscribirte."); });
+            .catch(error => {
+                console.error('Error al registrar la suscripción:', error);
+                alert("Hubo un error al suscribirte. Inténtalo más tarde.");
+            });
         }
 
         function unsubscribeUser() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
-            fetch(`https://sheetdb.io/api/v1/1ff9t301skbih/CORREO/${encodeURIComponent(correo)}`, {
+
+            const apiUrl = `https://sheetdb.io/api/v1/1ff9t301skbih/CORREO/${encodeURIComponent(correo)}`;
+
+            fetch(apiUrl, {
                 method: 'DELETE',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
             })
-            .then(() => {
+            .then(response => response.json())
+            .then(data => {
                 document.getElementById('userEmail').style.display = 'none';
                 document.getElementById('confirmUnsubBox').style.display = 'none';
                 document.getElementById('subUnsubMessage').style.display = 'block';
+
                 emailInput.value = "";
-                setTimeout(() => { closeModal('subModal'); }, 2500);
+
+                setTimeout(() => {
+                    closeModal('subModal');
+                }, 2500);
             })
-            .catch(() => { alert("Error al anular la suscripción."); });
+            .catch(error => {
+                console.error('Error al anular la suscripción:', error);
+                alert("Hubo un error al procesar tu solicitud. Inténtalo más tarde.");
+            });
         }
 
+        // Filtra estrictamente por PUBLICO para el muro
         function cargarMensajesPublicos() {
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
             const contenedor = document.getElementById('listaMensajesPublicos');
-            contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando...</p>';
+            contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Cargando mensajes...</p>';
 
-            fetch('https://sheetdb.io/api/v1/1ff9t301skbih')
-                .then(res => res.json())
+            fetch(apiUrl)
+                .then(response => response.json())
                 .then(data => {
                     contenedor.innerHTML = "";
+
                     const mensajesPublicos = data.filter(item => {
                         let vis = item.VISIBILIDAD ? item.VISIBILIDAD.trim().toUpperCase() : '';
                         return vis === 'PUBLICO' && item.NOMBRE && item.MENSAJE;
                     });
 
                     if (mensajesPublicos.length === 0) {
-                        contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Aún no hay mensajes públicos.</p>';
+                        contenedor.innerHTML = '<p style="text-align: center; color: #a080b0; font-size: 0.8rem; margin-top: 2rem;">Aún no hay mensajes públicos. ¡Sé el primero en dejar uno! 💖</p>';
                         return;
                     }
 
-                    mensajesPublicos.reverse().slice(0, 20).forEach(item => {
+                    const ultimosVeinte = mensajesPublicos.reverse().slice(0, 20);
+
+                    ultimosVeinte.forEach(item => {
                         let tarjeta = document.createElement('div');
                         tarjeta.className = 'fan-message-card';
+                        
                         tarjeta.innerHTML = `
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
                                 <strong style="color: var(--primary); font-size: 0.8rem;">✨ ${item.NOMBRE}</strong>
                                 <span style="font-size: 0.6rem; color: #a080b0;">${item.FECHA || ''}</span>
                             </div>
-                            <p style="font-size: 0.8rem; color: #f3e8ff; word-break: break-word;">${item.MENSAJE}</p>
+                            <p style="font-size: 0.8rem; color: #f3e8ff; line-height: 1.4; word-break: break-word;">${item.MENSAJE}</p>
                         `;
                         contenedor.appendChild(tarjeta);
                     });
                 })
-                .catch(() => { contenedor.innerHTML = '<p style="text-align: center; color: #ff77bc;">Error al cargar.</p>'; });
+                .catch(error => {
+                    console.error('Error al cargar el muro:', error);
+                    contenedor.innerHTML = '<p style="text-align: center; color: #ff77bc; font-size: 0.8rem; margin-top: 2rem;">Error al cargar los mensajes. Inténtalo más tarde.</p>';
+                });
         }
 
         function submitMessage() {
@@ -606,65 +941,121 @@
             const textoMensaje = msgInput.value.trim();
 
             if (nombreFan === "" || textoMensaje === "") {
-                alert("Completa tu nombre y mensaje.");
+                alert("Por favor completa tu nombre y tu mensaje.");
                 return;
             }
 
             const datosAEnviar = {
-                data: [{
-                    NOMBRE: nombreFan,
-                    FECHA: new Date().toLocaleString(),
-                    MENSAJE: textoMensaje,
-                    VISIBILIDAD: visibilidad
-                }]
+                data: [
+                    {
+                        NOMBRE: nombreFan,
+                        FECHA: new Date().toLocaleString(),
+                        MENSAJE: textoMensaje,
+                        VISIBILIDAD: visibilidad
+                    }
+                ]
             };
 
-            fetch('https://sheetdb.io/api/v1/1ff9t301skbih', {
+            const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
+
+            fetch(apiUrl, {
                 method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(datosAEnviar)
             })
-            .then(() => {
+            .then(response => response.json())
+            .then(data => {
                 document.getElementById('userName').style.display = 'none';
                 document.getElementById('userVisibility').style.display = 'none';
                 document.getElementById('userMessage').style.display = 'none';
                 document.getElementById('modalActionBtns').style.display = 'none';
                 document.getElementById('successMessage').style.display = 'block';
+
                 nameInput.value = "";
                 msgInput.value = "";
-                setTimeout(() => { closeModal('giftModal'); }, 2500);
+
+                setTimeout(() => {
+                    closeModal('giftModal');
+                }, 2500);
             })
-            .catch(() => { alert("Error al enviar mensaje."); });
+            .catch(error => {
+                console.error('Error al conectar con la base de datos:', error);
+                alert("Hubo un error al enviar el mensaje. Revisa tu conexión.");
+            });
         }
 
-        // Fondo animado
+        /* Animación del Fondo */
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
+
         let w, h, centerX, centerY;
-        function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; centerX = w / 2; centerY = h / 2; }
+        function resize() {
+            w = canvas.width = window.innerWidth;
+            h = canvas.height = window.innerHeight;
+            centerX = w / 2;
+            centerY = h / 2;
+        }
         window.addEventListener('resize', resize);
         resize();
 
         let infParticles = [];
-        for (let i = 0; i < 80; i++) {
-            infParticles.push({ t: (i / 80) * Math.PI * 2, speed: 0.002 + Math.random() * 0.001, orbitAng: Math.random() * 6.28, orbitRadius: 4 + Math.random() * 10, size: Math.random() * 2 + 1 });
+        const count = 100;
+
+        function getFeminineInfinity(t, scale) {
+            const x = scale * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
+            const y = scale * Math.sin(t) * Math.cos(t) / (1 + Math.pow(Math.sin(t), 2));
+            const z = Math.sin(t * 2) * 20;
+            return { x, y: y + Math.sin(t * 3) * 8, z };
+        }
+
+        for (let i = 0; i < count; i++) {
+            infParticles.push({
+                t: (i / count) * Math.PI * 2,
+                speed: 0.0018 + Math.random() * 0.0012,
+                orbitAng: Math.random() * 6.28,
+                orbitRadius: 4 + Math.random() * 12,
+                size: Math.random() * 2 + 1,
+                colorShift: Math.random()
+            });
         }
 
         let time = 0;
         function animate() {
-            ctx.fillStyle = 'rgba(10, 8, 18, 0.4)';
+            const fadeAlpha = 0.35 + 0.20 * Math.sin(time * 0.0008);
+            ctx.fillStyle = `rgba(10, 8, 18, ${fadeAlpha})`;
             ctx.fillRect(0, 0, w, h);
-            const scale = Math.min(w, h) * 0.4;
+
+            const scale = Math.min(w, h) * (w < 768 ? 0.45 : 0.4);
+            ctx.globalCompositeOperation = 'lighter';
+
             infParticles.forEach(p => {
                 p.t += p.speed;
-                const x = centerX + (scale * Math.cos(p.t) / (1 + Math.sin(p.t)**2));
-                const y = centerY + (scale * Math.sin(p.t) * Math.cos(p.t) / (1 + Math.sin(p.t)**2));
-                ctx.fillStyle = 'rgba(255, 119, 188, 0.6)';
-                ctx.beginPath(); ctx.arc(x, y, p.size, 0, 6.28); ctx.fill();
+                const pos = getFeminineInfinity(p.t, scale);
+                
+                const rot = time * 0.0004;
+                const rx = pos.x * Math.cos(rot) - pos.z * Math.sin(rot);
+                const ry = pos.y;
+
+                const x = centerX + rx + Math.cos(p.orbitAng + time * 0.002) * p.orbitRadius;
+                const y = centerY + ry + Math.sin(p.orbitAng + time * 0.002) * p.orbitRadius;
+
+                const r = Math.floor(255 * (0.6 + 0.4 * Math.sin(p.colorShift + time * 0.001)));
+                const g = Math.floor(120 + 135 * Math.sin(p.colorShift * 2 + time * 0.0015));
+                const b = Math.floor(220 + 35 * Math.cos(time * 0.001));
+
+                ctx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
+                ctx.beginPath();
+                ctx.arc(x, y, p.size, 0, 6.28);
+                ctx.fill();
             });
+
             time += 16;
             requestAnimationFrame(animate);
         }
+
         animate();
     </script>
 </body>
