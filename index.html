@@ -821,7 +821,7 @@
             }, 3500);
         }
 
-        /* 🚀 FUNCIÓN SECRETA PARA DISPARAR EL SCRIPT DE CORREOS DESDE LA WEB SIN BLOQUEO CORS */
+        /* 🚀 FUNCIÓN SECRETA ACTUALIZADA PARA LEER EL ESTADO Y BLOQUEO DEL SCRIPT */
         let clickCount = 0;
         let clickTimer = null;
 
@@ -843,16 +843,26 @@
 
                 const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
 
-                alert("🚀 Procesando envíos... Los correos se están enviando a los nuevos suscriptores en segundo plano.");
+                alert("⏳ Verificando escudo anti-spam y procesando envíos...");
 
-                // Usamos modo 'no-cors' para evitar que el navegador bloquee la respuesta de Google
-                fetch(scriptWebUrl, { method: 'GET', mode: 'no-cors' })
-                    .then(() => {
-                        alert("✨ ¡Orden enviada con éxito! Revisa tu Google Sheets en unos segundos para ver cómo se van marcando como 'Enviado'. 💖");
+                // Hacemos fetch normal (sin no-cors) para poder leer la respuesta JSON del Apps Script
+                fetch(scriptWebUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Leemos tanto ESTADO (en mayúscula) como status (en minúscula) por compatibilidad
+                        const estadoActual = data.ESTADO || data.status;
+
+                        if (estadoActual === "bloqueado") {
+                            alert("⚠️ " + (data.mensaje || "Espera de seguridad activa. Intenta más tarde."));
+                        } else if (estadoActual === "success") {
+                            alert("✅ ¡Correos enviados con éxito! Total de correos nuevos: " + (data.enviados || 0));
+                        } else {
+                            alert("✨ ¡Orden procesada con éxito por el servidor!");
+                        }
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        alert("Hubo un error de conexión al disparar el script.");
+                        alert("Hubo un error de conexión al conectar con el servidor de correos.");
                     });
             }
         }
