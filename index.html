@@ -821,7 +821,7 @@
             }, 3500);
         }
 
-        /* 🚀 FUNCIÓN SECRETA PARA DISPARAR EL SCRIPT DE CORREOS DESDE LA WEB */
+        /* 🚀 FUNCIÓN SECRETA PARA DISPARAR EL SCRIPT DE CORREOS DESDE LA WEB SIN BLOQUEO CORS */
         let clickCount = 0;
         let clickTimer = null;
 
@@ -830,7 +830,7 @@
             if (clickCount === 1) {
                 clickTimer = setTimeout(() => {
                     clickCount = 0;
-                }, 600); // Ventana de tiempo para los clics
+                }, 600);
             } else if (clickCount === 3) {
                 clearTimeout(clickTimer);
                 clickCount = 0;
@@ -843,20 +843,16 @@
 
                 const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
 
-                alert("🚀 Procesando envíos... El sistema está enviando los correos a los nuevos suscriptores y actualizando la hoja.");
+                alert("🚀 Procesando envíos... Los correos se están enviando a los nuevos suscriptores en segundo plano.");
 
-                fetch(scriptWebUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === "success") {
-                            alert(`✨ ¡Proceso completado con éxito! Se enviaron notificaciones a ${data.enviados} nuevos suscriptores.`);
-                        } else {
-                            alert("Hubo un error al procesar las notificaciones.");
-                        }
+                // Usamos modo 'no-cors' para evitar que el navegador bloquee la respuesta de Google
+                fetch(scriptWebUrl, { method: 'GET', mode: 'no-cors' })
+                    .then(() => {
+                        alert("✨ ¡Orden enviada con éxito! Revisa tu Google Sheets en unos segundos para ver cómo se van marcando como 'Enviado'. 💖");
                     })
                     .catch(error => {
                         console.error("Error:", error);
-                        alert("No se pudo conectar con el servidor de Apps Script. Revisa tu conexión.");
+                        alert("Hubo un error de conexión al disparar el script.");
                     });
             }
         }
@@ -1073,7 +1069,7 @@
         }
 
         /* Animación del Fondo de Partículas Cíclico */
-        const canvas = destinationId = document.getElementById('bg-canvas');
+        const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
 
         let w, h, centerX, centerY;
