@@ -821,7 +821,7 @@
             }, 3500);
         }
 
-        /* 🚀 FUNCIÓN SECRETA ACTUALIZADA CON GESTIÓN COMPLETA DE ESTADOS (pendiente, bloqueado, enviado, vacío) */
+        /* 🚀 FUNCIÓN ACTUALIZADA CON LA URL CORRECTA DEL SCRIPT DE GOOGLE Y LECTURA DE CONTADOR */
         let clickCount = 0;
         let clickTimer = null;
 
@@ -841,7 +841,8 @@
                     return;
                 }
 
-                const scriptWebUrl = "https://script.google.com/macros/s/AKfycbxc2MSyKH3TYhHdlE_F7w3ppo4Uxabv0HHDNC1LhGT7S4ESsgFnTUGBCPqd-8mI8fwS/exec";
+                // URL CORRECTA PROPORCIONADA
+                const scriptWebUrl = "https://script.google.com/macros/s/AKfycbygmLhxmji6PUU-Zhvy00SMpoZhoN4d7U2CB0wQy7SXdLk3xt64wRGC7JA1mbFIgEpN/exec";
 
                 alert("⏳ [Estado: PENDIENTE] Verificando escudo anti-spam y procesando envíos...");
 
@@ -862,7 +863,6 @@
                         } else if (estadoActual === "vacio") {
                             alert("📭 [Estado: VACÍO] La lista de correos pendientes está vacía.");
                         } else {
-                            // Respuesta genérica por compatibilidad
                             alert("✨ ¡Orden procesada con éxito por el servidor!");
                         }
                     })
