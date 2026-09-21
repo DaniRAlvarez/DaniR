@@ -552,7 +552,6 @@
             color: #ffcc66;
         }
 
-        /* Contenedor de la Advertencia de Anulación (Inicialmente oculto) */
         #confirmUnsubBox {
             display: none;
             background: rgba(255, 68, 85, 0.1);
@@ -568,7 +567,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Mariposas flotantes animadas */
         .butterfly {
             position: absolute;
             font-size: 1.2rem;
@@ -611,16 +609,13 @@
     <canvas id="bg-canvas"></canvas>
 
     <header>
-        <!-- Atajo secreto: Haz triple clic en el título DANI R para activar las notificaciones -->
         <h1 class="title" onclick="verificarDispararNotificaciones()" title="Haz triple clic aquí para notificar a tus fans">DANI R</h1>
     </header>
 
-    <!-- Banner Principal -->
     <section class="banner-container">
         <img src="FotosWeb/banner.png" alt="Dani R Banner Principal" class="main-banner">
     </section>
 
-    <!-- Contenido del Perfil -->
     <main class="profile-card">
         <div class="profile-img-container">
             <img src="FotosWeb/perfil.jpg" alt="Dani R" class="profile-img">
@@ -629,56 +624,24 @@
         <h2 class="profile-name">Dani R</h2>
         <p class="profile-bio">Digital Creator ✨ • Cozy & Aesthetic Vibes 🌙</p>
 
-        <!-- Bloque de Presentación -->
         <blockquote class="intro-quote">
             "Hola, Yo soy Dani R. Belleza, estilo y una mirada que dice más que mil palabras. ¿Te quedas a descubrir el resto? Te va a encantar."
         </blockquote>
 
         <div class="links-container">
-            <!-- Enlace a la Galería Multimedia -->
-            <a href="index1.html" class="link-btn gallery-btn">
-                🖼️ VER GALERÍA MULTIMEDIA
-            </a>
-
-            <!-- Enlace a Minijuegos -->
-            <a href="bunny.html" class="link-btn game-btn">
-                🎮 MINIJUEGOS: BUNNY
-            </a>
-
-            <!-- Redes Sociales Oficiales -->
-            <a href="https://www.tiktok.com/@dani_r_alvarez" target="_blank" rel="noopener noreferrer" class="link-btn">
-                TIKTOK
-            </a>
-            <a href="https://www.instagram.com/dani.r.alvarez/" target="_blank" rel="noopener noreferrer" class="link-btn">
-                INSTAGRAM
-            </a>
-            <a href="https://www.facebook.com/DaniRAlvarez22" target="_blank" rel="noopener noreferrer" class="link-btn">
-                FACEBOOK
-            </a>
-
-            <!-- Botón Tienda -->
-            <a onclick="openModal('shopModal')" class="link-btn shop-btn">
-                🛍️ TIENDA
-            </a>
-
-            <!-- Botón Muro de Fans -->
-            <a onclick="openModal('wallModal')" class="link-btn wall-btn">
-                💬 MURO DE FANS
-            </a>
-
-            <!-- Botón Regalos -->
-            <a onclick="openModal('giftModal')" class="link-btn gift-btn">
-                🎁 REGALOS
-            </a>
-
-            <!-- Botón Suscripción al puro final -->
-            <a onclick="openModal('subModal')" class="link-btn sub-btn">
-                🔔 SUSCRÍBETE
-            </a>
+            <a href="index1.html" class="link-btn gallery-btn">🖼️ VER GALERÍA MULTIMEDIA</a>
+            <a href="bunny.html" class="link-btn game-btn">🎮 MINIJUEGOS: BUNNY</a>
+            <a href="https://www.tiktok.com/@dani_r_alvarez" target="_blank" rel="noopener noreferrer" class="link-btn">TIKTOK</a>
+            <a href="https://www.instagram.com/dani.r.alvarez/" target="_blank" rel="noopener noreferrer" class="link-btn">INSTAGRAM</a>
+            <a href="https://www.facebook.com/DaniRAlvarez22" target="_blank" rel="noopener noreferrer" class="link-btn">FACEBOOK</a>
+            <a onclick="openModal('shopModal')" class="link-btn shop-btn">🛍️ TIENDA</a>
+            <a onclick="openModal('wallModal')" class="link-btn wall-btn">💬 MURO DE FANS</a>
+            <a onclick="openModal('giftModal')" class="link-btn gift-btn">🎁 REGALOS</a>
+            <a onclick="openModal('subModal')" class="link-btn sub-btn">🔔 SUSCRÍBETE</a>
         </div>
     </main>
 
-    <!-- Panel Flotante / Modal de Tienda -->
+    <!-- Modal Tienda -->
     <div id="shopModal" class="modal-overlay" onclick="closeModalOnBg(event, 'shopModal')">
         <div class="modal-card" style="border-color: var(--shop-color); box-shadow: 0 0 30px rgba(255, 170, 51, 0.3);">
             <h3 class="modal-title" style="color: var(--shop-color);">✨ TIENDA OFICIAL ✨</h3>
@@ -689,7 +652,7 @@
         </div>
     </div>
 
-    <!-- Panel Flotante / Modal del Muro de Mensajes Públicos -->
+    <!-- Modal Muro de Fans -->
     <div id="wallModal" class="modal-overlay" onclick="closeModalOnBg(event, 'wallModal')">
         <div class="modal-card wall-card" style="border-color: var(--wall-color); box-shadow: 0 0 30px rgba(0, 255, 204, 0.3);">
             <h3 class="modal-title" style="color: var(--wall-color);">💬 MURO DE FANS 💬</h3>
@@ -705,7 +668,7 @@
         </div>
     </div>
 
-    <!-- Panel Flotante / Modal de Regalos -->
+    <!-- Modal Regalos -->
     <div id="giftModal" class="modal-overlay" onclick="closeModalOnBg(event, 'giftModal')">
         <div class="modal-card" style="border-color: var(--gift-color); box-shadow: 0 0 30px rgba(255, 85, 170, 0.3);">
             <span class="butterfly" style="top: 80%; left: 15%; animation-delay: 0s;">🦋</span>
@@ -735,7 +698,7 @@
         </div>
     </div>
 
-    <!-- Panel Flotante / Modal de Suscripción -->
+    <!-- Modal Suscripción -->
     <div id="subModal" class="modal-overlay" onclick="closeModalOnBg(event, 'subModal')">
         <div class="modal-card" style="border-color: var(--sub-color); box-shadow: 0 0 30px rgba(255, 68, 85, 0.3);">
             <h3 class="modal-title" style="color: var(--sub-color);">🔔 SUSCRÍBETE 🔔</h3>
@@ -744,10 +707,8 @@
             <div id="subSuccessMessage">💖 ¡Te has suscripto con éxito! Bienvenid@ al círculo exclusivo. ✨</div>
             <div id="subUnsubMessage">⚠️ Tu correo ha sido eliminado de la lista de suscripción. ¡Te extrañaremos!</div>
 
-            <!-- Campo de correo normal -->
             <input type="email" id="userEmail" class="email-input" placeholder="Ingresa tu correo electrónico...">
 
-            <!-- Caja de Advertencia y Confirmación para Anular Suscripción -->
             <div id="confirmUnsubBox">
                 <p style="font-size: 0.8rem; color: #ffb3b9; margin-bottom: 0.8rem; line-height: 1.4;">
                     ¿Estás seguro de que deseas anular tu correo electrónico? No recibirás notificaciones de Dani R.
@@ -758,7 +719,6 @@
                 </div>
             </div>
 
-            <!-- Botones principales del modal -->
             <div class="modal-buttons-column" id="subActionBtns">
                 <div style="display: flex; gap: 8px; width: 100%;">
                     <button class="modal-btn secondary" onclick="closeModal('subModal')">CANCELAR</button>
@@ -771,18 +731,15 @@
 
     <footer style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; width: 100%;">
         <p style="margin-bottom: 12px; text-align: center;">© Dani R • Official Page</p>
-        
         <div style="display: flex; justify-content: center;">
             <a href="https://www.freecounterstat.com" title="website hit counter" target="_blank">
                 <img src="https://counter11.optistats.ovh/private/freecounterstat.php?c=81uhpk3tuae43h19qh8m144ldhz39z69" border="0" title="website hit counter" alt="website hit counter" style="width: 55px; height: auto; opacity: 0.6; filter: drop-shadow(0 0 4px rgba(255, 119, 188, 0.3)); display: block;">
             </a>
         </div>
-
         <p style="margin-top: 12px; font-size: 0.7rem; color: #b55fe6; letter-spacing: 2px; text-align: center; width: 100%;">FANS</p>
     </footer>
 
     <script>
-        /* Funciones para controlar los paneles flotantes */
         function openModal(modalId) {
             if (modalId === 'giftModal') {
                 document.getElementById('successMessage').style.display = 'none';
@@ -821,7 +778,6 @@
             }, 3500);
         }
 
-        /* 🚀 FUNCIÓN ACTUALIZADA CON LA URL CORRECTA DEL SCRIPT DE GOOGLE Y LECTURA DE CONTADOR */
         let clickCount = 0;
         let clickTimer = null;
 
@@ -841,7 +797,6 @@
                     return;
                 }
 
-                // URL CORRECTA PROPORCIONADA
                 const scriptWebUrl = "https://script.google.com/macros/s/AKfycbygmLhxmji6PUU-Zhvy00SMpoZhoN4d7U2CB0wQy7SXdLk3xt64wRGC7JA1mbFIgEpN/exec";
 
                 alert("⏳ [Estado: PENDIENTE] Verificando escudo anti-spam y procesando envíos...");
@@ -873,7 +828,6 @@
             }
         }
 
-        /* Mostrar la advertencia de anulación */
         function mostrarConfirmacionUnsub() {
             const correo = document.getElementById('userEmail').value.trim();
             if (correo === "" || !correo.includes("@") || !correo.includes(".")) {
@@ -884,13 +838,12 @@
             document.getElementById('confirmUnsubBox').style.display = 'block';
         }
 
-        /* Volver atrás desde la advertencia */
         function cancelarConfirmacionUnsub() {
             document.getElementById('confirmUnsubBox').style.display = 'none';
             document.getElementById('subActionBtns').style.display = 'flex';
         }
 
-        /* Función para enviar el correo y guardarlo en la columna E (CORREO) de SheetDB */
+        /* SUSCRIPCIÓN ADAPTADA A LAS 6 COLUMNAS DE TU SHEET */
         function submitSubscription() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
@@ -903,7 +856,12 @@
             const datosSuscripcion = {
                 data: [
                     {
-                        CORREO: correo
+                        FECHA: new Date().toLocaleString(),
+                        NOMBRE: "Suscriptor Web",
+                        MENSAJE: "Suscripción a notificaciones",
+                        VISIBILIDAD: "PRIVADO",
+                        CORREO: correo,
+                        ESTADO: "PENDIENTE"
                     }
                 ]
             };
@@ -937,7 +895,6 @@
             });
         }
 
-        /* Función para anular la suscripción borrando el correo de SheetDB tras confirmar */
         function unsubscribeUser() {
             const emailInput = document.getElementById('userEmail');
             const correo = emailInput.value.trim();
@@ -969,7 +926,6 @@
             });
         }
 
-        /* Función para descargar, filtrar estrictamente por PUBLICO y mostrar los últimos 20 */
         function cargarMensajesPublicos() {
             const apiUrl = 'https://sheetdb.io/api/v1/1ff9t301skbih';
             const contenedor = document.getElementById('listaMensajesPublicos');
@@ -1012,7 +968,7 @@
                 });
         }
 
-        /* Función para enviar datos a SheetDB incluyendo la visibilidad */
+        /* ENVÍO DE MENSAJES ADAPTADO A LAS 6 COLUMNAS */
         function submitMessage() {
             const nameInput = document.getElementById('userName');
             const visibilitySelect = document.getElementById('userVisibility');
@@ -1042,10 +998,12 @@
             const datosAEnviar = {
                 data: [
                     {
-                        NOMBRE: nombreFan,
                         FECHA: new Date().toLocaleString(),
+                        NOMBRE: nombreFan,
                         MENSAJE: textoMensaje,
-                        VISIBILIDAD: visibilidad
+                        VISIBILIDAD: visibilidad,
+                        CORREO: "",
+                        ESTADO: "PENDIENTE"
                     }
                 ]
             };
@@ -1084,7 +1042,7 @@
             });
         }
 
-        /* Animación del Fondo de Partículas Cíclico */
+        /* Fondo Animado */
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
 
